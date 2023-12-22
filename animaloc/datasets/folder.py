@@ -137,6 +137,7 @@ class BalancedFolderDataset(Dataset):
         root_dir: str, 
         gt_file: str,
         num_non_empty_samples: int,
+        num_empty_samples: int,
         transform: Optional[callable] = None
     ) -> None:
         self.data = pd.read_csv(csv_file)
