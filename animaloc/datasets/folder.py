@@ -130,20 +130,24 @@ class FolderDataset(CSVDataset):
         
         return target
 ###################################################################################
-class BalancedFolderDataset(Dataset):
+@DATASETS.register()
+class BalancedFolderDataset(CSVDataset):
     def __init__(
         self, 
         csv_file: str, 
         root_dir: str, 
         gt_file: str,
         num_non_empty_samples: int,
-        transform: Optional[callable] = None
+        num_empty_samples: int,
+        albu_transforms: Optional[list] = None,
+        end_transforms: Optional[list] = None
     ) -> None:
-        self.data = pd.read_csv(csv_file)
-        self.root_dir = root_dir
-        self.gt_data = pd.read_csv(gt_file)
+        super(BalancedFolderDataset, self).__init__(csv_file, root_dir, albu_transforms, end_transforms)
+
+        self.gt_file = gt_file
         self.num_non_empty_samples = num_non_empty_samples
-        self.transform = transform
+        self.num_empty_samples = num_empty_samples
+        
 
         # Separate empty and non-empty patches
         self.empty_patches = self.data[self.data['label'] == 0]
