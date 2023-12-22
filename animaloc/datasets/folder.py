@@ -20,7 +20,7 @@ import PIL
 import pandas
 import numpy
 
-from typing import Optional, List, Any, Dict
+from typing import Optional, List, Any, Dict, Tuple, Union
 
 from ..data.types import BoundingBox
 from ..data.utils import group_by_image
@@ -129,3 +129,69 @@ class FolderDataset(CSVDataset):
                     target.update({key: []})
         
         return target
+###################################################################################
+class BalancedFolderDataset(Dataset):
+    def __init__(
+        self, 
+        csv_file: str, 
+        root_dir: str, 
+        gt_file: str,
+        num_non_empty_samples: int,
+        transform: Optional[callable] = None
+    ) -> None:
+        self.data = pd.read_csv(csv_file)
+        self.root_dir = root_dir
+        self.gt_data = pd.read_csv(gt_file)
+        self.num_non_empty_samples = num_non_empty_samples
+        self.transform = transform
+
+        # Separate empty and non-empty patches
+        self.empty_patches = self.data[self.data['label'] == 0]
+        self.non_empty_patches = self.data[self.data['label'] == 1]
+
+        # Assuming equal number of empty and non-empty patches
+        self.num_samples = min(len(self.empty_patches), len(self.non_empty_patches))
+
+    def __len__(self) -> int:
+        return self.num_samples
+
+    def __getitem__(self, idx: int) -> Dict[str, Any]:
+        # Randomly sample one empty and num_non_empty_samples non-empty patches in each iteration
+        empty_patch = self.empty_patches.sample(1)
+        non_empty_patches = self.non_empty_patches.sample(self.num_non_empty_samples)
+
+        # Extract patch IDs
+        empty_patch_id = empty_patch.iloc[0]['images']
+        non_empty_patch_ids = non_empty_patches['images'].tolist()
+
+        # Load images and targets
+        empty_image = Image.open(os.path.join(self.root_dir, f"{empty_patch_id}.jpg")).convert('RGB')
+        non_empty_images = [Image.open(os.path.join(self.root_dir, f"{patch_id}.jpg")).convert('RGB') for patch_id in non_empty_patch_ids]
+
+        # Extract targets from the ground truth file
+        empty_target = self.gt_data[self.gt_data['images'] == empty_patch_id]
+        non_empty_targets = self.gt_data[self.gt_data['images'].isin(non_empty_patch_ids)]
+
+        # Apply initial transformations if specified
+        if self.transform:
+            empty_image = self.transform(empty_image)
+            non_empty_images = [self.transform(image) for image in non_empty_images]
+
+        return {
+            'empty_image': empty_image,
+            'non_empty_images': non_empty_images,
+            'empty_target': empty_target,
+            'non_empty_targets': non_empty_targets
+        }
+
+# Example usage:
+csv_file = 'path/to/your/csv/file.csv'
+root_dir = 'path/to/your/patches/folder'
+gt_file = 'path/to/your/ground/truth/file.csv'
+num_non_empty_samples = 1000
+transform = transforms.Compose([transforms.ToTensor()])
+
+dataset = BalancedFolderDataset(csv_file, root_dir, gt_file, num_non_empty_samples, transform=transform)
+
+# Use DataLoader as usual
+dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
