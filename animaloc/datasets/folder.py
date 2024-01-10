@@ -129,3 +129,91 @@ class FolderDataset(CSVDataset):
                     target.update({key: []})
         
         return target
+##########################################
+@DATASETS.register()
+class BalancedFolderDataset(CSVDataset):
+    def __init__(
+        self, 
+        csv_file: str, 
+        root_dir: str, 
+        albu_transforms: Optional[list] = None,
+        end_transforms: Optional[list] = None
+        ) -> None:
+        super(BalancedFolderDataset, self).__init__(csv_file, root_dir, albu_transforms, end_transforms)
+
+        self.folder_images = [i for i in os.listdir(self.root_dir) if i.endswith(('.JPG', '.jpg', '.JPEG', '.jpeg'))]
+        self._img_names = self.folder_images
+        self.anno_keys = self.data.columns
+        self.data['from_folder'] = 0  # all images in the folder
+
+        folder_only_images = numpy.setdiff1d(self.folder_images, self.data['images'].unique().tolist())
+        folder_df = pandas.DataFrame(data=dict(images=folder_only_images))
+        folder_df['from_folder'] = 1  # images without annotations
+
+        self.data = pandas.concat([self.data, folder_df], ignore_index=True).convert_dtypes()
+        # Use group_by_image to organize or group the image data
+        self._ordered_img_names = group_by_image(self.data)['images'].values.tolist()
+        # Separate empty and non-empty patches based on 'from_folder'
+        self.non_empty_patches = self.data[self.data['from_folder'] == 0]['images'].tolist()
+        self.empty_patches = self.data[self.data['from_folder'] == 1]['images'].tolist()
+
+        # Initialize the dataset for the first epoch
+        self.refresh_samples()
+
+    def refresh_samples(self):
+        # Randomly sample from empty patches to match the number of non-empty patches
+        sampled_empty = numpy.random.choice(self.empty_patches, len(self.non_empty_patches), replace=False).tolist()
+
+        # Combine and shuffle
+        self.sampled_patches = self.non_empty_patches + sampled_empty
+        numpy.random.shuffle(self.sampled_patches)
+
+    def _load_image(self, img_name: str) -> PIL.Image.Image:
+        img_path = os.path.join(self.root_dir, img_name)
+        pil_img = PIL.Image.open(img_path).convert('RGB')
+        pil_img.filename = img_name
+        return pil_img
+        
+    def _load_target(self, index: int) -> Dict[str, List[Any]]:
+        img_name = self.sampled_patches[index]  # Use sampled_patches list
+        annotations = self.data[self.data['images'] == img_name]
+        anno_keys = list(self.anno_keys)
+        anno_keys.remove('images')   
+        target = {
+        'image_id': [index], 
+        'image_name': [img_name]
+    }
+
+        nan_in_annos = annotations[anno_keys].isnull().values.any()
+        if not nan_in_annos:
+            for key in anno_keys:
+                target.update({key: list(annotations[key])})
+
+                if key == 'annos': 
+                    target.update({key: [list(a.get_tuple) for a in annotations[key]]})  # Assuming 'get_tuple' method exists
+
+        else:
+            for key in anno_keys:
+                if self.anno_type == 'BoundingBox':
+                    if key == 'annos':  
+                        target.update({key: [[0,1,2,3]]})
+                    elif key == 'labels':
+                        target.update({key: [0]})
+                else:        
+                    target.update({key: []})
+
+        return target
+    
+
+    def __getitem__(self, index: int):
+        img_name = self.sampled_patches[index]
+        img = self._load_image(img_name)
+        target = self._load_target(img_name)
+        return img, target
+
+    def __len__(self):
+        return len(self.sampled_patches)
+
+    def on_epoch_end(self):
+        # Refresh samples at the end of each epoch
+        self.refresh_samples()
