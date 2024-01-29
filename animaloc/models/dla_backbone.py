@@ -90,4 +90,74 @@ class DLAEncoder(nn.Module):
     def _freeze_layer(self, layer_name: str) -> None:
         for param in getattr(self, layer_name).parameters():
             param.requires_grad = False
+##################################################################
+@MODELS.register()
+class DLAEncoderDecoder(nn.Module):
+    ''' DLA Encoder-Decoder architecture '''
+
+    def __init__(
+        self,
+        num_layers: int = 34,
+        num_classes: int = 2,
+        pretrained: bool = True,
+        down_ratio: int = 2,
+        ):
+        '''
+        Args:
+            num_layers (int, optional): number of layers of DLA. Defaults to 34.
+            num_classes (int, optional): number of output classes, background included. Defaults to 2.
+            pretrained (bool, optional): set False to disable pretrained DLA encoder parameters from ImageNet. Defaults to True.
+            down_ratio (int, optional): downsample ratio for decoder. Defaults to 2.
+        '''
+
+        super(DLAEncoderDecoder, self).__init__()
+        
+        base_name = 'dla{}'.format(num_layers)
+        self.num_classes = num_classes
+        self.down_ratio = down_ratio
+
+        # backbone
+        base = dla_modules.__dict__[base_name](pretrained=pretrained, return_levels=True)
+        self.base_0 = base
+        self.channels_0 = base.channels
+
+        # Initialize DLAUp (decoder) module
+        scales = [2 ** i for i in range(len(self.channels_0))]
+        self.dla_up = dla_modules.DLAUp(self.channels_0, scales=scales)
+
+        # Bottleneck convolutional layer (original)
+        self.bottleneck_conv = nn.Conv2d(
+            self.channels_0[-1], self.channels_0[-1], 
+            kernel_size=1, stride=1, 
+            padding=0, bias=True
+        )
+        self.pooling = nn.AvgPool2d(kernel_size=16, stride=1, padding=0)
+
+        # Classification head (original)
+        self.cls_head = nn.Linear(512, num_classes)
+
+    def forward(self, input: torch.Tensor):
+        encode = self.base_0(input) # Nx512x16x16
+        bottleneck = self.bottleneck_conv(encode[-1])
+        bottleneck = self.pooling(bottleneck)
+        bottleneck = torch.reshape(bottleneck, (bottleneck.size()[0], -1)) # keeping the first dimension (samples)
+        encode[-1] = bottleneck # Nx512
+
+        # Decoder
+        decode = self.dla_up(encode)
+
+        # Classification (original)
+        cls = self.cls_head(bottleneck) # Classification
+
+        return cls, decode
+
+    def freeze(self, layers: list) -> None:
+        ''' Freeze all layers mentioned in the input list '''
+        for layer in layers:
+            self._freeze_layer(layer)
     
+    def _freeze_layer(self, layer_name: str) -> None:
+        for param in getattr(self, layer_name).parameters():
+            param.requires_grad = False
+  
+
