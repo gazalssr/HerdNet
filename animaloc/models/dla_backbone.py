@@ -140,11 +140,11 @@ class DLAEncoderDecoder(nn.Module):
         self.cls_head = nn.Linear(512, num_classes)
 
     def forward(self, input: torch.Tensor):
-        encode = self.base_0(input) # Nx512x16x16
+        encode = self.base_0(input) # Nx512x16x16-get feature maps from the encoder
         bottleneck = self.bottleneck_conv(encode[-1])
         bottleneck = self.pooling(bottleneck)
         bottleneck = torch.reshape(bottleneck, (bottleneck.size()[0], -1)) # keeping the first dimension (samples)
-        encode[-1] = bottleneck # Nx512
+        # encode[-1] = bottleneck # Nx512
 
         # Decoder
         decode = self.dla_up(encode)
