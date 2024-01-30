@@ -128,7 +128,8 @@ class DLAEncoderDecoder(nn.Module):
         # Added lines to match the input to the bottleneck
         channels = self.channels_0
         # last_channel_size = channels[-1]  # Get the number of channels from the last layer of the encoder
-        last_channel_size = encode[-1].shape[1]   
+        last_channel_size = self.channels_0[-1]
+        # last_channel_size = encode[-1].shape[1]   
         # Bottleneck convolutional layer (original)
         self.bottleneck_conv = nn.Conv2d(
             last_channel_size, last_channel_size,  # Adjust the number of input channels
