@@ -124,10 +124,11 @@ class DLAEncoderDecoder(nn.Module):
         # Initialize DLAUp (decoder) module
         scales = [2 ** i for i in range(len(self.channels_0))]
         self.dla_up = dla_modules.DLAUp(self.channels_0, scales=scales)
+            
         # Added lines to match the input to the bottleneck
         channels = self.channels_0
-        last_channel_size = channels[-1]  # Get the number of channels from the last layer of the encoder
-            
+        # last_channel_size = channels[-1]  # Get the number of channels from the last layer of the encoder
+        last_channel_size = encode[-1].shape[1]   
         # Bottleneck convolutional layer (original)
         self.bottleneck_conv = nn.Conv2d(
             last_channel_size, last_channel_size,  # Adjust the number of input channels
@@ -136,6 +137,7 @@ class DLAEncoderDecoder(nn.Module):
         )
         self.pooling = nn.AvgPool2d(kernel_size=16, stride=1, padding=0)
 
+            
         # Classification head (original)
         self.cls_head = nn.Linear(512, num_classes)
 
