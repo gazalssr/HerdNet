@@ -1,0 +1,40 @@
+04-03-2024 21:14:13 - validation [ 1/54] eta: 0:00:31 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 332.0 MSE: 110224.0 RMSE: 332.0 time: 0.5892 data: 0.5584 max mem: 1557
+04-03-2024 21:14:17 - validation [11/54] eta: 0:00:17 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.4027 data: 0.3813 max mem: 1557
+04-03-2024 21:14:18 - validation [21/54] eta: 0:00:07 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.2012 data: 0.1819 max mem: 1557
+04-03-2024 21:14:18 - validation [31/54] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 262.0 MSE: 68644.0 RMSE: 262.0 time: 0.0191 data: 0.0007 max mem: 1557
+04-03-2024 21:14:18 - validation [41/54] eta: 0:00:01 n: 7 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 420.0 MSE: 176400.0 RMSE: 420.0 time: 0.0196 data: 0.0015 max mem: 1557
+04-03-2024 21:14:18 - validation [51/54] eta: 0:00:00 n: 7 recall: 1.0 precision: 0.02 f1-score: 0.05 MAE: 274.0 MSE: 75076.0 RMSE: 274.0 time: 0.0193 data: 0.0016 max mem: 1557
+04-03-2024 21:14:18 - validation [54/54] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 331.0 MSE: 109561.0 RMSE: 331.0 time: 0.0190 data: 0.0016 max mem: 1557
+04-03-2024 21:14:19 - validation Total time: 0:00:06 (0.1142 s / it)
+04-03-2024 21:19:36 - validation [ 1/54] eta: 0:00:31 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 332.0 MSE: 110224.0 RMSE: 332.0 time: 0.5899 data: 0.5588 max mem: 1557
+04-03-2024 21:19:39 - validation [11/54] eta: 0:00:17 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.3949 data: 0.3743 max mem: 1557
+04-03-2024 21:19:40 - validation [21/54] eta: 0:00:07 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.1968 data: 0.1781 max mem: 1557
+04-03-2024 21:19:40 - validation [31/54] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 262.0 MSE: 68644.0 RMSE: 262.0 time: 0.0274 data: 0.0008 max mem: 1557
+04-03-2024 21:19:40 - validation [41/54] eta: 0:00:01 n: 7 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 420.0 MSE: 176400.0 RMSE: 420.0 time: 0.0285 data: 0.0016 max mem: 1557
+04-03-2024 21:19:40 - validation [51/54] eta: 0:00:00 n: 7 recall: 1.0 precision: 0.02 f1-score: 0.05 MAE: 274.0 MSE: 75076.0 RMSE: 274.0 time: 0.0197 data: 0.0016 max mem: 1557
+04-03-2024 21:19:40 - validation [54/54] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 331.0 MSE: 109561.0 RMSE: 331.0 time: 0.0192 data: 0.0016 max mem: 1557
+04-03-2024 21:19:41 - validation Total time: 0:00:06 (0.1156 s / it)
+04-03-2024 21:27:07 - validation [ 1/54] eta: 0:00:30 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 332.0 MSE: 110224.0 RMSE: 332.0 time: 0.5568 data: 0.5257 max mem: 1557
+04-03-2024 21:27:11 - validation [11/54] eta: 0:00:18 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.4139 data: 0.3932 max mem: 1557
+04-03-2024 21:27:11 - validation [21/54] eta: 0:00:07 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.2092 data: 0.1901 max mem: 1557
+04-03-2024 21:27:12 - validation [31/54] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 262.0 MSE: 68644.0 RMSE: 262.0 time: 0.0193 data: 0.0008 max mem: 1557
+04-03-2024 21:27:12 - validation [41/54] eta: 0:00:01 n: 7 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 420.0 MSE: 176400.0 RMSE: 420.0 time: 0.0199 data: 0.0016 max mem: 1557
+04-03-2024 21:27:12 - validation [51/54] eta: 0:00:00 n: 7 recall: 1.0 precision: 0.02 f1-score: 0.05 MAE: 274.0 MSE: 75076.0 RMSE: 274.0 time: 0.0196 data: 0.0017 max mem: 1557
+04-03-2024 21:27:12 - validation [54/54] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 331.0 MSE: 109561.0 RMSE: 331.0 time: 0.0194 data: 0.0017 max mem: 1557
+04-03-2024 21:27:13 - validation Total time: 0:00:06 (0.1152 s / it)
+04-03-2024 21:34:11 - validation [ 1/54] eta: 0:00:33 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 332.0 MSE: 110224.0 RMSE: 332.0 time: 0.6150 data: 0.5844 max mem: 1557
+04-03-2024 21:34:15 - validation [11/54] eta: 0:00:16 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.3668 data: 0.3458 max mem: 1557
+04-03-2024 21:34:15 - validation [21/54] eta: 0:00:06 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.1802 data: 0.1611 max mem: 1557
+04-03-2024 21:34:15 - validation [31/54] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 262.0 MSE: 68644.0 RMSE: 262.0 time: 0.0190 data: 0.0008 max mem: 1557
+04-03-2024 21:34:15 - validation [41/54] eta: 0:00:01 n: 7 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 420.0 MSE: 176400.0 RMSE: 420.0 time: 0.0197 data: 0.0016 max mem: 1557
+04-03-2024 21:34:15 - validation [51/54] eta: 0:00:00 n: 7 recall: 1.0 precision: 0.02 f1-score: 0.05 MAE: 274.0 MSE: 75076.0 RMSE: 274.0 time: 0.0195 data: 0.0017 max mem: 1557
+04-03-2024 21:34:15 - validation [54/54] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 331.0 MSE: 109561.0 RMSE: 331.0 time: 0.0194 data: 0.0017 max mem: 1557
+04-03-2024 21:34:16 - validation Total time: 0:00:05 (0.1061 s / it)
+04-03-2024 21:43:41 - validation [ 1/54] eta: 0:00:32 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 332.0 MSE: 110224.0 RMSE: 332.0 time: 0.6081 data: 0.5638 max mem: 1557
+04-03-2024 21:43:45 - validation [11/54] eta: 0:00:17 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.4006 data: 0.3778 max mem: 1557
+04-03-2024 21:43:45 - validation [21/54] eta: 0:00:07 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.1992 data: 0.1797 max mem: 1557
+04-03-2024 21:43:45 - validation [31/54] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 262.0 MSE: 68644.0 RMSE: 262.0 time: 0.0282 data: 0.0008 max mem: 1557
+04-03-2024 21:43:46 - validation [41/54] eta: 0:00:01 n: 7 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 420.0 MSE: 176400.0 RMSE: 420.0 time: 0.0289 data: 0.0016 max mem: 1557
+04-03-2024 21:43:46 - validation [51/54] eta: 0:00:00 n: 7 recall: 1.0 precision: 0.02 f1-score: 0.05 MAE: 274.0 MSE: 75076.0 RMSE: 274.0 time: 0.0195 data: 0.0017 max mem: 1557
+04-03-2024 21:43:46 - validation [54/54] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 331.0 MSE: 109561.0 RMSE: 331.0 time: 0.0194 data: 0.0016 max mem: 1557
+04-03-2024 21:43:47 - validation Total time: 0:00:06 (0.1167 s / it)

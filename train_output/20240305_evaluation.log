@@ -1,0 +1,750 @@
+05-03-2024 18:33:36 - train [  1/730] eta: 0:06:29 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 369.0 MSE: 136161.0 RMSE: 369.0 time: 0.5330 data: 0.5092 max mem: 1557
+05-03-2024 18:33:40 - train [ 11/730] eta: 0:04:35 n: 6 recall: 1.0 precision: 0.29 f1-score: 0.44 MAE: 15.0 MSE: 225.0 RMSE: 15.0 time: 0.3823 data: 0.3633 max mem: 1557
+05-03-2024 18:33:40 - train [ 21/730] eta: 0:02:28 n: 8 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 14.0 MSE: 196.0 RMSE: 14.0 time: 0.1923 data: 0.1745 max mem: 1557
+05-03-2024 18:33:40 - train [ 31/730] eta: 0:01:43 n: 3 recall: 1.0 precision: 0.12 f1-score: 0.21 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0181 data: 0.0008 max mem: 1557
+05-03-2024 18:33:40 - train [ 41/730] eta: 0:01:20 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0190 data: 0.0015 max mem: 1557
+05-03-2024 18:33:40 - train [ 51/730] eta: 0:01:05 n: 2 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 122.0 MSE: 14884.0 RMSE: 122.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 18:33:40 - train [ 61/730] eta: 0:00:56 n: 16 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 28.0 MSE: 784.0 RMSE: 28.0 time: 0.0183 data: 0.0016 max mem: 1557
+05-03-2024 18:33:41 - train [ 71/730] eta: 0:00:49 n: 12 recall: 0.83 precision: 0.26 f1-score: 0.4 MAE: 26.0 MSE: 676.0 RMSE: 26.0 time: 0.0181 data: 0.0017 max mem: 1557
+05-03-2024 18:33:41 - train [ 81/730] eta: 0:00:44 n: 14 recall: 1.0 precision: 0.31 f1-score: 0.47 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0184 data: 0.0017 max mem: 1557
+05-03-2024 18:33:41 - train [ 91/730] eta: 0:00:39 n: 14 recall: 1.0 precision: 0.23 f1-score: 0.38 MAE: 46.0 MSE: 2116.0 RMSE: 46.0 time: 0.0184 data: 0.0016 max mem: 1557
+05-03-2024 18:33:41 - train [101/730] eta: 0:00:36 n: 56 recall: 0.95 precision: 0.46 f1-score: 0.62 MAE: 59.0 MSE: 3481.0 RMSE: 59.0 time: 0.0186 data: 0.0017 max mem: 1557
+05-03-2024 18:33:41 - train [111/730] eta: 0:00:33 n: 25 recall: 0.88 precision: 0.51 f1-score: 0.65 MAE: 18.0 MSE: 324.0 RMSE: 18.0 time: 0.0186 data: 0.0017 max mem: 1557
+05-03-2024 18:33:42 - train [121/730] eta: 0:00:31 n: 63 recall: 0.92 precision: 0.51 f1-score: 0.66 MAE: 50.0 MSE: 2500.0 RMSE: 50.0 time: 0.0183 data: 0.0016 max mem: 1557
+05-03-2024 18:33:42 - train [131/730] eta: 0:00:29 n: 40 recall: 0.95 precision: 0.61 f1-score: 0.75 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0191 data: 0.0017 max mem: 1557
+05-03-2024 18:33:42 - train [141/730] eta: 0:00:27 n: 4 recall: 1.0 precision: 0.05 f1-score: 0.09 MAE: 80.0 MSE: 6400.0 RMSE: 80.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 18:33:42 - train [151/730] eta: 0:00:26 n: 66 recall: 0.97 precision: 0.5 f1-score: 0.66 MAE: 63.0 MSE: 3969.0 RMSE: 63.0 time: 0.0193 data: 0.0016 max mem: 1557
+05-03-2024 18:33:42 - train [161/730] eta: 0:00:24 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0196 data: 0.0017 max mem: 1557
+05-03-2024 18:33:43 - train [171/730] eta: 0:00:23 n: 71 recall: 0.97 precision: 0.55 f1-score: 0.7 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0198 data: 0.0017 max mem: 1557
+05-03-2024 18:33:43 - train [181/730] eta: 0:00:22 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 225.0 MSE: 50625.0 RMSE: 225.0 time: 0.0199 data: 0.0016 max mem: 1557
+05-03-2024 18:33:43 - train [191/730] eta: 0:00:21 n: 100 recall: 0.94 precision: 0.59 f1-score: 0.73 MAE: 58.0 MSE: 3364.0 RMSE: 58.0 time: 0.0198 data: 0.0017 max mem: 1557
+05-03-2024 18:33:43 - train [201/730] eta: 0:00:20 n: 5 recall: 1.0 precision: 0.03 f1-score: 0.07 MAE: 139.0 MSE: 19321.0 RMSE: 139.0 time: 0.0200 data: 0.0017 max mem: 1557
+05-03-2024 18:33:43 - train [211/730] eta: 0:00:19 n: 69 recall: 0.94 precision: 0.45 f1-score: 0.61 MAE: 75.0 MSE: 5625.0 RMSE: 75.0 time: 0.0198 data: 0.0016 max mem: 1557
+05-03-2024 18:33:44 - train [221/730] eta: 0:00:18 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0197 data: 0.0017 max mem: 1557
+05-03-2024 18:33:44 - train [231/730] eta: 0:00:18 n: 34 recall: 0.97 precision: 0.49 f1-score: 0.65 MAE: 34.0 MSE: 1156.0 RMSE: 34.0 time: 0.0192 data: 0.0017 max mem: 1557
+05-03-2024 18:33:44 - train [241/730] eta: 0:00:17 n: 49 recall: 0.94 precision: 0.47 f1-score: 0.63 MAE: 48.0 MSE: 2304.0 RMSE: 48.0 time: 0.0192 data: 0.0016 max mem: 1557
+05-03-2024 18:33:44 - train [251/730] eta: 0:00:16 n: 9 recall: 0.78 precision: 0.17 f1-score: 0.29 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 18:33:44 - train [261/730] eta: 0:00:16 n: 13 recall: 1.0 precision: 0.19 f1-score: 0.33 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0187 data: 0.0017 max mem: 1557
+05-03-2024 18:33:44 - train [271/730] eta: 0:00:15 n: 29 recall: 0.93 precision: 0.35 f1-score: 0.5 MAE: 49.0 MSE: 2401.0 RMSE: 49.0 time: 0.0189 data: 0.0016 max mem: 1557
+05-03-2024 18:33:45 - train [281/730] eta: 0:00:14 n: 4 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 199.0 MSE: 39601.0 RMSE: 199.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 18:33:45 - train [291/730] eta: 0:00:14 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0197 data: 0.0017 max mem: 1557
+05-03-2024 18:33:45 - train [301/730] eta: 0:00:13 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.0 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0210 data: 0.0016 max mem: 1557
+05-03-2024 18:33:45 - train [311/730] eta: 0:00:13 n: 12 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 135.0 MSE: 18225.0 RMSE: 135.0 time: 0.0264 data: 0.0017 max mem: 1557
+05-03-2024 18:33:46 - train [321/730] eta: 0:00:13 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 526.0 MSE: 276676.0 RMSE: 526.0 time: 0.0264 data: 0.0017 max mem: 1557
+05-03-2024 18:33:46 - train [331/730] eta: 0:00:12 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 433.0 MSE: 187489.0 RMSE: 433.0 time: 0.0211 data: 0.0016 max mem: 1557
+05-03-2024 18:33:46 - train [341/730] eta: 0:00:12 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 368.0 MSE: 135424.0 RMSE: 368.0 time: 0.0208 data: 0.0017 max mem: 1557
+05-03-2024 18:33:46 - train [351/730] eta: 0:00:11 n: 22 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 246.0 MSE: 60516.0 RMSE: 246.0 time: 0.0207 data: 0.0017 max mem: 1557
+05-03-2024 18:33:46 - train [361/730] eta: 0:00:11 n: 17 recall: 1.0 precision: 0.09 f1-score: 0.17 MAE: 167.0 MSE: 27889.0 RMSE: 167.0 time: 0.0205 data: 0.0016 max mem: 1557
+05-03-2024 18:33:47 - train [371/730] eta: 0:00:10 n: 18 recall: 1.0 precision: 0.07 f1-score: 0.14 MAE: 223.0 MSE: 49729.0 RMSE: 223.0 time: 0.0205 data: 0.0017 max mem: 1557
+05-03-2024 18:33:47 - train [381/730] eta: 0:00:10 n: 20 recall: 1.0 precision: 0.09 f1-score: 0.16 MAE: 207.0 MSE: 42849.0 RMSE: 207.0 time: 0.0205 data: 0.0017 max mem: 1557
+05-03-2024 18:33:47 - train [391/730] eta: 0:00:10 n: 24 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 275.0 MSE: 75625.0 RMSE: 275.0 time: 0.0207 data: 0.0016 max mem: 1557
+05-03-2024 18:33:47 - train [401/730] eta: 0:00:09 n: 41 recall: 1.0 precision: 0.17 f1-score: 0.28 MAE: 206.0 MSE: 42436.0 RMSE: 206.0 time: 0.0214 data: 0.0017 max mem: 1557
+05-03-2024 18:33:48 - train [411/730] eta: 0:00:09 n: 55 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 258.0 MSE: 66564.0 RMSE: 258.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 18:33:48 - train [421/730] eta: 0:00:09 n: 69 recall: 1.0 precision: 0.17 f1-score: 0.29 MAE: 336.0 MSE: 112896.0 RMSE: 336.0 time: 0.0239 data: 0.0016 max mem: 1557
+05-03-2024 18:33:48 - train [431/730] eta: 0:00:08 n: 57 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 344.0 MSE: 118336.0 RMSE: 344.0 time: 0.0246 data: 0.0017 max mem: 1557
+05-03-2024 18:33:48 - train [441/730] eta: 0:00:08 n: 39 recall: 0.97 precision: 0.1 f1-score: 0.18 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0248 data: 0.0017 max mem: 1557
+05-03-2024 18:33:49 - train [451/730] eta: 0:00:08 n: 64 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 401.0 MSE: 160801.0 RMSE: 401.0 time: 0.0248 data: 0.0016 max mem: 1557
+05-03-2024 18:33:49 - train [461/730] eta: 0:00:07 n: 57 recall: 1.0 precision: 0.13 f1-score: 0.23 MAE: 390.0 MSE: 152100.0 RMSE: 390.0 time: 0.0242 data: 0.0017 max mem: 1557
+05-03-2024 18:33:49 - train [471/730] eta: 0:00:07 n: 64 recall: 0.98 precision: 0.15 f1-score: 0.27 MAE: 346.0 MSE: 119716.0 RMSE: 346.0 time: 0.0238 data: 0.0017 max mem: 1557
+05-03-2024 18:33:49 - train [481/730] eta: 0:00:07 n: 60 recall: 0.97 precision: 0.15 f1-score: 0.26 MAE: 318.0 MSE: 101124.0 RMSE: 318.0 time: 0.0233 data: 0.0016 max mem: 1557
+05-03-2024 18:33:49 - train [491/730] eta: 0:00:06 n: 63 recall: 0.95 precision: 0.17 f1-score: 0.28 MAE: 300.0 MSE: 90000.0 RMSE: 300.0 time: 0.0227 data: 0.0017 max mem: 1557
+05-03-2024 18:33:50 - train [501/730] eta: 0:00:06 n: 66 recall: 0.95 precision: 0.22 f1-score: 0.36 MAE: 222.0 MSE: 49284.0 RMSE: 222.0 time: 0.0222 data: 0.0017 max mem: 1557
+05-03-2024 18:33:50 - train [511/730] eta: 0:00:06 n: 65 recall: 0.97 precision: 0.22 f1-score: 0.36 MAE: 219.0 MSE: 47961.0 RMSE: 219.0 time: 0.0264 data: 0.0016 max mem: 1557
+05-03-2024 18:33:50 - train [521/730] eta: 0:00:05 n: 65 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 304.0 MSE: 92416.0 RMSE: 304.0 time: 0.0271 data: 0.0017 max mem: 1557
+05-03-2024 18:33:50 - train [531/730] eta: 0:00:05 n: 58 recall: 1.0 precision: 0.25 f1-score: 0.4 MAE: 172.0 MSE: 29584.0 RMSE: 172.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 18:33:51 - train [541/730] eta: 0:00:05 n: 63 recall: 1.0 precision: 0.2 f1-score: 0.33 MAE: 260.0 MSE: 67600.0 RMSE: 260.0 time: 0.0225 data: 0.0016 max mem: 1557
+05-03-2024 18:33:51 - train [551/730] eta: 0:00:05 n: 68 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 291.0 MSE: 84681.0 RMSE: 291.0 time: 0.0228 data: 0.0017 max mem: 1557
+05-03-2024 18:33:51 - train [561/730] eta: 0:00:04 n: 61 recall: 1.0 precision: 0.23 f1-score: 0.37 MAE: 210.0 MSE: 44100.0 RMSE: 210.0 time: 0.0228 data: 0.0017 max mem: 1557
+05-03-2024 18:33:51 - train [571/730] eta: 0:00:04 n: 64 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 241.0 MSE: 58081.0 RMSE: 241.0 time: 0.0234 data: 0.0016 max mem: 1557
+05-03-2024 18:33:52 - train [581/730] eta: 0:00:04 n: 85 recall: 0.99 precision: 0.23 f1-score: 0.37 MAE: 284.0 MSE: 80656.0 RMSE: 284.0 time: 0.0234 data: 0.0017 max mem: 1557
+05-03-2024 18:33:52 - train [591/730] eta: 0:00:03 n: 67 recall: 0.99 precision: 0.2 f1-score: 0.33 MAE: 264.0 MSE: 69696.0 RMSE: 264.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 18:33:52 - train [601/730] eta: 0:00:03 n: 27 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0224 data: 0.0016 max mem: 1557
+05-03-2024 18:33:52 - train [611/730] eta: 0:00:03 n: 7 recall: 1.0 precision: 0.06 f1-score: 0.11 MAE: 108.0 MSE: 11664.0 RMSE: 108.0 time: 0.0229 data: 0.0017 max mem: 1557
+05-03-2024 18:33:53 - train [621/730] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0230 data: 0.0017 max mem: 1557
+05-03-2024 18:33:53 - train [631/730] eta: 0:00:02 n: 14 recall: 1.0 precision: 0.12 f1-score: 0.22 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0223 data: 0.0016 max mem: 1557
+05-03-2024 18:33:53 - train [641/730] eta: 0:00:02 n: 51 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 190.0 MSE: 36100.0 RMSE: 190.0 time: 0.0223 data: 0.0017 max mem: 1557
+05-03-2024 18:33:53 - train [651/730] eta: 0:00:02 n: 6 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 305.0 MSE: 93025.0 RMSE: 305.0 time: 0.0229 data: 0.0017 max mem: 1557
+05-03-2024 18:33:53 - train [661/730] eta: 0:00:01 n: 8 recall: 1.0 precision: 0.04 f1-score: 0.09 MAE: 171.0 MSE: 29241.0 RMSE: 171.0 time: 0.0225 data: 0.0016 max mem: 1557
+05-03-2024 18:33:54 - train [671/730] eta: 0:00:01 n: 11 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 47.0 MSE: 2209.0 RMSE: 47.0 time: 0.0212 data: 0.0017 max mem: 1557
+05-03-2024 18:33:54 - train [681/730] eta: 0:00:01 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.0206 data: 0.0017 max mem: 1557
+05-03-2024 18:33:54 - train [691/730] eta: 0:00:01 n: 4 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 418.0 MSE: 174724.0 RMSE: 418.0 time: 0.0218 data: 0.0016 max mem: 1557
+05-03-2024 18:33:54 - train [701/730] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0231 data: 0.0017 max mem: 1557
+05-03-2024 18:33:55 - train [711/730] eta: 0:00:00 n: 59 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.0240 data: 0.0017 max mem: 1557
+05-03-2024 18:33:55 - train [721/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 142.0 MSE: 20164.0 RMSE: 142.0 time: 0.0233 data: 0.0016 max mem: 1557
+05-03-2024 18:33:55 - train [730/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 441.0 MSE: 194481.0 RMSE: 441.0 time: 0.0214 data: 0.0017 max mem: 1557
+05-03-2024 18:33:56 - train Total time: 0:00:20 (0.0281 s / it)
+05-03-2024 18:37:41 - train [  1/730] eta: 0:06:19 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 369.0 MSE: 136161.0 RMSE: 369.0 time: 0.5203 data: 0.4950 max mem: 1557
+05-03-2024 18:37:45 - train [ 11/730] eta: 0:04:43 n: 6 recall: 1.0 precision: 0.29 f1-score: 0.44 MAE: 15.0 MSE: 225.0 RMSE: 15.0 time: 0.3934 data: 0.3750 max mem: 1557
+05-03-2024 18:37:45 - train [ 21/730] eta: 0:02:32 n: 8 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 14.0 MSE: 196.0 RMSE: 14.0 time: 0.1990 data: 0.1816 max mem: 1557
+05-03-2024 18:37:45 - train [ 31/730] eta: 0:01:45 n: 3 recall: 1.0 precision: 0.12 f1-score: 0.21 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0178 data: 0.0008 max mem: 1557
+05-03-2024 18:37:45 - train [ 41/730] eta: 0:01:21 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0183 data: 0.0016 max mem: 1557
+05-03-2024 18:37:45 - train [ 51/730] eta: 0:01:07 n: 2 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 122.0 MSE: 14884.0 RMSE: 122.0 time: 0.0179 data: 0.0016 max mem: 1557
+05-03-2024 18:37:46 - train [ 61/730] eta: 0:00:57 n: 16 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 28.0 MSE: 784.0 RMSE: 28.0 time: 0.0177 data: 0.0015 max mem: 1557
+05-03-2024 18:37:46 - train [ 71/730] eta: 0:00:50 n: 12 recall: 0.83 precision: 0.26 f1-score: 0.4 MAE: 26.0 MSE: 676.0 RMSE: 26.0 time: 0.0179 data: 0.0016 max mem: 1557
+05-03-2024 18:37:46 - train [ 81/730] eta: 0:00:44 n: 14 recall: 1.0 precision: 0.31 f1-score: 0.47 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0181 data: 0.0016 max mem: 1557
+05-03-2024 18:37:46 - train [ 91/730] eta: 0:00:40 n: 14 recall: 1.0 precision: 0.23 f1-score: 0.38 MAE: 46.0 MSE: 2116.0 RMSE: 46.0 time: 0.0179 data: 0.0016 max mem: 1557
+05-03-2024 18:37:46 - train [101/730] eta: 0:00:37 n: 56 recall: 0.95 precision: 0.46 f1-score: 0.62 MAE: 59.0 MSE: 3481.0 RMSE: 59.0 time: 0.0182 data: 0.0016 max mem: 1557
+05-03-2024 18:37:46 - train [111/730] eta: 0:00:34 n: 25 recall: 0.88 precision: 0.51 f1-score: 0.65 MAE: 18.0 MSE: 324.0 RMSE: 18.0 time: 0.0182 data: 0.0016 max mem: 1557
+05-03-2024 18:37:47 - train [121/730] eta: 0:00:31 n: 63 recall: 0.92 precision: 0.51 f1-score: 0.66 MAE: 50.0 MSE: 2500.0 RMSE: 50.0 time: 0.0179 data: 0.0015 max mem: 1557
+05-03-2024 18:37:47 - train [131/730] eta: 0:00:29 n: 40 recall: 0.95 precision: 0.61 f1-score: 0.75 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0186 data: 0.0016 max mem: 1557
+05-03-2024 18:37:47 - train [141/730] eta: 0:00:27 n: 4 recall: 1.0 precision: 0.05 f1-score: 0.09 MAE: 80.0 MSE: 6400.0 RMSE: 80.0 time: 0.0186 data: 0.0016 max mem: 1557
+05-03-2024 18:37:47 - train [151/730] eta: 0:00:26 n: 66 recall: 0.97 precision: 0.5 f1-score: 0.66 MAE: 63.0 MSE: 3969.0 RMSE: 63.0 time: 0.0189 data: 0.0015 max mem: 1557
+05-03-2024 18:37:47 - train [161/730] eta: 0:00:24 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0190 data: 0.0016 max mem: 1557
+05-03-2024 18:37:48 - train [171/730] eta: 0:00:23 n: 71 recall: 0.97 precision: 0.55 f1-score: 0.7 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0193 data: 0.0016 max mem: 1557
+05-03-2024 18:37:48 - train [181/730] eta: 0:00:22 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 225.0 MSE: 50625.0 RMSE: 225.0 time: 0.0195 data: 0.0015 max mem: 1557
+05-03-2024 18:37:48 - train [191/730] eta: 0:00:21 n: 100 recall: 0.94 precision: 0.59 f1-score: 0.73 MAE: 58.0 MSE: 3364.0 RMSE: 58.0 time: 0.0194 data: 0.0016 max mem: 1557
+05-03-2024 18:37:48 - train [201/730] eta: 0:00:20 n: 5 recall: 1.0 precision: 0.03 f1-score: 0.07 MAE: 139.0 MSE: 19321.0 RMSE: 139.0 time: 0.0196 data: 0.0016 max mem: 1557
+05-03-2024 18:37:48 - train [211/730] eta: 0:00:19 n: 69 recall: 0.94 precision: 0.45 f1-score: 0.61 MAE: 75.0 MSE: 5625.0 RMSE: 75.0 time: 0.0193 data: 0.0015 max mem: 1557
+05-03-2024 18:37:49 - train [221/730] eta: 0:00:18 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0191 data: 0.0016 max mem: 1557
+05-03-2024 18:37:49 - train [231/730] eta: 0:00:18 n: 34 recall: 0.97 precision: 0.49 f1-score: 0.65 MAE: 34.0 MSE: 1156.0 RMSE: 34.0 time: 0.0187 data: 0.0016 max mem: 1557
+05-03-2024 18:37:49 - train [241/730] eta: 0:00:17 n: 49 recall: 0.94 precision: 0.47 f1-score: 0.63 MAE: 48.0 MSE: 2304.0 RMSE: 48.0 time: 0.0188 data: 0.0015 max mem: 1557
+05-03-2024 18:37:49 - train [251/730] eta: 0:00:16 n: 9 recall: 0.78 precision: 0.17 f1-score: 0.29 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0184 data: 0.0016 max mem: 1557
+05-03-2024 18:37:49 - train [261/730] eta: 0:00:16 n: 13 recall: 1.0 precision: 0.19 f1-score: 0.33 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0183 data: 0.0016 max mem: 1557
+05-03-2024 18:37:49 - train [271/730] eta: 0:00:15 n: 29 recall: 0.93 precision: 0.35 f1-score: 0.5 MAE: 49.0 MSE: 2401.0 RMSE: 49.0 time: 0.0183 data: 0.0016 max mem: 1557
+05-03-2024 18:37:50 - train [281/730] eta: 0:00:14 n: 4 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 199.0 MSE: 39601.0 RMSE: 199.0 time: 0.0186 data: 0.0017 max mem: 1557
+05-03-2024 18:37:50 - train [291/730] eta: 0:00:14 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0197 data: 0.0017 max mem: 1557
+05-03-2024 18:37:50 - train [301/730] eta: 0:00:13 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.0 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0210 data: 0.0016 max mem: 1557
+05-03-2024 18:37:50 - train [311/730] eta: 0:00:13 n: 12 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 135.0 MSE: 18225.0 RMSE: 135.0 time: 0.0208 data: 0.0016 max mem: 1557
+05-03-2024 18:37:51 - train [321/730] eta: 0:00:13 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 526.0 MSE: 276676.0 RMSE: 526.0 time: 0.0262 data: 0.0017 max mem: 1557
+05-03-2024 18:37:51 - train [331/730] eta: 0:00:12 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 433.0 MSE: 187489.0 RMSE: 433.0 time: 0.0263 data: 0.0016 max mem: 1557
+05-03-2024 18:37:51 - train [341/730] eta: 0:00:12 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 368.0 MSE: 135424.0 RMSE: 368.0 time: 0.0206 data: 0.0017 max mem: 1557
+05-03-2024 18:37:51 - train [351/730] eta: 0:00:11 n: 22 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 246.0 MSE: 60516.0 RMSE: 246.0 time: 0.0205 data: 0.0017 max mem: 1557
+05-03-2024 18:37:51 - train [361/730] eta: 0:00:11 n: 17 recall: 1.0 precision: 0.09 f1-score: 0.17 MAE: 167.0 MSE: 27889.0 RMSE: 167.0 time: 0.0203 data: 0.0016 max mem: 1557
+05-03-2024 18:37:52 - train [371/730] eta: 0:00:10 n: 18 recall: 1.0 precision: 0.07 f1-score: 0.14 MAE: 223.0 MSE: 49729.0 RMSE: 223.0 time: 0.0200 data: 0.0016 max mem: 1557
+05-03-2024 18:37:52 - train [381/730] eta: 0:00:10 n: 20 recall: 1.0 precision: 0.09 f1-score: 0.16 MAE: 207.0 MSE: 42849.0 RMSE: 207.0 time: 0.0201 data: 0.0016 max mem: 1557
+05-03-2024 18:37:52 - train [391/730] eta: 0:00:10 n: 24 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 275.0 MSE: 75625.0 RMSE: 275.0 time: 0.0205 data: 0.0016 max mem: 1557
+05-03-2024 18:37:52 - train [401/730] eta: 0:00:09 n: 41 recall: 1.0 precision: 0.17 f1-score: 0.28 MAE: 206.0 MSE: 42436.0 RMSE: 206.0 time: 0.0212 data: 0.0016 max mem: 1557
+05-03-2024 18:37:52 - train [411/730] eta: 0:00:09 n: 55 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 258.0 MSE: 66564.0 RMSE: 258.0 time: 0.0222 data: 0.0016 max mem: 1557
+05-03-2024 18:37:53 - train [421/730] eta: 0:00:09 n: 69 recall: 1.0 precision: 0.17 f1-score: 0.29 MAE: 336.0 MSE: 112896.0 RMSE: 336.0 time: 0.0237 data: 0.0016 max mem: 1557
+05-03-2024 18:37:53 - train [431/730] eta: 0:00:08 n: 57 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 344.0 MSE: 118336.0 RMSE: 344.0 time: 0.0248 data: 0.0017 max mem: 1557
+05-03-2024 18:37:53 - train [441/730] eta: 0:00:08 n: 39 recall: 0.97 precision: 0.1 f1-score: 0.18 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0249 data: 0.0017 max mem: 1557
+05-03-2024 18:37:53 - train [451/730] eta: 0:00:08 n: 64 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 401.0 MSE: 160801.0 RMSE: 401.0 time: 0.0244 data: 0.0016 max mem: 1557
+05-03-2024 18:37:54 - train [461/730] eta: 0:00:07 n: 57 recall: 1.0 precision: 0.13 f1-score: 0.23 MAE: 390.0 MSE: 152100.0 RMSE: 390.0 time: 0.0238 data: 0.0017 max mem: 1557
+05-03-2024 18:37:54 - train [471/730] eta: 0:00:07 n: 64 recall: 0.98 precision: 0.15 f1-score: 0.27 MAE: 346.0 MSE: 119716.0 RMSE: 346.0 time: 0.0237 data: 0.0017 max mem: 1557
+05-03-2024 18:37:54 - train [481/730] eta: 0:00:07 n: 60 recall: 0.97 precision: 0.15 f1-score: 0.26 MAE: 318.0 MSE: 101124.0 RMSE: 318.0 time: 0.0230 data: 0.0016 max mem: 1557
+05-03-2024 18:37:54 - train [491/730] eta: 0:00:06 n: 63 recall: 0.95 precision: 0.17 f1-score: 0.28 MAE: 300.0 MSE: 90000.0 RMSE: 300.0 time: 0.0222 data: 0.0017 max mem: 1557
+05-03-2024 18:37:55 - train [501/730] eta: 0:00:06 n: 66 recall: 0.95 precision: 0.22 f1-score: 0.36 MAE: 222.0 MSE: 49284.0 RMSE: 222.0 time: 0.0219 data: 0.0017 max mem: 1557
+05-03-2024 18:37:55 - train [511/730] eta: 0:00:06 n: 65 recall: 0.97 precision: 0.22 f1-score: 0.36 MAE: 219.0 MSE: 47961.0 RMSE: 219.0 time: 0.0218 data: 0.0017 max mem: 1557
+05-03-2024 18:37:55 - train [521/730] eta: 0:00:05 n: 65 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 304.0 MSE: 92416.0 RMSE: 304.0 time: 0.0225 data: 0.0018 max mem: 1557
+05-03-2024 18:37:55 - train [531/730] eta: 0:00:05 n: 58 recall: 1.0 precision: 0.25 f1-score: 0.4 MAE: 172.0 MSE: 29584.0 RMSE: 172.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 18:37:56 - train [541/730] eta: 0:00:05 n: 63 recall: 1.0 precision: 0.2 f1-score: 0.33 MAE: 260.0 MSE: 67600.0 RMSE: 260.0 time: 0.0223 data: 0.0016 max mem: 1557
+05-03-2024 18:37:56 - train [551/730] eta: 0:00:05 n: 68 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 291.0 MSE: 84681.0 RMSE: 291.0 time: 0.0276 data: 0.0018 max mem: 1557
+05-03-2024 18:37:56 - train [561/730] eta: 0:00:04 n: 61 recall: 1.0 precision: 0.23 f1-score: 0.37 MAE: 210.0 MSE: 44100.0 RMSE: 210.0 time: 0.0276 data: 0.0018 max mem: 1557
+05-03-2024 18:37:56 - train [571/730] eta: 0:00:04 n: 64 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 241.0 MSE: 58081.0 RMSE: 241.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 18:37:57 - train [581/730] eta: 0:00:04 n: 85 recall: 0.99 precision: 0.23 f1-score: 0.37 MAE: 284.0 MSE: 80656.0 RMSE: 284.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 18:37:57 - train [591/730] eta: 0:00:03 n: 67 recall: 0.99 precision: 0.2 f1-score: 0.33 MAE: 264.0 MSE: 69696.0 RMSE: 264.0 time: 0.0223 data: 0.0018 max mem: 1557
+05-03-2024 18:37:57 - train [601/730] eta: 0:00:03 n: 27 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0221 data: 0.0017 max mem: 1557
+05-03-2024 18:37:57 - train [611/730] eta: 0:00:03 n: 7 recall: 1.0 precision: 0.06 f1-score: 0.11 MAE: 108.0 MSE: 11664.0 RMSE: 108.0 time: 0.0222 data: 0.0018 max mem: 1557
+05-03-2024 18:37:57 - train [621/730] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0224 data: 0.0018 max mem: 1557
+05-03-2024 18:37:58 - train [631/730] eta: 0:00:02 n: 14 recall: 1.0 precision: 0.12 f1-score: 0.22 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0222 data: 0.0017 max mem: 1557
+05-03-2024 18:37:58 - train [641/730] eta: 0:00:02 n: 51 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 190.0 MSE: 36100.0 RMSE: 190.0 time: 0.0220 data: 0.0017 max mem: 1557
+05-03-2024 18:37:58 - train [651/730] eta: 0:00:02 n: 6 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 305.0 MSE: 93025.0 RMSE: 305.0 time: 0.0224 data: 0.0017 max mem: 1557
+05-03-2024 18:37:58 - train [661/730] eta: 0:00:01 n: 8 recall: 1.0 precision: 0.04 f1-score: 0.09 MAE: 171.0 MSE: 29241.0 RMSE: 171.0 time: 0.0221 data: 0.0017 max mem: 1557
+05-03-2024 18:37:59 - train [671/730] eta: 0:00:01 n: 11 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 47.0 MSE: 2209.0 RMSE: 47.0 time: 0.0207 data: 0.0017 max mem: 1557
+05-03-2024 18:37:59 - train [681/730] eta: 0:00:01 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.0199 data: 0.0017 max mem: 1557
+05-03-2024 18:37:59 - train [691/730] eta: 0:00:01 n: 4 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 418.0 MSE: 174724.0 RMSE: 418.0 time: 0.0209 data: 0.0016 max mem: 1557
+05-03-2024 18:37:59 - train [701/730] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0223 data: 0.0017 max mem: 1557
+05-03-2024 18:37:59 - train [711/730] eta: 0:00:00 n: 59 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.0234 data: 0.0017 max mem: 1557
+05-03-2024 18:38:00 - train [721/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 142.0 MSE: 20164.0 RMSE: 142.0 time: 0.0228 data: 0.0016 max mem: 1557
+05-03-2024 18:38:00 - train [730/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 441.0 MSE: 194481.0 RMSE: 441.0 time: 0.0214 data: 0.0017 max mem: 1557
+05-03-2024 18:38:01 - train Total time: 0:00:20 (0.0277 s / it)
+05-03-2024 19:02:04 - train [  1/730] eta: 0:07:00 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 369.0 MSE: 136161.0 RMSE: 369.0 time: 0.5754 data: 0.5496 max mem: 1557
+05-03-2024 19:02:07 - train [ 11/730] eta: 0:04:43 n: 6 recall: 1.0 precision: 0.29 f1-score: 0.44 MAE: 15.0 MSE: 225.0 RMSE: 15.0 time: 0.3935 data: 0.3729 max mem: 1557
+05-03-2024 19:02:08 - train [ 21/730] eta: 0:02:32 n: 8 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 14.0 MSE: 196.0 RMSE: 14.0 time: 0.1964 data: 0.1777 max mem: 1557
+05-03-2024 19:02:08 - train [ 31/730] eta: 0:01:45 n: 3 recall: 1.0 precision: 0.12 f1-score: 0.21 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0177 data: 0.0008 max mem: 1557
+05-03-2024 19:02:08 - train [ 41/730] eta: 0:01:21 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0183 data: 0.0016 max mem: 1557
+05-03-2024 19:02:08 - train [ 51/730] eta: 0:01:07 n: 2 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 122.0 MSE: 14884.0 RMSE: 122.0 time: 0.0188 data: 0.0018 max mem: 1557
+05-03-2024 19:02:08 - train [ 61/730] eta: 0:00:57 n: 16 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 28.0 MSE: 784.0 RMSE: 28.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 19:02:08 - train [ 71/730] eta: 0:00:50 n: 12 recall: 0.83 precision: 0.26 f1-score: 0.4 MAE: 26.0 MSE: 676.0 RMSE: 26.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 19:02:09 - train [ 81/730] eta: 0:00:45 n: 14 recall: 1.0 precision: 0.31 f1-score: 0.47 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 19:02:09 - train [ 91/730] eta: 0:00:40 n: 14 recall: 1.0 precision: 0.23 f1-score: 0.38 MAE: 46.0 MSE: 2116.0 RMSE: 46.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 19:02:09 - train [101/730] eta: 0:00:37 n: 56 recall: 0.95 precision: 0.46 f1-score: 0.62 MAE: 59.0 MSE: 3481.0 RMSE: 59.0 time: 0.0194 data: 0.0018 max mem: 1557
+05-03-2024 19:02:09 - train [111/730] eta: 0:00:34 n: 25 recall: 0.88 precision: 0.51 f1-score: 0.65 MAE: 18.0 MSE: 324.0 RMSE: 18.0 time: 0.0194 data: 0.0017 max mem: 1557
+05-03-2024 19:02:09 - train [121/730] eta: 0:00:32 n: 63 recall: 0.92 precision: 0.51 f1-score: 0.66 MAE: 50.0 MSE: 2500.0 RMSE: 50.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 19:02:10 - train [131/730] eta: 0:00:30 n: 40 recall: 0.95 precision: 0.61 f1-score: 0.75 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0198 data: 0.0017 max mem: 1557
+05-03-2024 19:02:10 - train [141/730] eta: 0:00:28 n: 4 recall: 1.0 precision: 0.05 f1-score: 0.09 MAE: 80.0 MSE: 6400.0 RMSE: 80.0 time: 0.0198 data: 0.0018 max mem: 1557
+05-03-2024 19:02:10 - train [151/730] eta: 0:00:26 n: 66 recall: 0.97 precision: 0.5 f1-score: 0.66 MAE: 63.0 MSE: 3969.0 RMSE: 63.0 time: 0.0200 data: 0.0017 max mem: 1557
+05-03-2024 19:02:10 - train [161/730] eta: 0:00:25 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0201 data: 0.0018 max mem: 1557
+05-03-2024 19:02:10 - train [171/730] eta: 0:00:24 n: 71 recall: 0.97 precision: 0.55 f1-score: 0.7 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0204 data: 0.0018 max mem: 1557
+05-03-2024 19:02:11 - train [181/730] eta: 0:00:23 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 225.0 MSE: 50625.0 RMSE: 225.0 time: 0.0206 data: 0.0017 max mem: 1557
+05-03-2024 19:02:11 - train [191/730] eta: 0:00:22 n: 100 recall: 0.94 precision: 0.59 f1-score: 0.73 MAE: 58.0 MSE: 3364.0 RMSE: 58.0 time: 0.0205 data: 0.0018 max mem: 1557
+05-03-2024 19:02:11 - train [201/730] eta: 0:00:21 n: 5 recall: 1.0 precision: 0.03 f1-score: 0.07 MAE: 139.0 MSE: 19321.0 RMSE: 139.0 time: 0.0205 data: 0.0017 max mem: 1557
+05-03-2024 19:02:11 - train [211/730] eta: 0:00:20 n: 69 recall: 0.94 precision: 0.45 f1-score: 0.61 MAE: 75.0 MSE: 5625.0 RMSE: 75.0 time: 0.0204 data: 0.0017 max mem: 1557
+05-03-2024 19:02:11 - train [221/730] eta: 0:00:19 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0204 data: 0.0017 max mem: 1557
+05-03-2024 19:02:12 - train [231/730] eta: 0:00:18 n: 34 recall: 0.97 precision: 0.49 f1-score: 0.65 MAE: 34.0 MSE: 1156.0 RMSE: 34.0 time: 0.0199 data: 0.0017 max mem: 1557
+05-03-2024 19:02:12 - train [241/730] eta: 0:00:17 n: 49 recall: 0.94 precision: 0.47 f1-score: 0.63 MAE: 48.0 MSE: 2304.0 RMSE: 48.0 time: 0.0199 data: 0.0017 max mem: 1557
+05-03-2024 19:02:12 - train [251/730] eta: 0:00:17 n: 9 recall: 0.78 precision: 0.17 f1-score: 0.29 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0196 data: 0.0018 max mem: 1557
+05-03-2024 19:02:12 - train [261/730] eta: 0:00:16 n: 13 recall: 1.0 precision: 0.19 f1-score: 0.33 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0196 data: 0.0018 max mem: 1557
+05-03-2024 19:02:12 - train [271/730] eta: 0:00:15 n: 29 recall: 0.93 precision: 0.35 f1-score: 0.5 MAE: 49.0 MSE: 2401.0 RMSE: 49.0 time: 0.0194 data: 0.0017 max mem: 1557
+05-03-2024 19:02:13 - train [281/730] eta: 0:00:15 n: 4 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 199.0 MSE: 39601.0 RMSE: 199.0 time: 0.0194 data: 0.0018 max mem: 1557
+05-03-2024 19:02:13 - train [291/730] eta: 0:00:14 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0205 data: 0.0018 max mem: 1557
+05-03-2024 19:02:13 - train [301/730] eta: 0:00:14 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.0 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0220 data: 0.0017 max mem: 1557
+05-03-2024 19:02:13 - train [311/730] eta: 0:00:13 n: 12 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 135.0 MSE: 18225.0 RMSE: 135.0 time: 0.0219 data: 0.0018 max mem: 1557
+05-03-2024 19:02:14 - train [321/730] eta: 0:00:13 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 526.0 MSE: 276676.0 RMSE: 526.0 time: 0.0269 data: 0.0018 max mem: 1557
+05-03-2024 19:02:14 - train [331/730] eta: 0:00:13 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 433.0 MSE: 187489.0 RMSE: 433.0 time: 0.0272 data: 0.0017 max mem: 1557
+05-03-2024 19:02:14 - train [341/730] eta: 0:00:12 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 368.0 MSE: 135424.0 RMSE: 368.0 time: 0.0218 data: 0.0018 max mem: 1557
+05-03-2024 19:02:14 - train [351/730] eta: 0:00:12 n: 22 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 246.0 MSE: 60516.0 RMSE: 246.0 time: 0.0218 data: 0.0018 max mem: 1557
+05-03-2024 19:02:15 - train [361/730] eta: 0:00:11 n: 17 recall: 1.0 precision: 0.09 f1-score: 0.17 MAE: 167.0 MSE: 27889.0 RMSE: 167.0 time: 0.0215 data: 0.0017 max mem: 1557
+05-03-2024 19:02:15 - train [371/730] eta: 0:00:11 n: 18 recall: 1.0 precision: 0.07 f1-score: 0.14 MAE: 223.0 MSE: 49729.0 RMSE: 223.0 time: 0.0215 data: 0.0018 max mem: 1557
+05-03-2024 19:02:15 - train [381/730] eta: 0:00:10 n: 20 recall: 1.0 precision: 0.09 f1-score: 0.16 MAE: 207.0 MSE: 42849.0 RMSE: 207.0 time: 0.0216 data: 0.0018 max mem: 1557
+05-03-2024 19:02:15 - train [391/730] eta: 0:00:10 n: 24 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 275.0 MSE: 75625.0 RMSE: 275.0 time: 0.0217 data: 0.0018 max mem: 1557
+05-03-2024 19:02:15 - train [401/730] eta: 0:00:10 n: 41 recall: 1.0 precision: 0.17 f1-score: 0.28 MAE: 206.0 MSE: 42436.0 RMSE: 206.0 time: 0.0223 data: 0.0018 max mem: 1557
+05-03-2024 19:02:16 - train [411/730] eta: 0:00:09 n: 55 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 258.0 MSE: 66564.0 RMSE: 258.0 time: 0.0235 data: 0.0018 max mem: 1557
+05-03-2024 19:02:16 - train [421/730] eta: 0:00:09 n: 69 recall: 1.0 precision: 0.17 f1-score: 0.29 MAE: 336.0 MSE: 112896.0 RMSE: 336.0 time: 0.0251 data: 0.0018 max mem: 1557
+05-03-2024 19:02:16 - train [431/730] eta: 0:00:09 n: 57 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 344.0 MSE: 118336.0 RMSE: 344.0 time: 0.0261 data: 0.0018 max mem: 1557
+05-03-2024 19:02:16 - train [441/730] eta: 0:00:08 n: 39 recall: 0.97 precision: 0.1 f1-score: 0.18 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0263 data: 0.0019 max mem: 1557
+05-03-2024 19:02:17 - train [451/730] eta: 0:00:08 n: 64 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 401.0 MSE: 160801.0 RMSE: 401.0 time: 0.0258 data: 0.0018 max mem: 1557
+05-03-2024 19:02:17 - train [461/730] eta: 0:00:08 n: 57 recall: 1.0 precision: 0.13 f1-score: 0.23 MAE: 390.0 MSE: 152100.0 RMSE: 390.0 time: 0.0252 data: 0.0019 max mem: 1557
+05-03-2024 19:02:17 - train [471/730] eta: 0:00:07 n: 64 recall: 0.98 precision: 0.15 f1-score: 0.27 MAE: 346.0 MSE: 119716.0 RMSE: 346.0 time: 0.0248 data: 0.0018 max mem: 1557
+05-03-2024 19:02:17 - train [481/730] eta: 0:00:07 n: 60 recall: 0.97 precision: 0.15 f1-score: 0.26 MAE: 318.0 MSE: 101124.0 RMSE: 318.0 time: 0.0239 data: 0.0017 max mem: 1557
+05-03-2024 19:02:18 - train [491/730] eta: 0:00:07 n: 63 recall: 0.95 precision: 0.17 f1-score: 0.28 MAE: 300.0 MSE: 90000.0 RMSE: 300.0 time: 0.0234 data: 0.0018 max mem: 1557
+05-03-2024 19:02:18 - train [501/730] eta: 0:00:06 n: 66 recall: 0.95 precision: 0.22 f1-score: 0.36 MAE: 222.0 MSE: 49284.0 RMSE: 222.0 time: 0.0232 data: 0.0018 max mem: 1557
+05-03-2024 19:02:18 - train [511/730] eta: 0:00:06 n: 65 recall: 0.97 precision: 0.22 f1-score: 0.36 MAE: 219.0 MSE: 47961.0 RMSE: 219.0 time: 0.0228 data: 0.0017 max mem: 1557
+05-03-2024 19:02:18 - train [521/730] eta: 0:00:06 n: 65 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 304.0 MSE: 92416.0 RMSE: 304.0 time: 0.0232 data: 0.0018 max mem: 1557
+05-03-2024 19:02:19 - train [531/730] eta: 0:00:05 n: 58 recall: 1.0 precision: 0.25 f1-score: 0.4 MAE: 172.0 MSE: 29584.0 RMSE: 172.0 time: 0.0237 data: 0.0018 max mem: 1557
+05-03-2024 19:02:19 - train [541/730] eta: 0:00:05 n: 63 recall: 1.0 precision: 0.2 f1-score: 0.33 MAE: 260.0 MSE: 67600.0 RMSE: 260.0 time: 0.0235 data: 0.0017 max mem: 1557
+05-03-2024 19:02:19 - train [551/730] eta: 0:00:05 n: 68 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 291.0 MSE: 84681.0 RMSE: 291.0 time: 0.0285 data: 0.0018 max mem: 1557
+05-03-2024 19:02:19 - train [561/730] eta: 0:00:04 n: 61 recall: 1.0 precision: 0.23 f1-score: 0.37 MAE: 210.0 MSE: 44100.0 RMSE: 210.0 time: 0.0286 data: 0.0018 max mem: 1557
+05-03-2024 19:02:20 - train [571/730] eta: 0:00:04 n: 64 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 241.0 MSE: 58081.0 RMSE: 241.0 time: 0.0237 data: 0.0017 max mem: 1557
+05-03-2024 19:02:20 - train [581/730] eta: 0:00:04 n: 85 recall: 0.99 precision: 0.23 f1-score: 0.37 MAE: 284.0 MSE: 80656.0 RMSE: 284.0 time: 0.0239 data: 0.0018 max mem: 1557
+05-03-2024 19:02:20 - train [591/730] eta: 0:00:04 n: 67 recall: 0.99 precision: 0.2 f1-score: 0.33 MAE: 264.0 MSE: 69696.0 RMSE: 264.0 time: 0.0233 data: 0.0018 max mem: 1557
+05-03-2024 19:02:20 - train [601/730] eta: 0:00:03 n: 27 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0229 data: 0.0017 max mem: 1557
+05-03-2024 19:02:21 - train [611/730] eta: 0:00:03 n: 7 recall: 1.0 precision: 0.06 f1-score: 0.11 MAE: 108.0 MSE: 11664.0 RMSE: 108.0 time: 0.0234 data: 0.0018 max mem: 1557
+05-03-2024 19:02:21 - train [621/730] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0236 data: 0.0018 max mem: 1557
+05-03-2024 19:02:21 - train [631/730] eta: 0:00:02 n: 14 recall: 1.0 precision: 0.12 f1-score: 0.22 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0229 data: 0.0017 max mem: 1557
+05-03-2024 19:02:21 - train [641/730] eta: 0:00:02 n: 51 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 190.0 MSE: 36100.0 RMSE: 190.0 time: 0.0227 data: 0.0018 max mem: 1557
+05-03-2024 19:02:21 - train [651/730] eta: 0:00:02 n: 6 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 305.0 MSE: 93025.0 RMSE: 305.0 time: 0.0229 data: 0.0018 max mem: 1557
+05-03-2024 19:02:22 - train [661/730] eta: 0:00:01 n: 8 recall: 1.0 precision: 0.04 f1-score: 0.09 MAE: 171.0 MSE: 29241.0 RMSE: 171.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 19:02:22 - train [671/730] eta: 0:00:01 n: 11 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 47.0 MSE: 2209.0 RMSE: 47.0 time: 0.0215 data: 0.0018 max mem: 1557
+05-03-2024 19:02:22 - train [681/730] eta: 0:00:01 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.0204 data: 0.0018 max mem: 1557
+05-03-2024 19:02:22 - train [691/730] eta: 0:00:01 n: 4 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 418.0 MSE: 174724.0 RMSE: 418.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 19:02:23 - train [701/730] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0235 data: 0.0018 max mem: 1557
+05-03-2024 19:02:23 - train [711/730] eta: 0:00:00 n: 59 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.0244 data: 0.0018 max mem: 1557
+05-03-2024 19:02:23 - train [721/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 142.0 MSE: 20164.0 RMSE: 142.0 time: 0.0231 data: 0.0017 max mem: 1557
+05-03-2024 19:02:23 - train [730/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 441.0 MSE: 194481.0 RMSE: 441.0 time: 0.0212 data: 0.0017 max mem: 1557
+05-03-2024 19:02:24 - train Total time: 0:00:21 (0.0288 s / it)
+05-03-2024 19:38:48 - train [  1/730] eta: 0:07:38 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 369.0 MSE: 136161.0 RMSE: 369.0 time: 0.6287 data: 0.6043 max mem: 1557
+05-03-2024 19:38:51 - train [ 11/730] eta: 0:04:32 n: 6 recall: 1.0 precision: 0.29 f1-score: 0.44 MAE: 15.0 MSE: 225.0 RMSE: 15.0 time: 0.3790 data: 0.3590 max mem: 1557
+05-03-2024 19:38:51 - train [ 21/730] eta: 0:02:26 n: 8 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 14.0 MSE: 196.0 RMSE: 14.0 time: 0.1857 data: 0.1673 max mem: 1557
+05-03-2024 19:38:51 - train [ 31/730] eta: 0:01:42 n: 3 recall: 1.0 precision: 0.12 f1-score: 0.21 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0180 data: 0.0008 max mem: 1557
+05-03-2024 19:38:52 - train [ 41/730] eta: 0:01:19 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0187 data: 0.0015 max mem: 1557
+05-03-2024 19:38:52 - train [ 51/730] eta: 0:01:05 n: 2 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 122.0 MSE: 14884.0 RMSE: 122.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 19:38:52 - train [ 61/730] eta: 0:00:56 n: 16 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 28.0 MSE: 784.0 RMSE: 28.0 time: 0.0191 data: 0.0016 max mem: 1557
+05-03-2024 19:38:52 - train [ 71/730] eta: 0:00:49 n: 12 recall: 0.83 precision: 0.26 f1-score: 0.4 MAE: 26.0 MSE: 676.0 RMSE: 26.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 19:38:52 - train [ 81/730] eta: 0:00:43 n: 14 recall: 1.0 precision: 0.31 f1-score: 0.47 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 19:38:53 - train [ 91/730] eta: 0:00:39 n: 14 recall: 1.0 precision: 0.23 f1-score: 0.38 MAE: 46.0 MSE: 2116.0 RMSE: 46.0 time: 0.0184 data: 0.0016 max mem: 1557
+05-03-2024 19:38:53 - train [101/730] eta: 0:00:36 n: 56 recall: 0.95 precision: 0.46 f1-score: 0.62 MAE: 59.0 MSE: 3481.0 RMSE: 59.0 time: 0.0183 data: 0.0017 max mem: 1557
+05-03-2024 19:38:53 - train [111/730] eta: 0:00:33 n: 25 recall: 0.88 precision: 0.51 f1-score: 0.65 MAE: 18.0 MSE: 324.0 RMSE: 18.0 time: 0.0183 data: 0.0016 max mem: 1557
+05-03-2024 19:38:53 - train [121/730] eta: 0:00:31 n: 63 recall: 0.92 precision: 0.51 f1-score: 0.66 MAE: 50.0 MSE: 2500.0 RMSE: 50.0 time: 0.0182 data: 0.0016 max mem: 1557
+05-03-2024 19:38:53 - train [131/730] eta: 0:00:29 n: 40 recall: 0.95 precision: 0.61 f1-score: 0.75 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0191 data: 0.0017 max mem: 1557
+05-03-2024 19:38:54 - train [141/730] eta: 0:00:27 n: 4 recall: 1.0 precision: 0.05 f1-score: 0.09 MAE: 80.0 MSE: 6400.0 RMSE: 80.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 19:38:54 - train [151/730] eta: 0:00:26 n: 66 recall: 0.97 precision: 0.5 f1-score: 0.66 MAE: 63.0 MSE: 3969.0 RMSE: 63.0 time: 0.0190 data: 0.0016 max mem: 1557
+05-03-2024 19:38:54 - train [161/730] eta: 0:00:24 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0192 data: 0.0016 max mem: 1557
+05-03-2024 19:38:54 - train [171/730] eta: 0:00:23 n: 71 recall: 0.97 precision: 0.55 f1-score: 0.7 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0196 data: 0.0017 max mem: 1557
+05-03-2024 19:38:54 - train [181/730] eta: 0:00:22 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 225.0 MSE: 50625.0 RMSE: 225.0 time: 0.0197 data: 0.0016 max mem: 1557
+05-03-2024 19:38:55 - train [191/730] eta: 0:00:21 n: 100 recall: 0.94 precision: 0.59 f1-score: 0.73 MAE: 58.0 MSE: 3364.0 RMSE: 58.0 time: 0.0197 data: 0.0017 max mem: 1557
+05-03-2024 19:38:55 - train [201/730] eta: 0:00:20 n: 5 recall: 1.0 precision: 0.03 f1-score: 0.07 MAE: 139.0 MSE: 19321.0 RMSE: 139.0 time: 0.0198 data: 0.0017 max mem: 1557
+05-03-2024 19:38:55 - train [211/730] eta: 0:00:19 n: 69 recall: 0.94 precision: 0.45 f1-score: 0.61 MAE: 75.0 MSE: 5625.0 RMSE: 75.0 time: 0.0194 data: 0.0016 max mem: 1557
+05-03-2024 19:38:55 - train [221/730] eta: 0:00:18 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0192 data: 0.0016 max mem: 1557
+05-03-2024 19:38:55 - train [231/730] eta: 0:00:18 n: 34 recall: 0.97 precision: 0.49 f1-score: 0.65 MAE: 34.0 MSE: 1156.0 RMSE: 34.0 time: 0.0188 data: 0.0016 max mem: 1557
+05-03-2024 19:38:55 - train [241/730] eta: 0:00:17 n: 49 recall: 0.94 precision: 0.47 f1-score: 0.63 MAE: 48.0 MSE: 2304.0 RMSE: 48.0 time: 0.0189 data: 0.0016 max mem: 1557
+05-03-2024 19:38:56 - train [251/730] eta: 0:00:16 n: 9 recall: 0.78 precision: 0.17 f1-score: 0.29 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0186 data: 0.0017 max mem: 1557
+05-03-2024 19:38:56 - train [261/730] eta: 0:00:16 n: 13 recall: 1.0 precision: 0.19 f1-score: 0.33 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0184 data: 0.0016 max mem: 1557
+05-03-2024 19:38:56 - train [271/730] eta: 0:00:15 n: 29 recall: 0.93 precision: 0.35 f1-score: 0.5 MAE: 49.0 MSE: 2401.0 RMSE: 49.0 time: 0.0182 data: 0.0016 max mem: 1557
+05-03-2024 19:38:56 - train [281/730] eta: 0:00:14 n: 4 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 199.0 MSE: 39601.0 RMSE: 199.0 time: 0.0184 data: 0.0016 max mem: 1557
+05-03-2024 19:38:56 - train [291/730] eta: 0:00:14 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0194 data: 0.0017 max mem: 1557
+05-03-2024 19:38:57 - train [301/730] eta: 0:00:13 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.0 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0207 data: 0.0016 max mem: 1557
+05-03-2024 19:38:57 - train [311/730] eta: 0:00:13 n: 12 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 135.0 MSE: 18225.0 RMSE: 135.0 time: 0.0208 data: 0.0017 max mem: 1557
+05-03-2024 19:38:57 - train [321/730] eta: 0:00:13 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 526.0 MSE: 276676.0 RMSE: 526.0 time: 0.0261 data: 0.0017 max mem: 1557
+05-03-2024 19:38:57 - train [331/730] eta: 0:00:12 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 433.0 MSE: 187489.0 RMSE: 433.0 time: 0.0261 data: 0.0016 max mem: 1557
+05-03-2024 19:38:58 - train [341/730] eta: 0:00:12 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 368.0 MSE: 135424.0 RMSE: 368.0 time: 0.0204 data: 0.0017 max mem: 1557
+05-03-2024 19:38:58 - train [351/730] eta: 0:00:11 n: 22 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 246.0 MSE: 60516.0 RMSE: 246.0 time: 0.0204 data: 0.0017 max mem: 1557
+05-03-2024 19:38:58 - train [361/730] eta: 0:00:11 n: 17 recall: 1.0 precision: 0.09 f1-score: 0.17 MAE: 167.0 MSE: 27889.0 RMSE: 167.0 time: 0.0201 data: 0.0016 max mem: 1557
+05-03-2024 19:38:58 - train [371/730] eta: 0:00:10 n: 18 recall: 1.0 precision: 0.07 f1-score: 0.14 MAE: 223.0 MSE: 49729.0 RMSE: 223.0 time: 0.0199 data: 0.0017 max mem: 1557
+05-03-2024 19:38:58 - train [381/730] eta: 0:00:10 n: 20 recall: 1.0 precision: 0.09 f1-score: 0.16 MAE: 207.0 MSE: 42849.0 RMSE: 207.0 time: 0.0199 data: 0.0017 max mem: 1557
+05-03-2024 19:38:59 - train [391/730] eta: 0:00:10 n: 24 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 275.0 MSE: 75625.0 RMSE: 275.0 time: 0.0202 data: 0.0016 max mem: 1557
+05-03-2024 19:38:59 - train [401/730] eta: 0:00:09 n: 41 recall: 1.0 precision: 0.17 f1-score: 0.28 MAE: 206.0 MSE: 42436.0 RMSE: 206.0 time: 0.0209 data: 0.0017 max mem: 1557
+05-03-2024 19:38:59 - train [411/730] eta: 0:00:09 n: 55 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 258.0 MSE: 66564.0 RMSE: 258.0 time: 0.0220 data: 0.0017 max mem: 1557
+05-03-2024 19:38:59 - train [421/730] eta: 0:00:09 n: 69 recall: 1.0 precision: 0.17 f1-score: 0.29 MAE: 336.0 MSE: 112896.0 RMSE: 336.0 time: 0.0236 data: 0.0016 max mem: 1557
+05-03-2024 19:38:59 - train [431/730] eta: 0:00:08 n: 57 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 344.0 MSE: 118336.0 RMSE: 344.0 time: 0.0245 data: 0.0017 max mem: 1557
+05-03-2024 19:39:00 - train [441/730] eta: 0:00:08 n: 39 recall: 0.97 precision: 0.1 f1-score: 0.18 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0246 data: 0.0017 max mem: 1557
+05-03-2024 19:39:00 - train [451/730] eta: 0:00:08 n: 64 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 401.0 MSE: 160801.0 RMSE: 401.0 time: 0.0241 data: 0.0016 max mem: 1557
+05-03-2024 19:39:00 - train [461/730] eta: 0:00:07 n: 57 recall: 1.0 precision: 0.13 f1-score: 0.23 MAE: 390.0 MSE: 152100.0 RMSE: 390.0 time: 0.0235 data: 0.0017 max mem: 1557
+05-03-2024 19:39:00 - train [471/730] eta: 0:00:07 n: 64 recall: 0.98 precision: 0.15 f1-score: 0.27 MAE: 346.0 MSE: 119716.0 RMSE: 346.0 time: 0.0234 data: 0.0017 max mem: 1557
+05-03-2024 19:39:01 - train [481/730] eta: 0:00:07 n: 60 recall: 0.97 precision: 0.15 f1-score: 0.26 MAE: 318.0 MSE: 101124.0 RMSE: 318.0 time: 0.0227 data: 0.0017 max mem: 1557
+05-03-2024 19:39:01 - train [491/730] eta: 0:00:06 n: 63 recall: 0.95 precision: 0.17 f1-score: 0.28 MAE: 300.0 MSE: 90000.0 RMSE: 300.0 time: 0.0219 data: 0.0017 max mem: 1557
+05-03-2024 19:39:01 - train [501/730] eta: 0:00:06 n: 66 recall: 0.95 precision: 0.22 f1-score: 0.36 MAE: 222.0 MSE: 49284.0 RMSE: 222.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 19:39:01 - train [511/730] eta: 0:00:06 n: 65 recall: 0.97 precision: 0.22 f1-score: 0.36 MAE: 219.0 MSE: 47961.0 RMSE: 219.0 time: 0.0213 data: 0.0016 max mem: 1557
+05-03-2024 19:39:02 - train [521/730] eta: 0:00:05 n: 65 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 304.0 MSE: 92416.0 RMSE: 304.0 time: 0.0220 data: 0.0017 max mem: 1557
+05-03-2024 19:39:02 - train [531/730] eta: 0:00:05 n: 58 recall: 1.0 precision: 0.25 f1-score: 0.4 MAE: 172.0 MSE: 29584.0 RMSE: 172.0 time: 0.0223 data: 0.0018 max mem: 1557
+05-03-2024 19:39:02 - train [541/730] eta: 0:00:05 n: 63 recall: 1.0 precision: 0.2 f1-score: 0.33 MAE: 260.0 MSE: 67600.0 RMSE: 260.0 time: 0.0218 data: 0.0017 max mem: 1557
+05-03-2024 19:39:02 - train [551/730] eta: 0:00:05 n: 68 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 291.0 MSE: 84681.0 RMSE: 291.0 time: 0.0269 data: 0.0018 max mem: 1557
+05-03-2024 19:39:03 - train [561/730] eta: 0:00:04 n: 61 recall: 1.0 precision: 0.23 f1-score: 0.37 MAE: 210.0 MSE: 44100.0 RMSE: 210.0 time: 0.0269 data: 0.0018 max mem: 1557
+05-03-2024 19:39:03 - train [571/730] eta: 0:00:04 n: 64 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 241.0 MSE: 58081.0 RMSE: 241.0 time: 0.0221 data: 0.0017 max mem: 1557
+05-03-2024 19:39:03 - train [581/730] eta: 0:00:04 n: 85 recall: 0.99 precision: 0.23 f1-score: 0.37 MAE: 284.0 MSE: 80656.0 RMSE: 284.0 time: 0.0220 data: 0.0017 max mem: 1557
+05-03-2024 19:39:03 - train [591/730] eta: 0:00:03 n: 67 recall: 0.99 precision: 0.2 f1-score: 0.33 MAE: 264.0 MSE: 69696.0 RMSE: 264.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 19:39:03 - train [601/730] eta: 0:00:03 n: 27 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0216 data: 0.0017 max mem: 1557
+05-03-2024 19:39:04 - train [611/730] eta: 0:00:03 n: 7 recall: 1.0 precision: 0.06 f1-score: 0.11 MAE: 108.0 MSE: 11664.0 RMSE: 108.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 19:39:04 - train [621/730] eta: 0:00:02 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0220 data: 0.0018 max mem: 1557
+05-03-2024 19:39:04 - train [631/730] eta: 0:00:02 n: 14 recall: 1.0 precision: 0.12 f1-score: 0.22 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 19:39:04 - train [641/730] eta: 0:00:02 n: 51 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 190.0 MSE: 36100.0 RMSE: 190.0 time: 0.0216 data: 0.0017 max mem: 1557
+05-03-2024 19:39:04 - train [651/730] eta: 0:00:02 n: 6 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 305.0 MSE: 93025.0 RMSE: 305.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 19:39:05 - train [661/730] eta: 0:00:01 n: 8 recall: 1.0 precision: 0.04 f1-score: 0.09 MAE: 171.0 MSE: 29241.0 RMSE: 171.0 time: 0.0212 data: 0.0017 max mem: 1557
+05-03-2024 19:39:05 - train [671/730] eta: 0:00:01 n: 11 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 47.0 MSE: 2209.0 RMSE: 47.0 time: 0.0203 data: 0.0018 max mem: 1557
+05-03-2024 19:39:05 - train [681/730] eta: 0:00:01 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.0196 data: 0.0017 max mem: 1557
+05-03-2024 19:39:05 - train [691/730] eta: 0:00:01 n: 4 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 418.0 MSE: 174724.0 RMSE: 418.0 time: 0.0205 data: 0.0017 max mem: 1557
+05-03-2024 19:39:06 - train [701/730] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0218 data: 0.0018 max mem: 1557
+05-03-2024 19:39:06 - train [711/730] eta: 0:00:00 n: 59 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.0229 data: 0.0018 max mem: 1557
+05-03-2024 19:39:06 - train [721/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 142.0 MSE: 20164.0 RMSE: 142.0 time: 0.0227 data: 0.0017 max mem: 1557
+05-03-2024 19:39:06 - train [730/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 441.0 MSE: 194481.0 RMSE: 441.0 time: 0.0225 data: 0.0018 max mem: 1557
+05-03-2024 19:39:07 - train Total time: 0:00:20 (0.0275 s / it)
+05-03-2024 20:23:13 - train [  1/730] eta: 0:06:42 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 369.0 MSE: 136161.0 RMSE: 369.0 time: 0.5508 data: 0.5262 max mem: 1557
+05-03-2024 20:23:17 - train [ 11/730] eta: 0:04:55 n: 6 recall: 1.0 precision: 0.29 f1-score: 0.44 MAE: 15.0 MSE: 225.0 RMSE: 15.0 time: 0.4100 data: 0.3897 max mem: 1557
+05-03-2024 20:23:17 - train [ 21/730] eta: 0:02:38 n: 8 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 14.0 MSE: 196.0 RMSE: 14.0 time: 0.2064 data: 0.1881 max mem: 1557
+05-03-2024 20:23:17 - train [ 31/730] eta: 0:01:49 n: 3 recall: 1.0 precision: 0.12 f1-score: 0.21 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0175 data: 0.0008 max mem: 1557
+05-03-2024 20:23:17 - train [ 41/730] eta: 0:01:24 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0183 data: 0.0015 max mem: 1557
+05-03-2024 20:23:18 - train [ 51/730] eta: 0:01:09 n: 2 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 122.0 MSE: 14884.0 RMSE: 122.0 time: 0.0185 data: 0.0017 max mem: 1557
+05-03-2024 20:23:18 - train [ 61/730] eta: 0:00:59 n: 16 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 28.0 MSE: 784.0 RMSE: 28.0 time: 0.0185 data: 0.0016 max mem: 1557
+05-03-2024 20:23:18 - train [ 71/730] eta: 0:00:51 n: 12 recall: 0.83 precision: 0.26 f1-score: 0.4 MAE: 26.0 MSE: 676.0 RMSE: 26.0 time: 0.0182 data: 0.0017 max mem: 1557
+05-03-2024 20:23:18 - train [ 81/730] eta: 0:00:46 n: 14 recall: 1.0 precision: 0.31 f1-score: 0.47 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0179 data: 0.0016 max mem: 1557
+05-03-2024 20:23:18 - train [ 91/730] eta: 0:00:41 n: 14 recall: 1.0 precision: 0.23 f1-score: 0.38 MAE: 46.0 MSE: 2116.0 RMSE: 46.0 time: 0.0179 data: 0.0016 max mem: 1557
+05-03-2024 20:23:19 - train [101/730] eta: 0:00:38 n: 56 recall: 0.95 precision: 0.46 f1-score: 0.62 MAE: 59.0 MSE: 3481.0 RMSE: 59.0 time: 0.0181 data: 0.0016 max mem: 1557
+05-03-2024 20:23:19 - train [111/730] eta: 0:00:35 n: 25 recall: 0.88 precision: 0.51 f1-score: 0.65 MAE: 18.0 MSE: 324.0 RMSE: 18.0 time: 0.0182 data: 0.0016 max mem: 1557
+05-03-2024 20:23:19 - train [121/730] eta: 0:00:32 n: 63 recall: 0.92 precision: 0.51 f1-score: 0.66 MAE: 50.0 MSE: 2500.0 RMSE: 50.0 time: 0.0179 data: 0.0015 max mem: 1557
+05-03-2024 20:23:19 - train [131/730] eta: 0:00:30 n: 40 recall: 0.95 precision: 0.61 f1-score: 0.75 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0187 data: 0.0016 max mem: 1557
+05-03-2024 20:23:19 - train [141/730] eta: 0:00:28 n: 4 recall: 1.0 precision: 0.05 f1-score: 0.09 MAE: 80.0 MSE: 6400.0 RMSE: 80.0 time: 0.0188 data: 0.0017 max mem: 1557
+05-03-2024 20:23:20 - train [151/730] eta: 0:00:27 n: 66 recall: 0.97 precision: 0.5 f1-score: 0.66 MAE: 63.0 MSE: 3969.0 RMSE: 63.0 time: 0.0193 data: 0.0016 max mem: 1557
+05-03-2024 20:23:20 - train [161/730] eta: 0:00:25 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0193 data: 0.0017 max mem: 1557
+05-03-2024 20:23:20 - train [171/730] eta: 0:00:24 n: 71 recall: 0.97 precision: 0.55 f1-score: 0.7 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0194 data: 0.0017 max mem: 1557
+05-03-2024 20:23:20 - train [181/730] eta: 0:00:23 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 225.0 MSE: 50625.0 RMSE: 225.0 time: 0.0196 data: 0.0016 max mem: 1557
+05-03-2024 20:23:20 - train [191/730] eta: 0:00:22 n: 100 recall: 0.94 precision: 0.59 f1-score: 0.73 MAE: 58.0 MSE: 3364.0 RMSE: 58.0 time: 0.0195 data: 0.0017 max mem: 1557
+05-03-2024 20:23:20 - train [201/730] eta: 0:00:21 n: 5 recall: 1.0 precision: 0.03 f1-score: 0.07 MAE: 139.0 MSE: 19321.0 RMSE: 139.0 time: 0.0196 data: 0.0017 max mem: 1557
+05-03-2024 20:23:21 - train [211/730] eta: 0:00:20 n: 69 recall: 0.94 precision: 0.45 f1-score: 0.61 MAE: 75.0 MSE: 5625.0 RMSE: 75.0 time: 0.0192 data: 0.0016 max mem: 1557
+05-03-2024 20:23:21 - train [221/730] eta: 0:00:19 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0191 data: 0.0017 max mem: 1557
+05-03-2024 20:23:21 - train [231/730] eta: 0:00:18 n: 34 recall: 0.97 precision: 0.49 f1-score: 0.65 MAE: 34.0 MSE: 1156.0 RMSE: 34.0 time: 0.0187 data: 0.0017 max mem: 1557
+05-03-2024 20:23:21 - train [241/730] eta: 0:00:17 n: 49 recall: 0.94 precision: 0.47 f1-score: 0.63 MAE: 48.0 MSE: 2304.0 RMSE: 48.0 time: 0.0188 data: 0.0016 max mem: 1557
+05-03-2024 20:23:21 - train [251/730] eta: 0:00:17 n: 9 recall: 0.78 precision: 0.17 f1-score: 0.29 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0185 data: 0.0017 max mem: 1557
+05-03-2024 20:23:22 - train [261/730] eta: 0:00:16 n: 13 recall: 1.0 precision: 0.19 f1-score: 0.33 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0185 data: 0.0016 max mem: 1557
+05-03-2024 20:23:22 - train [271/730] eta: 0:00:15 n: 29 recall: 0.93 precision: 0.35 f1-score: 0.5 MAE: 49.0 MSE: 2401.0 RMSE: 49.0 time: 0.0184 data: 0.0016 max mem: 1557
+05-03-2024 20:23:22 - train [281/730] eta: 0:00:15 n: 4 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 199.0 MSE: 39601.0 RMSE: 199.0 time: 0.0184 data: 0.0016 max mem: 1557
+05-03-2024 20:23:22 - train [291/730] eta: 0:00:14 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0192 data: 0.0016 max mem: 1557
+05-03-2024 20:23:22 - train [301/730] eta: 0:00:14 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.0 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0206 data: 0.0016 max mem: 1557
+05-03-2024 20:23:23 - train [311/730] eta: 0:00:13 n: 12 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 135.0 MSE: 18225.0 RMSE: 135.0 time: 0.0206 data: 0.0017 max mem: 1557
+05-03-2024 20:23:23 - train [321/730] eta: 0:00:13 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 526.0 MSE: 276676.0 RMSE: 526.0 time: 0.0260 data: 0.0017 max mem: 1557
+05-03-2024 20:23:23 - train [331/730] eta: 0:00:12 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 433.0 MSE: 187489.0 RMSE: 433.0 time: 0.0262 data: 0.0016 max mem: 1557
+05-03-2024 20:23:23 - train [341/730] eta: 0:00:12 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 368.0 MSE: 135424.0 RMSE: 368.0 time: 0.0204 data: 0.0016 max mem: 1557
+05-03-2024 20:23:24 - train [351/730] eta: 0:00:11 n: 22 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 246.0 MSE: 60516.0 RMSE: 246.0 time: 0.0203 data: 0.0016 max mem: 1557
+05-03-2024 20:23:24 - train [361/730] eta: 0:00:11 n: 17 recall: 1.0 precision: 0.09 f1-score: 0.17 MAE: 167.0 MSE: 27889.0 RMSE: 167.0 time: 0.0201 data: 0.0016 max mem: 1557
+05-03-2024 20:23:24 - train [371/730] eta: 0:00:11 n: 18 recall: 1.0 precision: 0.07 f1-score: 0.14 MAE: 223.0 MSE: 49729.0 RMSE: 223.0 time: 0.0200 data: 0.0017 max mem: 1557
+05-03-2024 20:23:24 - train [381/730] eta: 0:00:10 n: 20 recall: 1.0 precision: 0.09 f1-score: 0.16 MAE: 207.0 MSE: 42849.0 RMSE: 207.0 time: 0.0208 data: 0.0017 max mem: 1557
+05-03-2024 20:23:24 - train [391/730] eta: 0:00:10 n: 24 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 275.0 MSE: 75625.0 RMSE: 275.0 time: 0.0218 data: 0.0017 max mem: 1557
+05-03-2024 20:23:25 - train [401/730] eta: 0:00:09 n: 41 recall: 1.0 precision: 0.17 f1-score: 0.28 MAE: 206.0 MSE: 42436.0 RMSE: 206.0 time: 0.0224 data: 0.0017 max mem: 1557
+05-03-2024 20:23:25 - train [411/730] eta: 0:00:09 n: 55 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 258.0 MSE: 66564.0 RMSE: 258.0 time: 0.0233 data: 0.0017 max mem: 1557
+05-03-2024 20:23:25 - train [421/730] eta: 0:00:09 n: 69 recall: 1.0 precision: 0.17 f1-score: 0.29 MAE: 336.0 MSE: 112896.0 RMSE: 336.0 time: 0.0244 data: 0.0017 max mem: 1557
+05-03-2024 20:23:25 - train [431/730] eta: 0:00:08 n: 57 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 344.0 MSE: 118336.0 RMSE: 344.0 time: 0.0249 data: 0.0017 max mem: 1557
+05-03-2024 20:23:26 - train [441/730] eta: 0:00:08 n: 39 recall: 0.97 precision: 0.1 f1-score: 0.18 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0247 data: 0.0017 max mem: 1557
+05-03-2024 20:23:26 - train [451/730] eta: 0:00:08 n: 64 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 401.0 MSE: 160801.0 RMSE: 401.0 time: 0.0241 data: 0.0016 max mem: 1557
+05-03-2024 20:23:26 - train [461/730] eta: 0:00:07 n: 57 recall: 1.0 precision: 0.13 f1-score: 0.23 MAE: 390.0 MSE: 152100.0 RMSE: 390.0 time: 0.0233 data: 0.0017 max mem: 1557
+05-03-2024 20:23:26 - train [471/730] eta: 0:00:07 n: 64 recall: 0.98 precision: 0.15 f1-score: 0.27 MAE: 346.0 MSE: 119716.0 RMSE: 346.0 time: 0.0234 data: 0.0017 max mem: 1557
+05-03-2024 20:23:27 - train [481/730] eta: 0:00:07 n: 60 recall: 0.97 precision: 0.15 f1-score: 0.26 MAE: 318.0 MSE: 101124.0 RMSE: 318.0 time: 0.0228 data: 0.0016 max mem: 1557
+05-03-2024 20:23:27 - train [491/730] eta: 0:00:06 n: 63 recall: 0.95 precision: 0.17 f1-score: 0.28 MAE: 300.0 MSE: 90000.0 RMSE: 300.0 time: 0.0218 data: 0.0017 max mem: 1557
+05-03-2024 20:23:27 - train [501/730] eta: 0:00:06 n: 66 recall: 0.95 precision: 0.22 f1-score: 0.36 MAE: 222.0 MSE: 49284.0 RMSE: 222.0 time: 0.0214 data: 0.0017 max mem: 1557
+05-03-2024 20:23:27 - train [511/730] eta: 0:00:06 n: 65 recall: 0.97 precision: 0.22 f1-score: 0.36 MAE: 219.0 MSE: 47961.0 RMSE: 219.0 time: 0.0212 data: 0.0016 max mem: 1557
+05-03-2024 20:23:27 - train [521/730] eta: 0:00:06 n: 65 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 304.0 MSE: 92416.0 RMSE: 304.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 20:23:28 - train [531/730] eta: 0:00:05 n: 58 recall: 1.0 precision: 0.25 f1-score: 0.4 MAE: 172.0 MSE: 29584.0 RMSE: 172.0 time: 0.0220 data: 0.0017 max mem: 1557
+05-03-2024 20:23:28 - train [541/730] eta: 0:00:05 n: 63 recall: 1.0 precision: 0.2 f1-score: 0.33 MAE: 260.0 MSE: 67600.0 RMSE: 260.0 time: 0.0217 data: 0.0016 max mem: 1557
+05-03-2024 20:23:28 - train [551/730] eta: 0:00:05 n: 68 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 291.0 MSE: 84681.0 RMSE: 291.0 time: 0.0268 data: 0.0017 max mem: 1557
+05-03-2024 20:23:28 - train [561/730] eta: 0:00:04 n: 61 recall: 1.0 precision: 0.23 f1-score: 0.37 MAE: 210.0 MSE: 44100.0 RMSE: 210.0 time: 0.0268 data: 0.0018 max mem: 1557
+05-03-2024 20:23:29 - train [571/730] eta: 0:00:04 n: 64 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 241.0 MSE: 58081.0 RMSE: 241.0 time: 0.0220 data: 0.0016 max mem: 1557
+05-03-2024 20:23:29 - train [581/730] eta: 0:00:04 n: 85 recall: 0.99 precision: 0.23 f1-score: 0.37 MAE: 284.0 MSE: 80656.0 RMSE: 284.0 time: 0.0221 data: 0.0017 max mem: 1557
+05-03-2024 20:23:29 - train [591/730] eta: 0:00:03 n: 67 recall: 0.99 precision: 0.2 f1-score: 0.33 MAE: 264.0 MSE: 69696.0 RMSE: 264.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 20:23:29 - train [601/730] eta: 0:00:03 n: 27 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0214 data: 0.0016 max mem: 1557
+05-03-2024 20:23:29 - train [611/730] eta: 0:00:03 n: 7 recall: 1.0 precision: 0.06 f1-score: 0.11 MAE: 108.0 MSE: 11664.0 RMSE: 108.0 time: 0.0215 data: 0.0017 max mem: 1557
+05-03-2024 20:23:30 - train [621/730] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0218 data: 0.0017 max mem: 1557
+05-03-2024 20:23:30 - train [631/730] eta: 0:00:02 n: 14 recall: 1.0 precision: 0.12 f1-score: 0.22 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0215 data: 0.0016 max mem: 1557
+05-03-2024 20:23:30 - train [641/730] eta: 0:00:02 n: 51 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 190.0 MSE: 36100.0 RMSE: 190.0 time: 0.0214 data: 0.0017 max mem: 1557
+05-03-2024 20:23:30 - train [651/730] eta: 0:00:02 n: 6 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 305.0 MSE: 93025.0 RMSE: 305.0 time: 0.0214 data: 0.0017 max mem: 1557
+05-03-2024 20:23:31 - train [661/730] eta: 0:00:01 n: 8 recall: 1.0 precision: 0.04 f1-score: 0.09 MAE: 171.0 MSE: 29241.0 RMSE: 171.0 time: 0.0209 data: 0.0016 max mem: 1557
+05-03-2024 20:23:31 - train [671/730] eta: 0:00:01 n: 11 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 47.0 MSE: 2209.0 RMSE: 47.0 time: 0.0200 data: 0.0017 max mem: 1557
+05-03-2024 20:23:31 - train [681/730] eta: 0:00:01 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.0196 data: 0.0017 max mem: 1557
+05-03-2024 20:23:31 - train [691/730] eta: 0:00:01 n: 4 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 418.0 MSE: 174724.0 RMSE: 418.0 time: 0.0206 data: 0.0016 max mem: 1557
+05-03-2024 20:23:31 - train [701/730] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0216 data: 0.0017 max mem: 1557
+05-03-2024 20:23:32 - train [711/730] eta: 0:00:00 n: 59 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.0229 data: 0.0017 max mem: 1557
+05-03-2024 20:23:32 - train [721/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 142.0 MSE: 20164.0 RMSE: 142.0 time: 0.0223 data: 0.0016 max mem: 1557
+05-03-2024 20:23:32 - train [730/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 441.0 MSE: 194481.0 RMSE: 441.0 time: 0.0208 data: 0.0017 max mem: 1557
+05-03-2024 20:23:33 - train Total time: 0:00:20 (0.0280 s / it)
+05-03-2024 20:31:54 - train [  1/730] eta: 0:06:26 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 369.0 MSE: 136161.0 RMSE: 369.0 time: 0.5299 data: 0.5050 max mem: 1557
+05-03-2024 20:31:58 - train [ 11/730] eta: 0:04:52 n: 6 recall: 1.0 precision: 0.29 f1-score: 0.44 MAE: 15.0 MSE: 225.0 RMSE: 15.0 time: 0.4056 data: 0.3855 max mem: 1557
+05-03-2024 20:31:58 - train [ 21/730] eta: 0:02:36 n: 8 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 14.0 MSE: 196.0 RMSE: 14.0 time: 0.2054 data: 0.1869 max mem: 1557
+05-03-2024 20:31:58 - train [ 31/730] eta: 0:01:48 n: 3 recall: 1.0 precision: 0.12 f1-score: 0.21 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0177 data: 0.0008 max mem: 1557
+05-03-2024 20:31:59 - train [ 41/730] eta: 0:01:24 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0180 data: 0.0015 max mem: 1557
+05-03-2024 20:31:59 - train [ 51/730] eta: 0:01:09 n: 2 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 122.0 MSE: 14884.0 RMSE: 122.0 time: 0.0181 data: 0.0017 max mem: 1557
+05-03-2024 20:31:59 - train [ 61/730] eta: 0:00:58 n: 16 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 28.0 MSE: 784.0 RMSE: 28.0 time: 0.0182 data: 0.0016 max mem: 1557
+05-03-2024 20:31:59 - train [ 71/730] eta: 0:00:51 n: 12 recall: 0.83 precision: 0.26 f1-score: 0.4 MAE: 26.0 MSE: 676.0 RMSE: 26.0 time: 0.0183 data: 0.0017 max mem: 1557
+05-03-2024 20:31:59 - train [ 81/730] eta: 0:00:46 n: 14 recall: 1.0 precision: 0.31 f1-score: 0.47 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0187 data: 0.0017 max mem: 1557
+05-03-2024 20:31:59 - train [ 91/730] eta: 0:00:41 n: 14 recall: 1.0 precision: 0.23 f1-score: 0.38 MAE: 46.0 MSE: 2116.0 RMSE: 46.0 time: 0.0186 data: 0.0016 max mem: 1557
+05-03-2024 20:32:00 - train [101/730] eta: 0:00:38 n: 56 recall: 0.95 precision: 0.46 f1-score: 0.62 MAE: 59.0 MSE: 3481.0 RMSE: 59.0 time: 0.0188 data: 0.0017 max mem: 1557
+05-03-2024 20:32:00 - train [111/730] eta: 0:00:35 n: 25 recall: 0.88 precision: 0.51 f1-score: 0.65 MAE: 18.0 MSE: 324.0 RMSE: 18.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 20:32:00 - train [121/730] eta: 0:00:32 n: 63 recall: 0.92 precision: 0.51 f1-score: 0.66 MAE: 50.0 MSE: 2500.0 RMSE: 50.0 time: 0.0187 data: 0.0016 max mem: 1557
+05-03-2024 20:32:00 - train [131/730] eta: 0:00:30 n: 40 recall: 0.95 precision: 0.61 f1-score: 0.75 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0195 data: 0.0017 max mem: 1557
+05-03-2024 20:32:00 - train [141/730] eta: 0:00:28 n: 4 recall: 1.0 precision: 0.05 f1-score: 0.09 MAE: 80.0 MSE: 6400.0 RMSE: 80.0 time: 0.0192 data: 0.0017 max mem: 1557
+05-03-2024 20:32:01 - train [151/730] eta: 0:00:27 n: 66 recall: 0.97 precision: 0.5 f1-score: 0.66 MAE: 63.0 MSE: 3969.0 RMSE: 63.0 time: 0.0195 data: 0.0016 max mem: 1557
+05-03-2024 20:32:01 - train [161/730] eta: 0:00:25 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0198 data: 0.0017 max mem: 1557
+05-03-2024 20:32:01 - train [171/730] eta: 0:00:24 n: 71 recall: 0.97 precision: 0.55 f1-score: 0.7 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0200 data: 0.0017 max mem: 1557
+05-03-2024 20:32:01 - train [181/730] eta: 0:00:23 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 225.0 MSE: 50625.0 RMSE: 225.0 time: 0.0200 data: 0.0016 max mem: 1557
+05-03-2024 20:32:01 - train [191/730] eta: 0:00:22 n: 100 recall: 0.94 precision: 0.59 f1-score: 0.73 MAE: 58.0 MSE: 3364.0 RMSE: 58.0 time: 0.0201 data: 0.0017 max mem: 1557
+05-03-2024 20:32:02 - train [201/730] eta: 0:00:21 n: 5 recall: 1.0 precision: 0.03 f1-score: 0.07 MAE: 139.0 MSE: 19321.0 RMSE: 139.0 time: 0.0202 data: 0.0017 max mem: 1557
+05-03-2024 20:32:02 - train [211/730] eta: 0:00:20 n: 69 recall: 0.94 precision: 0.45 f1-score: 0.61 MAE: 75.0 MSE: 5625.0 RMSE: 75.0 time: 0.0199 data: 0.0016 max mem: 1557
+05-03-2024 20:32:02 - train [221/730] eta: 0:00:19 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0197 data: 0.0017 max mem: 1557
+05-03-2024 20:32:02 - train [231/730] eta: 0:00:18 n: 34 recall: 0.97 precision: 0.49 f1-score: 0.65 MAE: 34.0 MSE: 1156.0 RMSE: 34.0 time: 0.0194 data: 0.0017 max mem: 1557
+05-03-2024 20:32:02 - train [241/730] eta: 0:00:17 n: 49 recall: 0.94 precision: 0.47 f1-score: 0.63 MAE: 48.0 MSE: 2304.0 RMSE: 48.0 time: 0.0193 data: 0.0016 max mem: 1557
+05-03-2024 20:32:03 - train [251/730] eta: 0:00:17 n: 9 recall: 0.78 precision: 0.17 f1-score: 0.29 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 20:32:03 - train [261/730] eta: 0:00:16 n: 13 recall: 1.0 precision: 0.19 f1-score: 0.33 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 20:32:03 - train [271/730] eta: 0:00:15 n: 29 recall: 0.93 precision: 0.35 f1-score: 0.5 MAE: 49.0 MSE: 2401.0 RMSE: 49.0 time: 0.0189 data: 0.0016 max mem: 1557
+05-03-2024 20:32:03 - train [281/730] eta: 0:00:15 n: 4 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 199.0 MSE: 39601.0 RMSE: 199.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 20:32:03 - train [291/730] eta: 0:00:14 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0197 data: 0.0017 max mem: 1557
+05-03-2024 20:32:04 - train [301/730] eta: 0:00:14 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.0 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0211 data: 0.0016 max mem: 1557
+05-03-2024 20:32:04 - train [311/730] eta: 0:00:13 n: 12 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 135.0 MSE: 18225.0 RMSE: 135.0 time: 0.0212 data: 0.0017 max mem: 1557
+05-03-2024 20:32:04 - train [321/730] eta: 0:00:13 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 526.0 MSE: 276676.0 RMSE: 526.0 time: 0.0269 data: 0.0017 max mem: 1557
+05-03-2024 20:32:04 - train [331/730] eta: 0:00:13 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 433.0 MSE: 187489.0 RMSE: 433.0 time: 0.0271 data: 0.0016 max mem: 1557
+05-03-2024 20:32:05 - train [341/730] eta: 0:00:12 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 368.0 MSE: 135424.0 RMSE: 368.0 time: 0.0210 data: 0.0017 max mem: 1557
+05-03-2024 20:32:05 - train [351/730] eta: 0:00:12 n: 22 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 246.0 MSE: 60516.0 RMSE: 246.0 time: 0.0209 data: 0.0017 max mem: 1557
+05-03-2024 20:32:05 - train [361/730] eta: 0:00:11 n: 17 recall: 1.0 precision: 0.09 f1-score: 0.17 MAE: 167.0 MSE: 27889.0 RMSE: 167.0 time: 0.0206 data: 0.0016 max mem: 1557
+05-03-2024 20:32:05 - train [371/730] eta: 0:00:11 n: 18 recall: 1.0 precision: 0.07 f1-score: 0.14 MAE: 223.0 MSE: 49729.0 RMSE: 223.0 time: 0.0205 data: 0.0017 max mem: 1557
+05-03-2024 20:32:05 - train [381/730] eta: 0:00:10 n: 20 recall: 1.0 precision: 0.09 f1-score: 0.16 MAE: 207.0 MSE: 42849.0 RMSE: 207.0 time: 0.0207 data: 0.0017 max mem: 1557
+05-03-2024 20:32:06 - train [391/730] eta: 0:00:10 n: 24 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 275.0 MSE: 75625.0 RMSE: 275.0 time: 0.0208 data: 0.0016 max mem: 1557
+05-03-2024 20:32:06 - train [401/730] eta: 0:00:10 n: 41 recall: 1.0 precision: 0.17 f1-score: 0.28 MAE: 206.0 MSE: 42436.0 RMSE: 206.0 time: 0.0214 data: 0.0017 max mem: 1557
+05-03-2024 20:32:06 - train [411/730] eta: 0:00:09 n: 55 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 258.0 MSE: 66564.0 RMSE: 258.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 20:32:06 - train [421/730] eta: 0:00:09 n: 69 recall: 1.0 precision: 0.17 f1-score: 0.29 MAE: 336.0 MSE: 112896.0 RMSE: 336.0 time: 0.0242 data: 0.0016 max mem: 1557
+05-03-2024 20:32:07 - train [431/730] eta: 0:00:09 n: 57 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 344.0 MSE: 118336.0 RMSE: 344.0 time: 0.0251 data: 0.0017 max mem: 1557
+05-03-2024 20:32:07 - train [441/730] eta: 0:00:08 n: 39 recall: 0.97 precision: 0.1 f1-score: 0.18 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0251 data: 0.0017 max mem: 1557
+05-03-2024 20:32:07 - train [451/730] eta: 0:00:08 n: 64 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 401.0 MSE: 160801.0 RMSE: 401.0 time: 0.0246 data: 0.0016 max mem: 1557
+05-03-2024 20:32:07 - train [461/730] eta: 0:00:08 n: 57 recall: 1.0 precision: 0.13 f1-score: 0.23 MAE: 390.0 MSE: 152100.0 RMSE: 390.0 time: 0.0242 data: 0.0017 max mem: 1557
+05-03-2024 20:32:08 - train [471/730] eta: 0:00:07 n: 64 recall: 0.98 precision: 0.15 f1-score: 0.27 MAE: 346.0 MSE: 119716.0 RMSE: 346.0 time: 0.0240 data: 0.0018 max mem: 1557
+05-03-2024 20:32:08 - train [481/730] eta: 0:00:07 n: 60 recall: 0.97 precision: 0.15 f1-score: 0.26 MAE: 318.0 MSE: 101124.0 RMSE: 318.0 time: 0.0232 data: 0.0016 max mem: 1557
+05-03-2024 20:32:08 - train [491/730] eta: 0:00:07 n: 63 recall: 0.95 precision: 0.17 f1-score: 0.28 MAE: 300.0 MSE: 90000.0 RMSE: 300.0 time: 0.0225 data: 0.0017 max mem: 1557
+05-03-2024 20:32:08 - train [501/730] eta: 0:00:06 n: 66 recall: 0.95 precision: 0.22 f1-score: 0.36 MAE: 222.0 MSE: 49284.0 RMSE: 222.0 time: 0.0224 data: 0.0017 max mem: 1557
+05-03-2024 20:32:08 - train [511/730] eta: 0:00:06 n: 65 recall: 0.97 precision: 0.22 f1-score: 0.36 MAE: 219.0 MSE: 47961.0 RMSE: 219.0 time: 0.0221 data: 0.0017 max mem: 1557
+05-03-2024 20:32:09 - train [521/730] eta: 0:00:06 n: 65 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 304.0 MSE: 92416.0 RMSE: 304.0 time: 0.0225 data: 0.0017 max mem: 1557
+05-03-2024 20:32:09 - train [531/730] eta: 0:00:05 n: 58 recall: 1.0 precision: 0.25 f1-score: 0.4 MAE: 172.0 MSE: 29584.0 RMSE: 172.0 time: 0.0227 data: 0.0017 max mem: 1557
+05-03-2024 20:32:09 - train [541/730] eta: 0:00:05 n: 63 recall: 1.0 precision: 0.2 f1-score: 0.33 MAE: 260.0 MSE: 67600.0 RMSE: 260.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 20:32:09 - train [551/730] eta: 0:00:05 n: 68 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 291.0 MSE: 84681.0 RMSE: 291.0 time: 0.0277 data: 0.0018 max mem: 1557
+05-03-2024 20:32:10 - train [561/730] eta: 0:00:04 n: 61 recall: 1.0 precision: 0.23 f1-score: 0.37 MAE: 210.0 MSE: 44100.0 RMSE: 210.0 time: 0.0277 data: 0.0018 max mem: 1557
+05-03-2024 20:32:10 - train [571/730] eta: 0:00:04 n: 64 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 241.0 MSE: 58081.0 RMSE: 241.0 time: 0.0229 data: 0.0017 max mem: 1557
+05-03-2024 20:32:10 - train [581/730] eta: 0:00:04 n: 85 recall: 0.99 precision: 0.23 f1-score: 0.37 MAE: 284.0 MSE: 80656.0 RMSE: 284.0 time: 0.0229 data: 0.0017 max mem: 1557
+05-03-2024 20:32:10 - train [591/730] eta: 0:00:03 n: 67 recall: 0.99 precision: 0.2 f1-score: 0.33 MAE: 264.0 MSE: 69696.0 RMSE: 264.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 20:32:11 - train [601/730] eta: 0:00:03 n: 27 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0224 data: 0.0017 max mem: 1557
+05-03-2024 20:32:11 - train [611/730] eta: 0:00:03 n: 7 recall: 1.0 precision: 0.06 f1-score: 0.11 MAE: 108.0 MSE: 11664.0 RMSE: 108.0 time: 0.0224 data: 0.0017 max mem: 1557
+05-03-2024 20:32:11 - train [621/730] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0227 data: 0.0017 max mem: 1557
+05-03-2024 20:32:11 - train [631/730] eta: 0:00:02 n: 14 recall: 1.0 precision: 0.12 f1-score: 0.22 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0224 data: 0.0017 max mem: 1557
+05-03-2024 20:32:12 - train [641/730] eta: 0:00:02 n: 51 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 190.0 MSE: 36100.0 RMSE: 190.0 time: 0.0223 data: 0.0017 max mem: 1557
+05-03-2024 20:32:12 - train [651/730] eta: 0:00:02 n: 6 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 305.0 MSE: 93025.0 RMSE: 305.0 time: 0.0223 data: 0.0017 max mem: 1557
+05-03-2024 20:32:12 - train [661/730] eta: 0:00:01 n: 8 recall: 1.0 precision: 0.04 f1-score: 0.09 MAE: 171.0 MSE: 29241.0 RMSE: 171.0 time: 0.0220 data: 0.0017 max mem: 1557
+05-03-2024 20:32:12 - train [671/730] eta: 0:00:01 n: 11 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 47.0 MSE: 2209.0 RMSE: 47.0 time: 0.0211 data: 0.0018 max mem: 1557
+05-03-2024 20:32:12 - train [681/730] eta: 0:00:01 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.0203 data: 0.0017 max mem: 1557
+05-03-2024 20:32:13 - train [691/730] eta: 0:00:01 n: 4 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 418.0 MSE: 174724.0 RMSE: 418.0 time: 0.0212 data: 0.0017 max mem: 1557
+05-03-2024 20:32:13 - train [701/730] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0225 data: 0.0017 max mem: 1557
+05-03-2024 20:32:13 - train [711/730] eta: 0:00:00 n: 59 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.0239 data: 0.0017 max mem: 1557
+05-03-2024 20:32:13 - train [721/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 142.0 MSE: 20164.0 RMSE: 142.0 time: 0.0232 data: 0.0017 max mem: 1557
+05-03-2024 20:32:13 - train [730/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 441.0 MSE: 194481.0 RMSE: 441.0 time: 0.0215 data: 0.0017 max mem: 1557
+05-03-2024 20:32:14 - train Total time: 0:00:20 (0.0284 s / it)
+05-03-2024 21:17:30 - train [  1/730] eta: 0:05:51 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 369.0 MSE: 136161.0 RMSE: 369.0 time: 0.4818 data: 0.4571 max mem: 1557
+05-03-2024 21:17:34 - train [ 11/730] eta: 0:04:42 n: 6 recall: 1.0 precision: 0.29 f1-score: 0.44 MAE: 15.0 MSE: 225.0 RMSE: 15.0 time: 0.3925 data: 0.3727 max mem: 1557
+05-03-2024 21:17:34 - train [ 21/730] eta: 0:02:31 n: 8 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 14.0 MSE: 196.0 RMSE: 14.0 time: 0.2001 data: 0.1823 max mem: 1557
+05-03-2024 21:17:35 - train [ 31/730] eta: 0:01:45 n: 3 recall: 1.0 precision: 0.12 f1-score: 0.21 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0173 data: 0.0008 max mem: 1557
+05-03-2024 21:17:35 - train [ 41/730] eta: 0:01:21 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0181 data: 0.0015 max mem: 1557
+05-03-2024 21:17:35 - train [ 51/730] eta: 0:01:07 n: 2 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 122.0 MSE: 14884.0 RMSE: 122.0 time: 0.0183 data: 0.0017 max mem: 1557
+05-03-2024 21:17:35 - train [ 61/730] eta: 0:00:57 n: 16 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 28.0 MSE: 784.0 RMSE: 28.0 time: 0.0183 data: 0.0016 max mem: 1557
+05-03-2024 21:17:35 - train [ 71/730] eta: 0:00:50 n: 12 recall: 0.83 precision: 0.26 f1-score: 0.4 MAE: 26.0 MSE: 676.0 RMSE: 26.0 time: 0.0184 data: 0.0017 max mem: 1557
+05-03-2024 21:17:35 - train [ 81/730] eta: 0:00:44 n: 14 recall: 1.0 precision: 0.31 f1-score: 0.47 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0185 data: 0.0017 max mem: 1557
+05-03-2024 21:17:36 - train [ 91/730] eta: 0:00:40 n: 14 recall: 1.0 precision: 0.23 f1-score: 0.38 MAE: 46.0 MSE: 2116.0 RMSE: 46.0 time: 0.0186 data: 0.0016 max mem: 1557
+05-03-2024 21:17:36 - train [101/730] eta: 0:00:37 n: 56 recall: 0.95 precision: 0.46 f1-score: 0.62 MAE: 59.0 MSE: 3481.0 RMSE: 59.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 21:17:36 - train [111/730] eta: 0:00:34 n: 25 recall: 0.88 precision: 0.51 f1-score: 0.65 MAE: 18.0 MSE: 324.0 RMSE: 18.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 21:17:36 - train [121/730] eta: 0:00:31 n: 63 recall: 0.92 precision: 0.51 f1-score: 0.66 MAE: 50.0 MSE: 2500.0 RMSE: 50.0 time: 0.0185 data: 0.0016 max mem: 1557
+05-03-2024 21:17:36 - train [131/730] eta: 0:00:29 n: 40 recall: 0.95 precision: 0.61 f1-score: 0.75 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0194 data: 0.0017 max mem: 1557
+05-03-2024 21:17:37 - train [141/730] eta: 0:00:28 n: 4 recall: 1.0 precision: 0.05 f1-score: 0.09 MAE: 80.0 MSE: 6400.0 RMSE: 80.0 time: 0.0193 data: 0.0017 max mem: 1557
+05-03-2024 21:17:37 - train [151/730] eta: 0:00:26 n: 66 recall: 0.97 precision: 0.5 f1-score: 0.66 MAE: 63.0 MSE: 3969.0 RMSE: 63.0 time: 0.0194 data: 0.0016 max mem: 1557
+05-03-2024 21:17:37 - train [161/730] eta: 0:00:25 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0197 data: 0.0017 max mem: 1557
+05-03-2024 21:17:37 - train [171/730] eta: 0:00:23 n: 71 recall: 0.97 precision: 0.55 f1-score: 0.7 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0202 data: 0.0018 max mem: 1557
+05-03-2024 21:17:37 - train [181/730] eta: 0:00:22 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 225.0 MSE: 50625.0 RMSE: 225.0 time: 0.0202 data: 0.0017 max mem: 1557
+05-03-2024 21:17:38 - train [191/730] eta: 0:00:21 n: 100 recall: 0.94 precision: 0.59 f1-score: 0.73 MAE: 58.0 MSE: 3364.0 RMSE: 58.0 time: 0.0200 data: 0.0017 max mem: 1557
+05-03-2024 21:17:38 - train [201/730] eta: 0:00:20 n: 5 recall: 1.0 precision: 0.03 f1-score: 0.07 MAE: 139.0 MSE: 19321.0 RMSE: 139.0 time: 0.0205 data: 0.0018 max mem: 1557
+05-03-2024 21:17:38 - train [211/730] eta: 0:00:20 n: 69 recall: 0.94 precision: 0.45 f1-score: 0.61 MAE: 75.0 MSE: 5625.0 RMSE: 75.0 time: 0.0203 data: 0.0017 max mem: 1557
+05-03-2024 21:17:38 - train [221/730] eta: 0:00:19 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0198 data: 0.0017 max mem: 1557
+05-03-2024 21:17:38 - train [231/730] eta: 0:00:18 n: 34 recall: 0.97 precision: 0.49 f1-score: 0.65 MAE: 34.0 MSE: 1156.0 RMSE: 34.0 time: 0.0194 data: 0.0017 max mem: 1557
+05-03-2024 21:17:39 - train [241/730] eta: 0:00:17 n: 49 recall: 0.94 precision: 0.47 f1-score: 0.63 MAE: 48.0 MSE: 2304.0 RMSE: 48.0 time: 0.0195 data: 0.0016 max mem: 1557
+05-03-2024 21:17:39 - train [251/730] eta: 0:00:17 n: 9 recall: 0.78 precision: 0.17 f1-score: 0.29 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0193 data: 0.0017 max mem: 1557
+05-03-2024 21:17:39 - train [261/730] eta: 0:00:16 n: 13 recall: 1.0 precision: 0.19 f1-score: 0.33 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0191 data: 0.0017 max mem: 1557
+05-03-2024 21:17:39 - train [271/730] eta: 0:00:15 n: 29 recall: 0.93 precision: 0.35 f1-score: 0.5 MAE: 49.0 MSE: 2401.0 RMSE: 49.0 time: 0.0188 data: 0.0016 max mem: 1557
+05-03-2024 21:17:39 - train [281/730] eta: 0:00:15 n: 4 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 199.0 MSE: 39601.0 RMSE: 199.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 21:17:40 - train [291/730] eta: 0:00:14 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0200 data: 0.0017 max mem: 1557
+05-03-2024 21:17:40 - train [301/730] eta: 0:00:14 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.0 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0213 data: 0.0016 max mem: 1557
+05-03-2024 21:17:40 - train [311/730] eta: 0:00:13 n: 12 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 135.0 MSE: 18225.0 RMSE: 135.0 time: 0.0216 data: 0.0017 max mem: 1557
+05-03-2024 21:17:40 - train [321/730] eta: 0:00:13 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 526.0 MSE: 276676.0 RMSE: 526.0 time: 0.0269 data: 0.0017 max mem: 1557
+05-03-2024 21:17:41 - train [331/730] eta: 0:00:12 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 433.0 MSE: 187489.0 RMSE: 433.0 time: 0.0270 data: 0.0017 max mem: 1557
+05-03-2024 21:17:41 - train [341/730] eta: 0:00:12 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 368.0 MSE: 135424.0 RMSE: 368.0 time: 0.0213 data: 0.0018 max mem: 1557
+05-03-2024 21:17:41 - train [351/730] eta: 0:00:11 n: 22 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 246.0 MSE: 60516.0 RMSE: 246.0 time: 0.0212 data: 0.0017 max mem: 1557
+05-03-2024 21:17:41 - train [361/730] eta: 0:00:11 n: 17 recall: 1.0 precision: 0.09 f1-score: 0.17 MAE: 167.0 MSE: 27889.0 RMSE: 167.0 time: 0.0213 data: 0.0016 max mem: 1557
+05-03-2024 21:17:41 - train [371/730] eta: 0:00:11 n: 18 recall: 1.0 precision: 0.07 f1-score: 0.14 MAE: 223.0 MSE: 49729.0 RMSE: 223.0 time: 0.0213 data: 0.0017 max mem: 1557
+05-03-2024 21:17:42 - train [381/730] eta: 0:00:10 n: 20 recall: 1.0 precision: 0.09 f1-score: 0.16 MAE: 207.0 MSE: 42849.0 RMSE: 207.0 time: 0.0211 data: 0.0017 max mem: 1557
+05-03-2024 21:17:42 - train [391/730] eta: 0:00:10 n: 24 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 275.0 MSE: 75625.0 RMSE: 275.0 time: 0.0213 data: 0.0017 max mem: 1557
+05-03-2024 21:17:42 - train [401/730] eta: 0:00:10 n: 41 recall: 1.0 precision: 0.17 f1-score: 0.28 MAE: 206.0 MSE: 42436.0 RMSE: 206.0 time: 0.0224 data: 0.0018 max mem: 1557
+05-03-2024 21:17:42 - train [411/730] eta: 0:00:09 n: 55 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 258.0 MSE: 66564.0 RMSE: 258.0 time: 0.0235 data: 0.0018 max mem: 1557
+05-03-2024 21:17:43 - train [421/730] eta: 0:00:09 n: 69 recall: 1.0 precision: 0.17 f1-score: 0.29 MAE: 336.0 MSE: 112896.0 RMSE: 336.0 time: 0.0246 data: 0.0017 max mem: 1557
+05-03-2024 21:17:43 - train [431/730] eta: 0:00:08 n: 57 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 344.0 MSE: 118336.0 RMSE: 344.0 time: 0.0257 data: 0.0018 max mem: 1557
+05-03-2024 21:17:43 - train [441/730] eta: 0:00:08 n: 39 recall: 0.97 precision: 0.1 f1-score: 0.18 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0260 data: 0.0018 max mem: 1557
+05-03-2024 21:17:43 - train [451/730] eta: 0:00:08 n: 64 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 401.0 MSE: 160801.0 RMSE: 401.0 time: 0.0254 data: 0.0017 max mem: 1557
+05-03-2024 21:17:44 - train [461/730] eta: 0:00:08 n: 57 recall: 1.0 precision: 0.13 f1-score: 0.23 MAE: 390.0 MSE: 152100.0 RMSE: 390.0 time: 0.0249 data: 0.0018 max mem: 1557
+05-03-2024 21:17:44 - train [471/730] eta: 0:00:07 n: 64 recall: 0.98 precision: 0.15 f1-score: 0.27 MAE: 346.0 MSE: 119716.0 RMSE: 346.0 time: 0.0247 data: 0.0018 max mem: 1557
+05-03-2024 21:17:44 - train [481/730] eta: 0:00:07 n: 60 recall: 0.97 precision: 0.15 f1-score: 0.26 MAE: 318.0 MSE: 101124.0 RMSE: 318.0 time: 0.0241 data: 0.0017 max mem: 1557
+05-03-2024 21:17:44 - train [491/730] eta: 0:00:07 n: 63 recall: 0.95 precision: 0.17 f1-score: 0.28 MAE: 300.0 MSE: 90000.0 RMSE: 300.0 time: 0.0235 data: 0.0018 max mem: 1557
+05-03-2024 21:17:44 - train [501/730] eta: 0:00:06 n: 66 recall: 0.95 precision: 0.22 f1-score: 0.36 MAE: 222.0 MSE: 49284.0 RMSE: 222.0 time: 0.0229 data: 0.0018 max mem: 1557
+05-03-2024 21:17:45 - train [511/730] eta: 0:00:06 n: 65 recall: 0.97 precision: 0.22 f1-score: 0.36 MAE: 219.0 MSE: 47961.0 RMSE: 219.0 time: 0.0227 data: 0.0017 max mem: 1557
+05-03-2024 21:17:45 - train [521/730] eta: 0:00:06 n: 65 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 304.0 MSE: 92416.0 RMSE: 304.0 time: 0.0234 data: 0.0018 max mem: 1557
+05-03-2024 21:17:45 - train [531/730] eta: 0:00:05 n: 58 recall: 1.0 precision: 0.25 f1-score: 0.4 MAE: 172.0 MSE: 29584.0 RMSE: 172.0 time: 0.0235 data: 0.0018 max mem: 1557
+05-03-2024 21:17:45 - train [541/730] eta: 0:00:05 n: 63 recall: 1.0 precision: 0.2 f1-score: 0.33 MAE: 260.0 MSE: 67600.0 RMSE: 260.0 time: 0.0231 data: 0.0018 max mem: 1557
+05-03-2024 21:17:46 - train [551/730] eta: 0:00:05 n: 68 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 291.0 MSE: 84681.0 RMSE: 291.0 time: 0.0286 data: 0.0019 max mem: 1557
+05-03-2024 21:17:46 - train [561/730] eta: 0:00:04 n: 61 recall: 1.0 precision: 0.23 f1-score: 0.37 MAE: 210.0 MSE: 44100.0 RMSE: 210.0 time: 0.0286 data: 0.0018 max mem: 1557
+05-03-2024 21:17:46 - train [571/730] eta: 0:00:04 n: 64 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 241.0 MSE: 58081.0 RMSE: 241.0 time: 0.0237 data: 0.0017 max mem: 1557
+05-03-2024 21:17:46 - train [581/730] eta: 0:00:04 n: 85 recall: 0.99 precision: 0.23 f1-score: 0.37 MAE: 284.0 MSE: 80656.0 RMSE: 284.0 time: 0.0235 data: 0.0018 max mem: 1557
+05-03-2024 21:17:47 - train [591/730] eta: 0:00:03 n: 67 recall: 0.99 precision: 0.2 f1-score: 0.33 MAE: 264.0 MSE: 69696.0 RMSE: 264.0 time: 0.0229 data: 0.0018 max mem: 1557
+05-03-2024 21:17:47 - train [601/730] eta: 0:00:03 n: 27 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0229 data: 0.0017 max mem: 1557
+05-03-2024 21:17:47 - train [611/730] eta: 0:00:03 n: 7 recall: 1.0 precision: 0.06 f1-score: 0.11 MAE: 108.0 MSE: 11664.0 RMSE: 108.0 time: 0.0230 data: 0.0018 max mem: 1557
+05-03-2024 21:17:47 - train [621/730] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0231 data: 0.0018 max mem: 1557
+05-03-2024 21:17:48 - train [631/730] eta: 0:00:02 n: 14 recall: 1.0 precision: 0.12 f1-score: 0.22 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0228 data: 0.0017 max mem: 1557
+05-03-2024 21:17:48 - train [641/730] eta: 0:00:02 n: 51 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 190.0 MSE: 36100.0 RMSE: 190.0 time: 0.0228 data: 0.0017 max mem: 1557
+05-03-2024 21:17:48 - train [651/730] eta: 0:00:02 n: 6 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 305.0 MSE: 93025.0 RMSE: 305.0 time: 0.0229 data: 0.0017 max mem: 1557
+05-03-2024 21:17:48 - train [661/730] eta: 0:00:01 n: 8 recall: 1.0 precision: 0.04 f1-score: 0.09 MAE: 171.0 MSE: 29241.0 RMSE: 171.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 21:17:49 - train [671/730] eta: 0:00:01 n: 11 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 47.0 MSE: 2209.0 RMSE: 47.0 time: 0.0215 data: 0.0018 max mem: 1557
+05-03-2024 21:17:49 - train [681/730] eta: 0:00:01 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.0206 data: 0.0017 max mem: 1557
+05-03-2024 21:17:49 - train [691/730] eta: 0:00:01 n: 4 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 418.0 MSE: 174724.0 RMSE: 418.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 21:17:49 - train [701/730] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0229 data: 0.0018 max mem: 1557
+05-03-2024 21:17:49 - train [711/730] eta: 0:00:00 n: 59 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.0241 data: 0.0018 max mem: 1557
+05-03-2024 21:17:50 - train [721/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 142.0 MSE: 20164.0 RMSE: 142.0 time: 0.0233 data: 0.0017 max mem: 1557
+05-03-2024 21:17:50 - train [730/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 441.0 MSE: 194481.0 RMSE: 441.0 time: 0.0214 data: 0.0017 max mem: 1557
+05-03-2024 21:17:51 - train Total time: 0:00:20 (0.0286 s / it)
+05-03-2024 21:33:52 - train [  1/730] eta: 0:07:24 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 369.0 MSE: 136161.0 RMSE: 369.0 time: 0.6094 data: 0.5858 max mem: 1557
+05-03-2024 21:33:56 - train [ 11/730] eta: 0:04:52 n: 6 recall: 1.0 precision: 0.29 f1-score: 0.44 MAE: 15.0 MSE: 225.0 RMSE: 15.0 time: 0.4069 data: 0.3878 max mem: 1557
+05-03-2024 21:33:56 - train [ 21/730] eta: 0:02:37 n: 8 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 14.0 MSE: 196.0 RMSE: 14.0 time: 0.2017 data: 0.1841 max mem: 1557
+05-03-2024 21:33:56 - train [ 31/730] eta: 0:01:48 n: 3 recall: 1.0 precision: 0.12 f1-score: 0.21 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0174 data: 0.0008 max mem: 1557
+05-03-2024 21:33:56 - train [ 41/730] eta: 0:01:24 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0181 data: 0.0015 max mem: 1557
+05-03-2024 21:33:57 - train [ 51/730] eta: 0:01:09 n: 2 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 122.0 MSE: 14884.0 RMSE: 122.0 time: 0.0183 data: 0.0017 max mem: 1557
+05-03-2024 21:33:57 - train [ 61/730] eta: 0:00:59 n: 16 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 28.0 MSE: 784.0 RMSE: 28.0 time: 0.0183 data: 0.0016 max mem: 1557
+05-03-2024 21:33:57 - train [ 71/730] eta: 0:00:51 n: 12 recall: 0.83 precision: 0.26 f1-score: 0.4 MAE: 26.0 MSE: 676.0 RMSE: 26.0 time: 0.0185 data: 0.0016 max mem: 1557
+05-03-2024 21:33:57 - train [ 81/730] eta: 0:00:46 n: 14 recall: 1.0 precision: 0.31 f1-score: 0.47 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0188 data: 0.0017 max mem: 1557
+05-03-2024 21:33:57 - train [ 91/730] eta: 0:00:41 n: 14 recall: 1.0 precision: 0.23 f1-score: 0.38 MAE: 46.0 MSE: 2116.0 RMSE: 46.0 time: 0.0187 data: 0.0016 max mem: 1557
+05-03-2024 21:33:58 - train [101/730] eta: 0:00:38 n: 56 recall: 0.95 precision: 0.46 f1-score: 0.62 MAE: 59.0 MSE: 3481.0 RMSE: 59.0 time: 0.0188 data: 0.0017 max mem: 1557
+05-03-2024 21:33:58 - train [111/730] eta: 0:00:35 n: 25 recall: 0.88 precision: 0.51 f1-score: 0.65 MAE: 18.0 MSE: 324.0 RMSE: 18.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 21:33:58 - train [121/730] eta: 0:00:32 n: 63 recall: 0.92 precision: 0.51 f1-score: 0.66 MAE: 50.0 MSE: 2500.0 RMSE: 50.0 time: 0.0186 data: 0.0016 max mem: 1557
+05-03-2024 21:33:58 - train [131/730] eta: 0:00:30 n: 40 recall: 0.95 precision: 0.61 f1-score: 0.75 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0194 data: 0.0017 max mem: 1557
+05-03-2024 21:33:58 - train [141/730] eta: 0:00:28 n: 4 recall: 1.0 precision: 0.05 f1-score: 0.09 MAE: 80.0 MSE: 6400.0 RMSE: 80.0 time: 0.0193 data: 0.0017 max mem: 1557
+05-03-2024 21:33:59 - train [151/730] eta: 0:00:27 n: 66 recall: 0.97 precision: 0.5 f1-score: 0.66 MAE: 63.0 MSE: 3969.0 RMSE: 63.0 time: 0.0196 data: 0.0016 max mem: 1557
+05-03-2024 21:33:59 - train [161/730] eta: 0:00:25 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0198 data: 0.0017 max mem: 1557
+05-03-2024 21:33:59 - train [171/730] eta: 0:00:24 n: 71 recall: 0.97 precision: 0.55 f1-score: 0.7 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0202 data: 0.0017 max mem: 1557
+05-03-2024 21:33:59 - train [181/730] eta: 0:00:23 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 225.0 MSE: 50625.0 RMSE: 225.0 time: 0.0204 data: 0.0016 max mem: 1557
+05-03-2024 21:33:59 - train [191/730] eta: 0:00:22 n: 100 recall: 0.94 precision: 0.59 f1-score: 0.73 MAE: 58.0 MSE: 3364.0 RMSE: 58.0 time: 0.0203 data: 0.0017 max mem: 1557
+05-03-2024 21:34:00 - train [201/730] eta: 0:00:21 n: 5 recall: 1.0 precision: 0.03 f1-score: 0.07 MAE: 139.0 MSE: 19321.0 RMSE: 139.0 time: 0.0203 data: 0.0017 max mem: 1557
+05-03-2024 21:34:00 - train [211/730] eta: 0:00:20 n: 69 recall: 0.94 precision: 0.45 f1-score: 0.61 MAE: 75.0 MSE: 5625.0 RMSE: 75.0 time: 0.0200 data: 0.0016 max mem: 1557
+05-03-2024 21:34:00 - train [221/730] eta: 0:00:19 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0200 data: 0.0017 max mem: 1557
+05-03-2024 21:34:00 - train [231/730] eta: 0:00:18 n: 34 recall: 0.97 precision: 0.49 f1-score: 0.65 MAE: 34.0 MSE: 1156.0 RMSE: 34.0 time: 0.0197 data: 0.0017 max mem: 1557
+05-03-2024 21:34:00 - train [241/730] eta: 0:00:18 n: 49 recall: 0.94 precision: 0.47 f1-score: 0.63 MAE: 48.0 MSE: 2304.0 RMSE: 48.0 time: 0.0197 data: 0.0016 max mem: 1557
+05-03-2024 21:34:01 - train [251/730] eta: 0:00:17 n: 9 recall: 0.78 precision: 0.17 f1-score: 0.29 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0193 data: 0.0017 max mem: 1557
+05-03-2024 21:34:01 - train [261/730] eta: 0:00:16 n: 13 recall: 1.0 precision: 0.19 f1-score: 0.33 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0191 data: 0.0017 max mem: 1557
+05-03-2024 21:34:01 - train [271/730] eta: 0:00:16 n: 29 recall: 0.93 precision: 0.35 f1-score: 0.5 MAE: 49.0 MSE: 2401.0 RMSE: 49.0 time: 0.0190 data: 0.0016 max mem: 1557
+05-03-2024 21:34:01 - train [281/730] eta: 0:00:15 n: 4 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 199.0 MSE: 39601.0 RMSE: 199.0 time: 0.0192 data: 0.0017 max mem: 1557
+05-03-2024 21:34:01 - train [291/730] eta: 0:00:14 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0203 data: 0.0017 max mem: 1557
+05-03-2024 21:34:02 - train [301/730] eta: 0:00:14 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.0 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0216 data: 0.0017 max mem: 1557
+05-03-2024 21:34:02 - train [311/730] eta: 0:00:14 n: 12 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 135.0 MSE: 18225.0 RMSE: 135.0 time: 0.0272 data: 0.0017 max mem: 1557
+05-03-2024 21:34:02 - train [321/730] eta: 0:00:13 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 526.0 MSE: 276676.0 RMSE: 526.0 time: 0.0270 data: 0.0017 max mem: 1557
+05-03-2024 21:34:02 - train [331/730] eta: 0:00:13 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 433.0 MSE: 187489.0 RMSE: 433.0 time: 0.0217 data: 0.0016 max mem: 1557
+05-03-2024 21:34:03 - train [341/730] eta: 0:00:12 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 368.0 MSE: 135424.0 RMSE: 368.0 time: 0.0214 data: 0.0017 max mem: 1557
+05-03-2024 21:34:03 - train [351/730] eta: 0:00:12 n: 22 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 246.0 MSE: 60516.0 RMSE: 246.0 time: 0.0213 data: 0.0017 max mem: 1557
+05-03-2024 21:34:03 - train [361/730] eta: 0:00:11 n: 17 recall: 1.0 precision: 0.09 f1-score: 0.17 MAE: 167.0 MSE: 27889.0 RMSE: 167.0 time: 0.0212 data: 0.0016 max mem: 1557
+05-03-2024 21:34:03 - train [371/730] eta: 0:00:11 n: 18 recall: 1.0 precision: 0.07 f1-score: 0.14 MAE: 223.0 MSE: 49729.0 RMSE: 223.0 time: 0.0210 data: 0.0017 max mem: 1557
+05-03-2024 21:34:03 - train [381/730] eta: 0:00:10 n: 20 recall: 1.0 precision: 0.09 f1-score: 0.16 MAE: 207.0 MSE: 42849.0 RMSE: 207.0 time: 0.0211 data: 0.0017 max mem: 1557
+05-03-2024 21:34:04 - train [391/730] eta: 0:00:10 n: 24 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 275.0 MSE: 75625.0 RMSE: 275.0 time: 0.0213 data: 0.0016 max mem: 1557
+05-03-2024 21:34:04 - train [401/730] eta: 0:00:10 n: 41 recall: 1.0 precision: 0.17 f1-score: 0.28 MAE: 206.0 MSE: 42436.0 RMSE: 206.0 time: 0.0221 data: 0.0017 max mem: 1557
+05-03-2024 21:34:04 - train [411/730] eta: 0:00:09 n: 55 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 258.0 MSE: 66564.0 RMSE: 258.0 time: 0.0233 data: 0.0017 max mem: 1557
+05-03-2024 21:34:04 - train [421/730] eta: 0:00:09 n: 69 recall: 1.0 precision: 0.17 f1-score: 0.29 MAE: 336.0 MSE: 112896.0 RMSE: 336.0 time: 0.0247 data: 0.0017 max mem: 1557
+05-03-2024 21:34:05 - train [431/730] eta: 0:00:09 n: 57 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 344.0 MSE: 118336.0 RMSE: 344.0 time: 0.0257 data: 0.0017 max mem: 1557
+05-03-2024 21:34:05 - train [441/730] eta: 0:00:08 n: 39 recall: 0.97 precision: 0.1 f1-score: 0.18 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0260 data: 0.0017 max mem: 1557
+05-03-2024 21:34:05 - train [451/730] eta: 0:00:08 n: 64 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 401.0 MSE: 160801.0 RMSE: 401.0 time: 0.0255 data: 0.0017 max mem: 1557
+05-03-2024 21:34:05 - train [461/730] eta: 0:00:08 n: 57 recall: 1.0 precision: 0.13 f1-score: 0.23 MAE: 390.0 MSE: 152100.0 RMSE: 390.0 time: 0.0248 data: 0.0018 max mem: 1557
+05-03-2024 21:34:06 - train [471/730] eta: 0:00:07 n: 64 recall: 0.98 precision: 0.15 f1-score: 0.27 MAE: 346.0 MSE: 119716.0 RMSE: 346.0 time: 0.0244 data: 0.0018 max mem: 1557
+05-03-2024 21:34:06 - train [481/730] eta: 0:00:07 n: 60 recall: 0.97 precision: 0.15 f1-score: 0.26 MAE: 318.0 MSE: 101124.0 RMSE: 318.0 time: 0.0238 data: 0.0017 max mem: 1557
+05-03-2024 21:34:06 - train [491/730] eta: 0:00:07 n: 63 recall: 0.95 precision: 0.17 f1-score: 0.28 MAE: 300.0 MSE: 90000.0 RMSE: 300.0 time: 0.0233 data: 0.0017 max mem: 1557
+05-03-2024 21:34:06 - train [501/730] eta: 0:00:06 n: 66 recall: 0.95 precision: 0.22 f1-score: 0.36 MAE: 222.0 MSE: 49284.0 RMSE: 222.0 time: 0.0229 data: 0.0017 max mem: 1557
+05-03-2024 21:34:07 - train [511/730] eta: 0:00:06 n: 65 recall: 0.97 precision: 0.22 f1-score: 0.36 MAE: 219.0 MSE: 47961.0 RMSE: 219.0 time: 0.0275 data: 0.0017 max mem: 1557
+05-03-2024 21:34:07 - train [521/730] eta: 0:00:06 n: 65 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 304.0 MSE: 92416.0 RMSE: 304.0 time: 0.0284 data: 0.0018 max mem: 1557
+05-03-2024 21:34:07 - train [531/730] eta: 0:00:05 n: 58 recall: 1.0 precision: 0.25 f1-score: 0.4 MAE: 172.0 MSE: 29584.0 RMSE: 172.0 time: 0.0237 data: 0.0018 max mem: 1557
+05-03-2024 21:34:07 - train [541/730] eta: 0:00:05 n: 63 recall: 1.0 precision: 0.2 f1-score: 0.33 MAE: 260.0 MSE: 67600.0 RMSE: 260.0 time: 0.0232 data: 0.0016 max mem: 1557
+05-03-2024 21:34:08 - train [551/730] eta: 0:00:05 n: 68 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 291.0 MSE: 84681.0 RMSE: 291.0 time: 0.0236 data: 0.0017 max mem: 1557
+05-03-2024 21:34:08 - train [561/730] eta: 0:00:04 n: 61 recall: 1.0 precision: 0.23 f1-score: 0.37 MAE: 210.0 MSE: 44100.0 RMSE: 210.0 time: 0.0237 data: 0.0017 max mem: 1557
+05-03-2024 21:34:08 - train [571/730] eta: 0:00:04 n: 64 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 241.0 MSE: 58081.0 RMSE: 241.0 time: 0.0235 data: 0.0017 max mem: 1557
+05-03-2024 21:34:08 - train [581/730] eta: 0:00:04 n: 85 recall: 0.99 precision: 0.23 f1-score: 0.37 MAE: 284.0 MSE: 80656.0 RMSE: 284.0 time: 0.0234 data: 0.0018 max mem: 1557
+05-03-2024 21:34:08 - train [591/730] eta: 0:00:04 n: 67 recall: 0.99 precision: 0.2 f1-score: 0.33 MAE: 264.0 MSE: 69696.0 RMSE: 264.0 time: 0.0230 data: 0.0018 max mem: 1557
+05-03-2024 21:34:09 - train [601/730] eta: 0:00:03 n: 27 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0230 data: 0.0017 max mem: 1557
+05-03-2024 21:34:09 - train [611/730] eta: 0:00:03 n: 7 recall: 1.0 precision: 0.06 f1-score: 0.11 MAE: 108.0 MSE: 11664.0 RMSE: 108.0 time: 0.0231 data: 0.0017 max mem: 1557
+05-03-2024 21:34:09 - train [621/730] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0233 data: 0.0017 max mem: 1557
+05-03-2024 21:34:09 - train [631/730] eta: 0:00:02 n: 14 recall: 1.0 precision: 0.12 f1-score: 0.22 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0234 data: 0.0017 max mem: 1557
+05-03-2024 21:34:10 - train [641/730] eta: 0:00:02 n: 51 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 190.0 MSE: 36100.0 RMSE: 190.0 time: 0.0237 data: 0.0018 max mem: 1557
+05-03-2024 21:34:10 - train [651/730] eta: 0:00:02 n: 6 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 305.0 MSE: 93025.0 RMSE: 305.0 time: 0.0235 data: 0.0018 max mem: 1557
+05-03-2024 21:34:10 - train [661/730] eta: 0:00:01 n: 8 recall: 1.0 precision: 0.04 f1-score: 0.09 MAE: 171.0 MSE: 29241.0 RMSE: 171.0 time: 0.0229 data: 0.0017 max mem: 1557
+05-03-2024 21:34:10 - train [671/730] eta: 0:00:01 n: 11 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 47.0 MSE: 2209.0 RMSE: 47.0 time: 0.0220 data: 0.0017 max mem: 1557
+05-03-2024 21:34:11 - train [681/730] eta: 0:00:01 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.0212 data: 0.0017 max mem: 1557
+05-03-2024 21:34:11 - train [691/730] eta: 0:00:01 n: 4 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 418.0 MSE: 174724.0 RMSE: 418.0 time: 0.0221 data: 0.0017 max mem: 1557
+05-03-2024 21:34:11 - train [701/730] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0235 data: 0.0017 max mem: 1557
+05-03-2024 21:34:11 - train [711/730] eta: 0:00:00 n: 59 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.0247 data: 0.0018 max mem: 1557
+05-03-2024 21:34:12 - train [721/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 142.0 MSE: 20164.0 RMSE: 142.0 time: 0.0238 data: 0.0017 max mem: 1557
+05-03-2024 21:34:12 - train [730/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 441.0 MSE: 194481.0 RMSE: 441.0 time: 0.0218 data: 0.0017 max mem: 1557
+05-03-2024 21:34:13 - train Total time: 0:00:21 (0.0288 s / it)
+05-03-2024 21:46:26 - train [  1/730] eta: 0:06:17 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 369.0 MSE: 136161.0 RMSE: 369.0 time: 0.5175 data: 0.4924 max mem: 1557
+05-03-2024 21:47:02 - train [ 11/730] eta: 0:40:05 n: 6 recall: 1.0 precision: 0.29 f1-score: 0.44 MAE: 15.0 MSE: 225.0 RMSE: 15.0 time: 3.3414 data: 3.3215 max mem: 1557
+05-03-2024 21:47:03 - train [ 21/730] eta: 0:20:48 n: 8 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 14.0 MSE: 196.0 RMSE: 14.0 time: 1.8203 data: 1.8023 max mem: 1557
+05-03-2024 21:47:03 - train [ 31/730] eta: 0:13:57 n: 3 recall: 1.0 precision: 0.12 f1-score: 0.21 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0173 data: 0.0008 max mem: 1557
+05-03-2024 21:47:03 - train [ 41/730] eta: 0:10:27 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0180 data: 0.0015 max mem: 1557
+05-03-2024 21:47:03 - train [ 51/730] eta: 0:08:19 n: 2 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 122.0 MSE: 14884.0 RMSE: 122.0 time: 0.0183 data: 0.0017 max mem: 1557
+05-03-2024 21:47:03 - train [ 61/730] eta: 0:06:53 n: 16 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 28.0 MSE: 784.0 RMSE: 28.0 time: 0.0184 data: 0.0016 max mem: 1557
+05-03-2024 21:47:04 - train [ 71/730] eta: 0:05:51 n: 12 recall: 0.83 precision: 0.26 f1-score: 0.4 MAE: 26.0 MSE: 676.0 RMSE: 26.0 time: 0.0184 data: 0.0017 max mem: 1557
+05-03-2024 21:47:04 - train [ 81/730] eta: 0:05:05 n: 14 recall: 1.0 precision: 0.31 f1-score: 0.47 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0185 data: 0.0016 max mem: 1557
+05-03-2024 21:47:04 - train [ 91/730] eta: 0:04:28 n: 14 recall: 1.0 precision: 0.23 f1-score: 0.38 MAE: 46.0 MSE: 2116.0 RMSE: 46.0 time: 0.0186 data: 0.0016 max mem: 1557
+05-03-2024 21:47:04 - train [101/730] eta: 0:03:59 n: 56 recall: 0.95 precision: 0.46 f1-score: 0.62 MAE: 59.0 MSE: 3481.0 RMSE: 59.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 21:47:04 - train [111/730] eta: 0:03:35 n: 25 recall: 0.88 precision: 0.51 f1-score: 0.65 MAE: 18.0 MSE: 324.0 RMSE: 18.0 time: 0.0188 data: 0.0017 max mem: 1557
+05-03-2024 21:47:04 - train [121/730] eta: 0:03:15 n: 63 recall: 0.92 precision: 0.51 f1-score: 0.66 MAE: 50.0 MSE: 2500.0 RMSE: 50.0 time: 0.0184 data: 0.0016 max mem: 1557
+05-03-2024 21:47:05 - train [131/730] eta: 0:02:58 n: 40 recall: 0.95 precision: 0.61 f1-score: 0.75 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0193 data: 0.0017 max mem: 1557
+05-03-2024 21:47:05 - train [141/730] eta: 0:02:43 n: 4 recall: 1.0 precision: 0.05 f1-score: 0.09 MAE: 80.0 MSE: 6400.0 RMSE: 80.0 time: 0.0193 data: 0.0017 max mem: 1557
+05-03-2024 21:47:05 - train [151/730] eta: 0:02:31 n: 66 recall: 0.97 precision: 0.5 f1-score: 0.66 MAE: 63.0 MSE: 3969.0 RMSE: 63.0 time: 0.0195 data: 0.0016 max mem: 1557
+05-03-2024 21:47:05 - train [161/730] eta: 0:02:20 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0197 data: 0.0017 max mem: 1557
+05-03-2024 21:47:05 - train [171/730] eta: 0:02:10 n: 71 recall: 0.97 precision: 0.55 f1-score: 0.7 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0201 data: 0.0017 max mem: 1557
+05-03-2024 21:47:06 - train [181/730] eta: 0:02:01 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 225.0 MSE: 50625.0 RMSE: 225.0 time: 0.0202 data: 0.0016 max mem: 1557
+05-03-2024 21:47:06 - train [191/730] eta: 0:01:53 n: 100 recall: 0.94 precision: 0.59 f1-score: 0.73 MAE: 58.0 MSE: 3364.0 RMSE: 58.0 time: 0.0200 data: 0.0017 max mem: 1557
+05-03-2024 21:47:06 - train [201/730] eta: 0:01:46 n: 5 recall: 1.0 precision: 0.03 f1-score: 0.07 MAE: 139.0 MSE: 19321.0 RMSE: 139.0 time: 0.0201 data: 0.0017 max mem: 1557
+05-03-2024 21:47:06 - train [211/730] eta: 0:01:39 n: 69 recall: 0.94 precision: 0.45 f1-score: 0.61 MAE: 75.0 MSE: 5625.0 RMSE: 75.0 time: 0.0200 data: 0.0016 max mem: 1557
+05-03-2024 21:47:06 - train [221/730] eta: 0:01:34 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0199 data: 0.0017 max mem: 1557
+05-03-2024 21:47:07 - train [231/730] eta: 0:01:28 n: 34 recall: 0.97 precision: 0.49 f1-score: 0.65 MAE: 34.0 MSE: 1156.0 RMSE: 34.0 time: 0.0195 data: 0.0017 max mem: 1557
+05-03-2024 21:47:07 - train [241/730] eta: 0:01:23 n: 49 recall: 0.94 precision: 0.47 f1-score: 0.63 MAE: 48.0 MSE: 2304.0 RMSE: 48.0 time: 0.0194 data: 0.0016 max mem: 1557
+05-03-2024 21:47:07 - train [251/730] eta: 0:01:19 n: 9 recall: 0.78 precision: 0.17 f1-score: 0.29 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0191 data: 0.0017 max mem: 1557
+05-03-2024 21:47:07 - train [261/730] eta: 0:01:14 n: 13 recall: 1.0 precision: 0.19 f1-score: 0.33 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 21:47:07 - train [271/730] eta: 0:01:10 n: 29 recall: 0.93 precision: 0.35 f1-score: 0.5 MAE: 49.0 MSE: 2401.0 RMSE: 49.0 time: 0.0189 data: 0.0016 max mem: 1557
+05-03-2024 21:47:08 - train [281/730] eta: 0:01:07 n: 4 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 199.0 MSE: 39601.0 RMSE: 199.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 21:47:08 - train [291/730] eta: 0:01:03 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0200 data: 0.0017 max mem: 1557
+05-03-2024 21:47:08 - train [301/730] eta: 0:01:00 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.0 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0215 data: 0.0016 max mem: 1557
+05-03-2024 21:47:08 - train [311/730] eta: 0:00:57 n: 12 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 135.0 MSE: 18225.0 RMSE: 135.0 time: 0.0214 data: 0.0017 max mem: 1557
+05-03-2024 21:47:09 - train [321/730] eta: 0:00:54 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 526.0 MSE: 276676.0 RMSE: 526.0 time: 0.0267 data: 0.0017 max mem: 1557
+05-03-2024 21:47:09 - train [331/730] eta: 0:00:52 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 433.0 MSE: 187489.0 RMSE: 433.0 time: 0.0270 data: 0.0017 max mem: 1557
+05-03-2024 21:47:09 - train [341/730] eta: 0:00:49 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 368.0 MSE: 135424.0 RMSE: 368.0 time: 0.0213 data: 0.0017 max mem: 1557
+05-03-2024 21:47:09 - train [351/730] eta: 0:00:47 n: 22 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 246.0 MSE: 60516.0 RMSE: 246.0 time: 0.0211 data: 0.0017 max mem: 1557
+05-03-2024 21:47:09 - train [361/730] eta: 0:00:44 n: 17 recall: 1.0 precision: 0.09 f1-score: 0.17 MAE: 167.0 MSE: 27889.0 RMSE: 167.0 time: 0.0210 data: 0.0017 max mem: 1557
+05-03-2024 21:47:10 - train [371/730] eta: 0:00:42 n: 18 recall: 1.0 precision: 0.07 f1-score: 0.14 MAE: 223.0 MSE: 49729.0 RMSE: 223.0 time: 0.0209 data: 0.0017 max mem: 1557
+05-03-2024 21:47:10 - train [381/730] eta: 0:00:40 n: 20 recall: 1.0 precision: 0.09 f1-score: 0.16 MAE: 207.0 MSE: 42849.0 RMSE: 207.0 time: 0.0210 data: 0.0017 max mem: 1557
+05-03-2024 21:47:10 - train [391/730] eta: 0:00:38 n: 24 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 275.0 MSE: 75625.0 RMSE: 275.0 time: 0.0211 data: 0.0017 max mem: 1557
+05-03-2024 21:47:10 - train [401/730] eta: 0:00:36 n: 41 recall: 1.0 precision: 0.17 f1-score: 0.28 MAE: 206.0 MSE: 42436.0 RMSE: 206.0 time: 0.0218 data: 0.0017 max mem: 1557
+05-03-2024 21:47:11 - train [411/730] eta: 0:00:34 n: 55 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 258.0 MSE: 66564.0 RMSE: 258.0 time: 0.0231 data: 0.0017 max mem: 1557
+05-03-2024 21:47:11 - train [421/730] eta: 0:00:33 n: 69 recall: 1.0 precision: 0.17 f1-score: 0.29 MAE: 336.0 MSE: 112896.0 RMSE: 336.0 time: 0.0246 data: 0.0017 max mem: 1557
+05-03-2024 21:47:11 - train [431/730] eta: 0:00:31 n: 57 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 344.0 MSE: 118336.0 RMSE: 344.0 time: 0.0254 data: 0.0018 max mem: 1557
+05-03-2024 21:47:11 - train [441/730] eta: 0:00:29 n: 39 recall: 0.97 precision: 0.1 f1-score: 0.18 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0260 data: 0.0018 max mem: 1557
+05-03-2024 21:47:12 - train [451/730] eta: 0:00:28 n: 64 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 401.0 MSE: 160801.0 RMSE: 401.0 time: 0.0257 data: 0.0017 max mem: 1557
+05-03-2024 21:47:12 - train [461/730] eta: 0:00:26 n: 57 recall: 1.0 precision: 0.13 f1-score: 0.23 MAE: 390.0 MSE: 152100.0 RMSE: 390.0 time: 0.0247 data: 0.0017 max mem: 1557
+05-03-2024 21:47:12 - train [471/730] eta: 0:00:25 n: 64 recall: 0.98 precision: 0.15 f1-score: 0.27 MAE: 346.0 MSE: 119716.0 RMSE: 346.0 time: 0.0245 data: 0.0017 max mem: 1557
+05-03-2024 21:47:12 - train [481/730] eta: 0:00:24 n: 60 recall: 0.97 precision: 0.15 f1-score: 0.26 MAE: 318.0 MSE: 101124.0 RMSE: 318.0 time: 0.0238 data: 0.0017 max mem: 1557
+05-03-2024 21:47:13 - train [491/730] eta: 0:00:22 n: 63 recall: 0.95 precision: 0.17 f1-score: 0.28 MAE: 300.0 MSE: 90000.0 RMSE: 300.0 time: 0.0230 data: 0.0017 max mem: 1557
+05-03-2024 21:47:13 - train [501/730] eta: 0:00:21 n: 66 recall: 0.95 precision: 0.22 f1-score: 0.36 MAE: 222.0 MSE: 49284.0 RMSE: 222.0 time: 0.0229 data: 0.0017 max mem: 1557
+05-03-2024 21:47:13 - train [511/730] eta: 0:00:20 n: 65 recall: 0.97 precision: 0.22 f1-score: 0.36 MAE: 219.0 MSE: 47961.0 RMSE: 219.0 time: 0.0228 data: 0.0017 max mem: 1557
+05-03-2024 21:47:13 - train [521/730] eta: 0:00:19 n: 65 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 304.0 MSE: 92416.0 RMSE: 304.0 time: 0.0231 data: 0.0017 max mem: 1557
+05-03-2024 21:47:13 - train [531/730] eta: 0:00:17 n: 58 recall: 1.0 precision: 0.25 f1-score: 0.4 MAE: 172.0 MSE: 29584.0 RMSE: 172.0 time: 0.0232 data: 0.0018 max mem: 1557
+05-03-2024 21:47:14 - train [541/730] eta: 0:00:16 n: 63 recall: 1.0 precision: 0.2 f1-score: 0.33 MAE: 260.0 MSE: 67600.0 RMSE: 260.0 time: 0.0233 data: 0.0017 max mem: 1557
+05-03-2024 21:47:14 - train [551/730] eta: 0:00:15 n: 68 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 291.0 MSE: 84681.0 RMSE: 291.0 time: 0.0288 data: 0.0018 max mem: 1557
+05-03-2024 21:47:14 - train [561/730] eta: 0:00:14 n: 61 recall: 1.0 precision: 0.23 f1-score: 0.37 MAE: 210.0 MSE: 44100.0 RMSE: 210.0 time: 0.0285 data: 0.0018 max mem: 1557
+05-03-2024 21:47:14 - train [571/730] eta: 0:00:13 n: 64 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 241.0 MSE: 58081.0 RMSE: 241.0 time: 0.0233 data: 0.0017 max mem: 1557
+05-03-2024 21:47:15 - train [581/730] eta: 0:00:12 n: 85 recall: 0.99 precision: 0.23 f1-score: 0.37 MAE: 284.0 MSE: 80656.0 RMSE: 284.0 time: 0.0234 data: 0.0017 max mem: 1557
+05-03-2024 21:47:15 - train [591/730] eta: 0:00:11 n: 67 recall: 0.99 precision: 0.2 f1-score: 0.33 MAE: 264.0 MSE: 69696.0 RMSE: 264.0 time: 0.0233 data: 0.0017 max mem: 1557
+05-03-2024 21:47:15 - train [601/730] eta: 0:00:10 n: 27 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0231 data: 0.0017 max mem: 1557
+05-03-2024 21:47:15 - train [611/730] eta: 0:00:09 n: 7 recall: 1.0 precision: 0.06 f1-score: 0.11 MAE: 108.0 MSE: 11664.0 RMSE: 108.0 time: 0.0233 data: 0.0018 max mem: 1557
+05-03-2024 21:47:16 - train [621/730] eta: 0:00:08 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0238 data: 0.0018 max mem: 1557
+05-03-2024 21:47:16 - train [631/730] eta: 0:00:07 n: 14 recall: 1.0 precision: 0.12 f1-score: 0.22 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0236 data: 0.0017 max mem: 1557
+05-03-2024 21:47:16 - train [641/730] eta: 0:00:07 n: 51 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 190.0 MSE: 36100.0 RMSE: 190.0 time: 0.0231 data: 0.0018 max mem: 1557
+05-03-2024 21:47:16 - train [651/730] eta: 0:00:06 n: 6 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 305.0 MSE: 93025.0 RMSE: 305.0 time: 0.0229 data: 0.0018 max mem: 1557
+05-03-2024 21:47:17 - train [661/730] eta: 0:00:05 n: 8 recall: 1.0 precision: 0.04 f1-score: 0.09 MAE: 171.0 MSE: 29241.0 RMSE: 171.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 21:47:17 - train [671/730] eta: 0:00:04 n: 11 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 47.0 MSE: 2209.0 RMSE: 47.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 21:47:17 - train [681/730] eta: 0:00:03 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.0206 data: 0.0017 max mem: 1557
+05-03-2024 21:47:17 - train [691/730] eta: 0:00:02 n: 4 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 418.0 MSE: 174724.0 RMSE: 418.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 21:47:17 - train [701/730] eta: 0:00:02 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0234 data: 0.0018 max mem: 1557
+05-03-2024 21:47:18 - train [711/730] eta: 0:00:01 n: 59 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.0249 data: 0.0018 max mem: 1557
+05-03-2024 21:47:18 - train [721/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 142.0 MSE: 20164.0 RMSE: 142.0 time: 0.0237 data: 0.0017 max mem: 1557
+05-03-2024 21:47:18 - train [730/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 441.0 MSE: 194481.0 RMSE: 441.0 time: 0.0218 data: 0.0017 max mem: 1557
+05-03-2024 21:47:19 - train Total time: 0:00:53 (0.0731 s / it)
+05-03-2024 21:57:36 - train [  1/730] eta: 0:05:46 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 369.0 MSE: 136161.0 RMSE: 369.0 time: 0.4744 data: 0.4436 max mem: 1557
+05-03-2024 21:57:39 - train [ 11/730] eta: 0:04:28 n: 6 recall: 1.0 precision: 0.29 f1-score: 0.44 MAE: 15.0 MSE: 225.0 RMSE: 15.0 time: 0.3733 data: 0.3537 max mem: 1557
+05-03-2024 21:57:39 - train [ 21/730] eta: 0:02:24 n: 8 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 14.0 MSE: 196.0 RMSE: 14.0 time: 0.1898 data: 0.1725 max mem: 1557
+05-03-2024 21:57:40 - train [ 31/730] eta: 0:01:40 n: 3 recall: 1.0 precision: 0.12 f1-score: 0.21 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0169 data: 0.0008 max mem: 1557
+05-03-2024 21:57:40 - train [ 41/730] eta: 0:01:17 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0176 data: 0.0015 max mem: 1557
+05-03-2024 21:57:40 - train [ 51/730] eta: 0:01:04 n: 2 recall: 1.0 precision: 0.02 f1-score: 0.03 MAE: 122.0 MSE: 14884.0 RMSE: 122.0 time: 0.0178 data: 0.0016 max mem: 1557
+05-03-2024 21:57:40 - train [ 61/730] eta: 0:00:54 n: 16 recall: 1.0 precision: 0.36 f1-score: 0.53 MAE: 28.0 MSE: 784.0 RMSE: 28.0 time: 0.0178 data: 0.0015 max mem: 1557
+05-03-2024 21:57:40 - train [ 71/730] eta: 0:00:47 n: 12 recall: 0.83 precision: 0.26 f1-score: 0.4 MAE: 26.0 MSE: 676.0 RMSE: 26.0 time: 0.0179 data: 0.0016 max mem: 1557
+05-03-2024 21:57:40 - train [ 81/730] eta: 0:00:42 n: 14 recall: 1.0 precision: 0.31 f1-score: 0.47 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0181 data: 0.0016 max mem: 1557
+05-03-2024 21:57:41 - train [ 91/730] eta: 0:00:38 n: 14 recall: 1.0 precision: 0.23 f1-score: 0.38 MAE: 46.0 MSE: 2116.0 RMSE: 46.0 time: 0.0180 data: 0.0015 max mem: 1557
+05-03-2024 21:57:41 - train [101/730] eta: 0:00:35 n: 56 recall: 0.95 precision: 0.46 f1-score: 0.62 MAE: 59.0 MSE: 3481.0 RMSE: 59.0 time: 0.0182 data: 0.0016 max mem: 1557
+05-03-2024 21:57:41 - train [111/730] eta: 0:00:32 n: 25 recall: 0.88 precision: 0.51 f1-score: 0.65 MAE: 18.0 MSE: 324.0 RMSE: 18.0 time: 0.0183 data: 0.0016 max mem: 1557
+05-03-2024 21:57:41 - train [121/730] eta: 0:00:30 n: 63 recall: 0.92 precision: 0.51 f1-score: 0.66 MAE: 50.0 MSE: 2500.0 RMSE: 50.0 time: 0.0181 data: 0.0015 max mem: 1557
+05-03-2024 21:57:41 - train [131/730] eta: 0:00:28 n: 40 recall: 0.95 precision: 0.61 f1-score: 0.75 MAE: 22.0 MSE: 484.0 RMSE: 22.0 time: 0.0191 data: 0.0016 max mem: 1557
+05-03-2024 21:57:42 - train [141/730] eta: 0:00:26 n: 4 recall: 1.0 precision: 0.05 f1-score: 0.09 MAE: 80.0 MSE: 6400.0 RMSE: 80.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 21:57:42 - train [151/730] eta: 0:00:25 n: 66 recall: 0.97 precision: 0.5 f1-score: 0.66 MAE: 63.0 MSE: 3969.0 RMSE: 63.0 time: 0.0189 data: 0.0016 max mem: 1557
+05-03-2024 21:57:42 - train [161/730] eta: 0:00:24 n: 6 recall: 1.0 precision: 0.11 f1-score: 0.19 MAE: 51.0 MSE: 2601.0 RMSE: 51.0 time: 0.0190 data: 0.0016 max mem: 1557
+05-03-2024 21:57:42 - train [171/730] eta: 0:00:23 n: 71 recall: 0.97 precision: 0.55 f1-score: 0.7 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0195 data: 0.0016 max mem: 1557
+05-03-2024 21:57:42 - train [181/730] eta: 0:00:21 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 225.0 MSE: 50625.0 RMSE: 225.0 time: 0.0196 data: 0.0016 max mem: 1557
+05-03-2024 21:57:43 - train [191/730] eta: 0:00:20 n: 100 recall: 0.94 precision: 0.59 f1-score: 0.73 MAE: 58.0 MSE: 3364.0 RMSE: 58.0 time: 0.0195 data: 0.0016 max mem: 1557
+05-03-2024 21:57:43 - train [201/730] eta: 0:00:20 n: 5 recall: 1.0 precision: 0.03 f1-score: 0.07 MAE: 139.0 MSE: 19321.0 RMSE: 139.0 time: 0.0196 data: 0.0016 max mem: 1557
+05-03-2024 21:57:43 - train [211/730] eta: 0:00:19 n: 69 recall: 0.94 precision: 0.45 f1-score: 0.61 MAE: 75.0 MSE: 5625.0 RMSE: 75.0 time: 0.0194 data: 0.0016 max mem: 1557
+05-03-2024 21:57:43 - train [221/730] eta: 0:00:18 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0193 data: 0.0017 max mem: 1557
+05-03-2024 21:57:43 - train [231/730] eta: 0:00:17 n: 34 recall: 0.97 precision: 0.49 f1-score: 0.65 MAE: 34.0 MSE: 1156.0 RMSE: 34.0 time: 0.0200 data: 0.0017 max mem: 1557
+05-03-2024 21:57:44 - train [241/730] eta: 0:00:17 n: 49 recall: 0.94 precision: 0.47 f1-score: 0.63 MAE: 48.0 MSE: 2304.0 RMSE: 48.0 time: 0.0200 data: 0.0016 max mem: 1557
+05-03-2024 21:57:44 - train [251/730] eta: 0:00:16 n: 9 recall: 0.78 precision: 0.17 f1-score: 0.29 MAE: 31.0 MSE: 961.0 RMSE: 31.0 time: 0.0190 data: 0.0017 max mem: 1557
+05-03-2024 21:57:44 - train [261/730] eta: 0:00:15 n: 13 recall: 1.0 precision: 0.19 f1-score: 0.33 MAE: 54.0 MSE: 2916.0 RMSE: 54.0 time: 0.0189 data: 0.0017 max mem: 1557
+05-03-2024 21:57:44 - train [271/730] eta: 0:00:15 n: 29 recall: 0.93 precision: 0.35 f1-score: 0.5 MAE: 49.0 MSE: 2401.0 RMSE: 49.0 time: 0.0182 data: 0.0015 max mem: 1557
+05-03-2024 21:57:44 - train [281/730] eta: 0:00:14 n: 4 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 199.0 MSE: 39601.0 RMSE: 199.0 time: 0.0182 data: 0.0016 max mem: 1557
+05-03-2024 21:57:44 - train [291/730] eta: 0:00:14 n: 5 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0191 data: 0.0016 max mem: 1557
+05-03-2024 21:57:45 - train [301/730] eta: 0:00:13 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.0 MAE: 613.0 MSE: 375769.0 RMSE: 613.0 time: 0.0204 data: 0.0015 max mem: 1557
+05-03-2024 21:57:45 - train [311/730] eta: 0:00:13 n: 12 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 135.0 MSE: 18225.0 RMSE: 135.0 time: 0.0204 data: 0.0016 max mem: 1557
+05-03-2024 21:57:45 - train [321/730] eta: 0:00:12 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 526.0 MSE: 276676.0 RMSE: 526.0 time: 0.0259 data: 0.0016 max mem: 1557
+05-03-2024 21:57:45 - train [331/730] eta: 0:00:12 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 433.0 MSE: 187489.0 RMSE: 433.0 time: 0.0265 data: 0.0016 max mem: 1557
+05-03-2024 21:57:46 - train [341/730] eta: 0:00:11 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 368.0 MSE: 135424.0 RMSE: 368.0 time: 0.0206 data: 0.0017 max mem: 1557
+05-03-2024 21:57:46 - train [351/730] eta: 0:00:11 n: 22 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 246.0 MSE: 60516.0 RMSE: 246.0 time: 0.0201 data: 0.0016 max mem: 1557
+05-03-2024 21:57:46 - train [361/730] eta: 0:00:11 n: 17 recall: 1.0 precision: 0.09 f1-score: 0.17 MAE: 167.0 MSE: 27889.0 RMSE: 167.0 time: 0.0200 data: 0.0016 max mem: 1557
+05-03-2024 21:57:46 - train [371/730] eta: 0:00:10 n: 18 recall: 1.0 precision: 0.07 f1-score: 0.14 MAE: 223.0 MSE: 49729.0 RMSE: 223.0 time: 0.0198 data: 0.0016 max mem: 1557
+05-03-2024 21:57:46 - train [381/730] eta: 0:00:10 n: 20 recall: 1.0 precision: 0.09 f1-score: 0.16 MAE: 207.0 MSE: 42849.0 RMSE: 207.0 time: 0.0197 data: 0.0016 max mem: 1557
+05-03-2024 21:57:47 - train [391/730] eta: 0:00:09 n: 24 recall: 1.0 precision: 0.08 f1-score: 0.15 MAE: 275.0 MSE: 75625.0 RMSE: 275.0 time: 0.0199 data: 0.0015 max mem: 1557
+05-03-2024 21:57:47 - train [401/730] eta: 0:00:09 n: 41 recall: 1.0 precision: 0.17 f1-score: 0.28 MAE: 206.0 MSE: 42436.0 RMSE: 206.0 time: 0.0206 data: 0.0016 max mem: 1557
+05-03-2024 21:57:47 - train [411/730] eta: 0:00:09 n: 55 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 258.0 MSE: 66564.0 RMSE: 258.0 time: 0.0218 data: 0.0016 max mem: 1557
+05-03-2024 21:57:47 - train [421/730] eta: 0:00:08 n: 69 recall: 1.0 precision: 0.17 f1-score: 0.29 MAE: 336.0 MSE: 112896.0 RMSE: 336.0 time: 0.0232 data: 0.0016 max mem: 1557
+05-03-2024 21:57:48 - train [431/730] eta: 0:00:08 n: 57 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 344.0 MSE: 118336.0 RMSE: 344.0 time: 0.0245 data: 0.0017 max mem: 1557
+05-03-2024 21:57:48 - train [441/730] eta: 0:00:08 n: 39 recall: 0.97 precision: 0.1 f1-score: 0.18 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0246 data: 0.0017 max mem: 1557
+05-03-2024 21:57:48 - train [451/730] eta: 0:00:07 n: 64 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 401.0 MSE: 160801.0 RMSE: 401.0 time: 0.0239 data: 0.0016 max mem: 1557
+05-03-2024 21:57:48 - train [461/730] eta: 0:00:07 n: 57 recall: 1.0 precision: 0.13 f1-score: 0.23 MAE: 390.0 MSE: 152100.0 RMSE: 390.0 time: 0.0233 data: 0.0017 max mem: 1557
+05-03-2024 21:57:48 - train [471/730] eta: 0:00:07 n: 64 recall: 0.98 precision: 0.15 f1-score: 0.27 MAE: 346.0 MSE: 119716.0 RMSE: 346.0 time: 0.0231 data: 0.0017 max mem: 1557
+05-03-2024 21:57:49 - train [481/730] eta: 0:00:07 n: 60 recall: 0.97 precision: 0.15 f1-score: 0.26 MAE: 318.0 MSE: 101124.0 RMSE: 318.0 time: 0.0226 data: 0.0016 max mem: 1557
+05-03-2024 21:57:49 - train [491/730] eta: 0:00:06 n: 63 recall: 0.95 precision: 0.17 f1-score: 0.28 MAE: 300.0 MSE: 90000.0 RMSE: 300.0 time: 0.0220 data: 0.0017 max mem: 1557
+05-03-2024 21:57:49 - train [501/730] eta: 0:00:06 n: 66 recall: 0.95 precision: 0.22 f1-score: 0.36 MAE: 222.0 MSE: 49284.0 RMSE: 222.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 21:57:49 - train [511/730] eta: 0:00:06 n: 65 recall: 0.97 precision: 0.22 f1-score: 0.36 MAE: 219.0 MSE: 47961.0 RMSE: 219.0 time: 0.0213 data: 0.0016 max mem: 1557
+05-03-2024 21:57:50 - train [521/730] eta: 0:00:05 n: 65 recall: 1.0 precision: 0.18 f1-score: 0.3 MAE: 304.0 MSE: 92416.0 RMSE: 304.0 time: 0.0220 data: 0.0017 max mem: 1557
+05-03-2024 21:57:50 - train [531/730] eta: 0:00:05 n: 58 recall: 1.0 precision: 0.25 f1-score: 0.4 MAE: 172.0 MSE: 29584.0 RMSE: 172.0 time: 0.0223 data: 0.0017 max mem: 1557
+05-03-2024 21:57:50 - train [541/730] eta: 0:00:05 n: 63 recall: 1.0 precision: 0.2 f1-score: 0.33 MAE: 260.0 MSE: 67600.0 RMSE: 260.0 time: 0.0218 data: 0.0016 max mem: 1557
+05-03-2024 21:57:50 - train [551/730] eta: 0:00:04 n: 68 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 291.0 MSE: 84681.0 RMSE: 291.0 time: 0.0270 data: 0.0018 max mem: 1557
+05-03-2024 21:57:51 - train [561/730] eta: 0:00:04 n: 61 recall: 1.0 precision: 0.23 f1-score: 0.37 MAE: 210.0 MSE: 44100.0 RMSE: 210.0 time: 0.0271 data: 0.0018 max mem: 1557
+05-03-2024 21:57:51 - train [571/730] eta: 0:00:04 n: 64 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 241.0 MSE: 58081.0 RMSE: 241.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 21:57:51 - train [581/730] eta: 0:00:04 n: 85 recall: 0.99 precision: 0.23 f1-score: 0.37 MAE: 284.0 MSE: 80656.0 RMSE: 284.0 time: 0.0226 data: 0.0017 max mem: 1557
+05-03-2024 21:57:51 - train [591/730] eta: 0:00:03 n: 67 recall: 0.99 precision: 0.2 f1-score: 0.33 MAE: 264.0 MSE: 69696.0 RMSE: 264.0 time: 0.0218 data: 0.0017 max mem: 1557
+05-03-2024 21:57:51 - train [601/730] eta: 0:00:03 n: 27 recall: 1.0 precision: 0.14 f1-score: 0.24 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0216 data: 0.0017 max mem: 1557
+05-03-2024 21:57:52 - train [611/730] eta: 0:00:03 n: 7 recall: 1.0 precision: 0.06 f1-score: 0.11 MAE: 108.0 MSE: 11664.0 RMSE: 108.0 time: 0.0219 data: 0.0017 max mem: 1557
+05-03-2024 21:57:52 - train [621/730] eta: 0:00:02 n: 1 recall: 1.0 precision: 0.01 f1-score: 0.01 MAE: 170.0 MSE: 28900.0 RMSE: 170.0 time: 0.0223 data: 0.0017 max mem: 1557
+05-03-2024 21:57:52 - train [631/730] eta: 0:00:02 n: 14 recall: 1.0 precision: 0.12 f1-score: 0.22 MAE: 101.0 MSE: 10201.0 RMSE: 101.0 time: 0.0218 data: 0.0016 max mem: 1557
+05-03-2024 21:57:52 - train [641/730] eta: 0:00:02 n: 51 recall: 1.0 precision: 0.21 f1-score: 0.35 MAE: 190.0 MSE: 36100.0 RMSE: 190.0 time: 0.0217 data: 0.0017 max mem: 1557
+05-03-2024 21:57:53 - train [651/730] eta: 0:00:02 n: 6 recall: 1.0 precision: 0.02 f1-score: 0.04 MAE: 305.0 MSE: 93025.0 RMSE: 305.0 time: 0.0220 data: 0.0017 max mem: 1557
+05-03-2024 21:57:53 - train [661/730] eta: 0:00:01 n: 8 recall: 1.0 precision: 0.04 f1-score: 0.09 MAE: 171.0 MSE: 29241.0 RMSE: 171.0 time: 0.0216 data: 0.0017 max mem: 1557
+05-03-2024 21:57:53 - train [671/730] eta: 0:00:01 n: 11 recall: 1.0 precision: 0.19 f1-score: 0.32 MAE: 47.0 MSE: 2209.0 RMSE: 47.0 time: 0.0206 data: 0.0018 max mem: 1557
+05-03-2024 21:57:53 - train [681/730] eta: 0:00:01 n: 1 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 303.0 MSE: 91809.0 RMSE: 303.0 time: 0.0200 data: 0.0018 max mem: 1557
+05-03-2024 21:57:53 - train [691/730] eta: 0:00:01 n: 4 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 418.0 MSE: 174724.0 RMSE: 418.0 time: 0.0209 data: 0.0017 max mem: 1557
+05-03-2024 21:57:54 - train [701/730] eta: 0:00:00 n: 3 recall: 1.0 precision: 0.01 f1-score: 0.02 MAE: 349.0 MSE: 121801.0 RMSE: 349.0 time: 0.0221 data: 0.0018 max mem: 1557
+05-03-2024 21:57:54 - train [711/730] eta: 0:00:00 n: 59 recall: 1.0 precision: 0.14 f1-score: 0.25 MAE: 352.0 MSE: 123904.0 RMSE: 352.0 time: 0.0235 data: 0.0018 max mem: 1557
+05-03-2024 21:57:54 - train [721/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.01 f1-score: 0.03 MAE: 142.0 MSE: 20164.0 RMSE: 142.0 time: 0.0228 data: 0.0017 max mem: 1557
+05-03-2024 21:57:54 - train [730/730] eta: 0:00:00 n: 2 recall: 1.0 precision: 0.0 f1-score: 0.01 MAE: 441.0 MSE: 194481.0 RMSE: 441.0 time: 0.0211 data: 0.0017 max mem: 1557
+05-03-2024 21:57:55 - train Total time: 0:00:20 (0.0275 s / it)

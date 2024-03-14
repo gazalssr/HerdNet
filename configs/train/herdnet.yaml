@@ -1,10 +1,10 @@
-wandb_project: 'Sample project'
-wandb_entity: 'youraccountname'
+wandb_project: 'herdnet-finetuning'
+wandb_entity: 'ghazaleh-serati'
 wandb_run: 'myrun'
 seed: 1
 device_name: 'cuda'
 
-model: 
+model:
   name: 'HerdNet'
   from_torchvision: False
   load_from: null
@@ -34,24 +34,24 @@ losses:
     lambda_const: 1.0
     kwargs:
       reduction: 'mean'
-      weight: [0.1,5.,15.,1.]
+
 
 datasets:
   img_size: [512,512]
   anno_type: 'point'
-  num_classes: 4 
+  num_classes: 2
+  num_workers: 2
   collate_fn: null
 
   class_def:
-    1: 'camel'
-    2: 'donkey'
-    3: 'sheep/goat'
-  
+    1: 'caribou'
+
+
   train:
     name: 'CSVDataset'
-    csv_file: '/path/to/your/file.csv'
-    root_dir: '/path/to/your/images/folder'
-    
+    csv_file: '/herdnet/DATASETS/Train_patches_stratified/gt.csv'
+    root_dir: '/herdnet/DATASETS/Train_patches_stratified'
+
     sampler: null
 
     albu_transforms:
@@ -61,7 +61,7 @@ datasets:
         p: 0.5
       Normalize:
         p: 1.0
-    
+
     end_transforms:
       MultiTransformsWrapper:
         FIDT:
@@ -75,13 +75,13 @@ datasets:
 
   validate:
     name: 'CSVDataset'
-    csv_file: '/path/to/your/file.csv'
-    root_dir: '/path/to/your/images/folder'
+    csv_file: '/herdnet/DATASETS/val_patches_stratified/gt.csv'
+    root_dir: '/herdnet/DATASETS/val_patches_stratified'
 
     albu_transforms:
       Normalize:
         p: 1.0
-    
+
     end_transforms:
       DownSample:
         down_ratio: ${train.model.kwargs.down_ratio}
@@ -105,8 +105,8 @@ training_settings:
     verbose: True
   warmup_iters: 100
   vizual_fn: null
-  epochs: 100
-  evaluator: 
+  epochs: 1
+  evaluator:
     name: 'HerdNetEvaluator'
     threshold: 5
     select_mode: 'max'

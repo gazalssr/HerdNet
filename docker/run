@@ -20,7 +20,7 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         -v /home/fous3401/DATASETS:/herdnet/DATASETS \
         --ipc=host \
         -v `pwd`:/herdnet \
-        -p 8000:8000 \
+        -p 8000:8000 $1 \
         --entrypoint /bin/bash \
-        herdnet:local
+        sfoucherq/herdnet:local
 fi

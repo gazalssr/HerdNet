@@ -1,12 +1,12 @@
-wandb_project: 'Sample project'
-wandb_entity: 'youraccountname'
+wandb_project: 'herdnet-finetuning'
+wandb_entity: 'ghazaleh-serati'
 wandb_run: 'myrun'
 device_name: 'cuda'
 
-model: 
+model:
   name: 'HerdNet'
   from_torchvision: False
-  pth_file: '/path/to/your/file.pth'
+  pth_file: '/herdnet/DATASETS/20220413_herdnet_model.pth'
   kwargs:
     num_layers: 34
     pretrained: False
@@ -16,17 +16,16 @@ model:
 dataset:
   img_size: [512,512]
   anno_type: 'point'
-  num_classes: 4
+  num_classes: 1
   collate_fn: null
 
   class_def:
-    1: 'camel'
-    2: 'donkey'
-    3: 'sheep/goat'
+    1: 'caribou'
+
 
   name: 'CSVDataset'
-  csv_file: '/path/to/your/file.csv'
-  root_dir: '/path/to/your/images/folder'
+  csv_file: '/herdnet/DATASETS/test_patches_stratified/gt.csv'
+  root_dir: '/herdnet/DATASETS/test_patches_stratified'
 
   mean: [0.485, 0.456, 0.406]
   std: [0.229, 0.224, 0.225]
