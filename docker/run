@@ -20,5 +20,5 @@ if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
         -v `pwd`:/herdnet \
         -p 8000:8000 \
         --entrypoint /bin/bash \
-        herdnet:local
+        sfoucherq/herdnet:local
 fi
