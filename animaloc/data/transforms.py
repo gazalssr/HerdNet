@@ -24,6 +24,7 @@ import scipy
 from typing import Dict, Optional, Union, Tuple, List
 
 from ..utils.registry import Registry
+from PIL import Image
 
 TRANSFORMS = Registry('transforms', module_key='animaloc.data.transforms')
 
@@ -71,40 +72,96 @@ class MultiTransformsWrapper:
             outputs.append(tr_trgt)
 
         return img, tuple(outputs)
-
-@TRANSFORMS.register()
-class SampleToTensor:
-    ''' Convert PIL image and target to Tensors '''
-
-    def __call__(
-        self,
-        image: PIL.Image.Image, 
-        target: dict,
-        anno_type: str = 'bbox'
-        ) -> Tuple[torch.Tensor,dict]:
-        '''
-        Args:
-            image (PIL.Image.Image or torch.Tensor): image to transform [C,H,W]
-            target (dict): corresponding target
-            anno_type (str, optional): choose between 'bbox' for bounding box or 'point'
-                for points. Defaults to 'bbox'
+######## BinaryMultiTransformWrapper ##########
+class BinaryMultiTransformsWrapper:
+    """
+    Applies each input transformation to the called input and returns the transformed image
+    and a tuple containing the original target for each transformation.
+    """
+    def __init__(self, transforms: List[object]) -> None:
+        self.transforms = transforms
+    def __call__(self, image: Union[Image.Image, torch.Tensor], target: Dict[str, torch.Tensor]) -> Tuple[torch.Tensor, Tuple[torch.Tensor]]:
+        for trans in self.transforms:
+            image, _ = trans(image, target)  # Ignore transformed target, apply transformation to image.
         
-        Returns:
-            Tuple[torch.Tensor, dict]:
-                the transormed image and target
-        '''
+        # Convert each key-value pair in the target dict to a tensor and store in a new dict
 
+        target = {key: torch.tensor(val, dtype=torch.int64) if not isinstance(val, torch.Tensor) else val for key, val in target.items()}
+        # Return the last transformed image and the original targets converted to tensors.
+        return image, target
+    
+    ###### OLD ######
+    # def __call__(self, image: Union[Image.Image, torch.Tensor], target: Dict[str, torch.Tensor]) -> Tuple[torch.Tensor, Tuple[Dict[str, torch.Tensor]]]:
+    #     outputs = []
+    #     for trans in self.transforms:
+    #         image, _ = trans(image, target)  # Ignore transformed target, apply transformation to image.
+            
+    #         outputs.append(target)
+        
+    #     # Return the last transformed image and a tuple of the original targets repeated for each transformation.
+    #     return image, tuple(outputs)
+
+#################################################################
+@TRANSFORMS.register()
+# class SampleToTensor:
+#     ''' Convert PIL image and target to Tensors '''
+
+#     def __call__(
+#         self,
+#         image: PIL.Image.Image, 
+#         target: dict,
+#         anno_type: str = 'bbox'
+#         ) -> Tuple[torch.Tensor,dict]:
+#         '''
+#         Args:
+#             image (PIL.Image.Image or torch.Tensor): image to transform [C,H,W]
+#             target (dict): corresponding target
+#             anno_type (str, optional): choose between 'bbox' for bounding box or 'point'
+#                 for points. Defaults to 'bbox'
+        
+#         Returns:
+#             Tuple[torch.Tensor, dict]:
+#                 the transormed image and target
+#         '''
+
+#         tr_image = torchvision.transforms.ToTensor()(image)
+
+#         tr_target = {}
+#         tr_target.update(dict(**target))
+
+#         if anno_type == 'bbox':
+#             tr_target['boxes'] = torch.as_tensor(tr_target['boxes'], dtype=torch.float32)
+#         elif anno_type == 'point':
+#             tr_target['points'] = torch.as_tensor(tr_target['points'], dtype=torch.float32)
+
+#         tr_target['labels'] = torch.as_tensor(tr_target['labels'], dtype=torch.int64)
+
+#         return tr_image, tr_target
+########################### New SampleToTensor Function ###############
+class SampleToTensor:
+    class SampleToTensor:
+        '''Convert PIL image and target to Tensors.'''
+
+    def __call__(self, image: PIL.Image.Image, target: dict, anno_type: str = 'bbox') -> Tuple[torch.Tensor, dict]:
+        # Convert the PIL Image to a PyTorch Tensor
         tr_image = torchvision.transforms.ToTensor()(image)
-
         tr_target = {}
-        tr_target.update(dict(**target))
 
-        if anno_type == 'bbox':
-            tr_target['boxes'] = torch.as_tensor(tr_target['boxes'], dtype=torch.float32)
-        elif anno_type == 'point':
-            tr_target['points'] = torch.as_tensor(tr_target['points'], dtype=torch.float32)
+        # Check for bounding boxes and convert them if present and required
+        if anno_type == 'bbox' and 'boxes' in target:
+            tr_target['boxes'] = torch.as_tensor(target['boxes'], dtype=torch.float32)
 
-        tr_target['labels'] = torch.as_tensor(tr_target['labels'], dtype=torch.int64)
+        # Check for points and convert them if present and required
+        if anno_type == 'point' and 'points' in target:
+            tr_target['points'] = torch.as_tensor(target['points'], dtype=torch.float32)
+
+        # Check for labels and convert them if present
+        if 'labels' in target:
+            tr_target['labels'] = torch.as_tensor(target['labels'], dtype=torch.int64)
+
+        # Add condition for binary annotations
+        if anno_type == 'binary' and 'binary' in target:
+            tr_target['binary'] = torch.as_tensor(target['binary'], dtype=torch.int64)
 
         return tr_image, tr_target
 
@@ -244,6 +301,17 @@ class AnimalDensity:
                 target['labels'] = torch.as_tensor([0], dtype=torch.int64)
         
         return image, target['labels'].float()
+############# Newly added class for Binary annotation to handle patch-based binary annoations ############3  
+@TRANSFORMS.register()
+class BinaryTransform:
+    ''' This class is a placeholder that indicates we are dealing with a binary classification task '''
+    
+    def __init__(self):
+        pass
+    
+    def __call__(self, image: Union[PIL.Image.Image, torch.Tensor], target: Dict[str, torch.Tensor]) -> Tuple[Union[PIL.Image.Image, torch.Tensor], Dict[str, torch.Tensor]]:
+        # No modification to the image, so return it as is alongside the target
+        return image, target
     
 @TRANSFORMS.register()
 class PointsToMask:

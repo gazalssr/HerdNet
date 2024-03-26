@@ -127,3 +127,52 @@ class BoundingBox:
             self.x_max == other.x_max,
             self.y_max == other.y_max
             ])
+        
+
+class BinaryAnnotation:
+    """
+    Class to define a binary annotation in a dataset.
+    This annotation type is used to indicate the binary condition (1 or 0),
+    typically representing the presence (1) or absence (0) of a specific condition.
+    """
+
+    def __init__(self, binary: int) -> None:
+        """
+        Initialize a BinaryAnnotation object.
+
+        Args:
+            binary (int): The binary condition represented as 1 or 0.
+        """
+        assert binary in [0, 1], f'Binary value must be 0 or 1, got {binary}'
+        self.binary = binary
+
+    @property
+    def atype(self) -> str:
+        """
+        Get the annotation type string.
+
+        Returns:
+            str: The annotation type ('Binary').
+        """
+        return 'Binary'
+
+    def __repr__(self) -> str:
+        """
+        Get the string representation of the BinaryAnnotation object.
+
+        Returns:
+            str: String representation of the BinaryAnnotation object.
+        """
+        return f'BinaryAnnotation(binary: {self.binary})'
+
+    def __eq__(self, other) -> bool:
+        """
+        Check equality with another BinaryAnnotation object.
+
+        Args:
+            other (BinaryAnnotation): The other BinaryAnnotation object to compare with.
+
+        Returns:
+            bool: True if both BinaryAnnotation objects have the same binary value, False otherwise.
+        """
+        return self.binary == other.binary

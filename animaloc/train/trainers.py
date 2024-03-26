@@ -195,7 +195,29 @@ class Trainer:
         self.train_logger = CustomLogger(delimiter=' ', filename='training', work_dir=self.work_dir, csv=self.csv_logger)
         self.val_logger = CustomLogger(delimiter=' ', filename='validation', work_dir=self.work_dir, csv=self.csv_logger)
     
+    # def prepare_data(self, images, targets) -> tuple:
+    #     ''' Method to prepare the data before feeding to the model. 
+    #     Can be override by subclass to create a custom Trainer.
+
+    #     Args:
+    #         images,
+    #         targets
+        
+    #     Returns:
+    #         tuple
+    #     '''
+
+    #     images = images.to(self.device)
+
+    #     if isinstance(targets, (list, tuple)):
+    #         targets = [tar.to(self.device) for tar in targets]
+    #     else:
+    #         targets = targets.to(self.device)
+
+    #     return images, targets
+    ############# New Preparedata Class #################
     def prepare_data(self, images, targets) -> tuple:
+        print(f"Targets type before processing: {type(targets)}")
         ''' Method to prepare the data before feeding to the model. 
         Can be override by subclass to create a custom Trainer.
 
@@ -209,12 +231,21 @@ class Trainer:
 
         images = images.to(self.device)
 
-        if isinstance(targets, (list, tuple)):
+        if isinstance(targets, dict):
+            # Move each tensor within the target dictionary to the device
+            print("Targets are a dictionary.")
+            targets = {k: v.to(self.device) for k, v in targets.items()}
+        elif isinstance(targets, (list, tuple)):
+            # If targets is a list or tuple, move each item to the device
             targets = [tar.to(self.device) for tar in targets]
+            print("Targets are in a list or tuple.")
         else:
-            targets = targets.to(self.device)
-
+            print("Unexpected targets format.")
+    
+        
         return images, targets
+
+
 
     def start(
         self, 

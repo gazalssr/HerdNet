@@ -19,6 +19,7 @@ import os
 import PIL
 import pandas
 import numpy 
+import torch
 
 from typing import Optional, List, Any, Dict
 
@@ -127,15 +128,19 @@ class FolderDataset(CSVDataset):
                         target.update({key: [0]})
                 else:        
                     target.update({key: []})
+                    ##############
+                    
         
         return target
     
-########################## BinaryFolderDataset #######################
+########################## BinaryFolderDataset (new) #######################
 class BinaryFolderDataset(CSVDataset):
     def __init__(self, csv_file, root_dir, albu_transforms=None, end_transforms=None):
         super(BinaryFolderDataset, self).__init__(csv_file, root_dir, albu_transforms, end_transforms)
         self.create_binary_dataframe()
-
+        self.anno_type = 'binary'  # Specify the annotation type as 'Binary'
+        self.anno_keys = ['binary']
+        self._ordered_img_names = group_by_image(self.data)['images'].values.tolist()
     def create_binary_dataframe(self):
         # Get all image files in the root directory
         self.folder_images = [i for i in os.listdir(self.root_dir) if i.endswith(('.JPG', '.jpg', '.JPEG', '.jpeg'))]
@@ -181,6 +186,31 @@ class BinaryFolderDataset(CSVDataset):
         pil_img = Image.open(img_path).convert('RGB')
         pil_img.filename = img_name  
         return pil_img
+    
+    # def _load_target(self, index: int) -> dict:
+    #     # Always return a dictionary, even if it's for an image without annotations
+        
+    #     if self.data.at[index, 'binary'] == 1:
+    #         # Return target for images with annotations
+    #         target = {'binary': 1}  
+    #     else:
+    #         # Return empty or default target for images without annotations
+    #         target = {'binary': 0}  
+    #     return target
+    def _load_target(self, index: int) -> dict:
+        img_name = self._ordered_img_names[index]
+        
+
+        binary_label = self.data.loc[self.data['images'] == img_name, 'binary'].iloc[0]
+        # Construct the target dictionary.
+        target = {
+            'image_id': index,
+            'image_name': img_name,
+            'binary': torch.tensor([binary_label], dtype=torch.int64)  # Ensure binary label is a tensor
+        }
+
+        return target
+
     
     def derive_base_image_id(self, image_name):
         # Remove the patch number from the end of 'images' filenames
