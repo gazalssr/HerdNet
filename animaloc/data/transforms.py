@@ -161,7 +161,7 @@ class SampleToTensor:
 
         # Add condition for binary annotations
         if anno_type == 'binary' and 'binary' in target:
-            tr_target['binary'] = torch.as_tensor(target['binary'], dtype=torch.int64)
+            tr_target['binary'] = torch.as_tensor(target['binary'], dtype=torch.float32)
 
         return tr_image, tr_target
 

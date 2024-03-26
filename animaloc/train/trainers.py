@@ -234,7 +234,10 @@ class Trainer:
         if isinstance(targets, dict):
             # Move each tensor within the target dictionary to the device
             print("Targets are a dictionary.")
-            targets = {k: v.to(self.device) for k, v in targets.items()}
+            if len(targets.keys())>1:
+                targets = {k: v.to(self.device) for k, v in targets.items()}
+            else:
+                targets = [v.to(self.device) for k, v in targets.items()]
         elif isinstance(targets, (list, tuple)):
             # If targets is a list or tuple, move each item to the device
             targets = [tar.to(self.device) for tar in targets]

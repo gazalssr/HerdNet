@@ -285,16 +285,7 @@ class BinaryFolderDataset(CSVDataset):
         pil_img.filename = img_name  
         return pil_img
     
-    # def _load_target(self, index: int) -> dict:
-    #     # Always return a dictionary, even if it's for an image without annotations
-        
-    #     if self.data.at[index, 'binary'] == 1:
-    #         # Return target for images with annotations
-    #         target = {'binary': 1}  
-    #     else:
-    #         # Return empty or default target for images without annotations
-    #         target = {'binary': 0}  
-    #     return target
+
     def _load_target(self, index: int) -> dict:
         img_name = self._ordered_img_names[index]
         
