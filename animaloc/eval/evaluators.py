@@ -129,8 +129,21 @@ class Evaluator:
         Returns:
             tuple
         '''
-        
-        return images.to(self.device), targets.to(self.device)
+        if isinstance(targets, dict):
+            # Move each tensor within the target dictionary to the device
+            print("Targets are a dictionary.")
+            if len(targets.keys())>1:
+                targets = {k: v.to(self.device) for k, v in targets.items()}
+            else:
+                targets = [v.to(self.device) for k, v in targets.items()]
+        elif isinstance(targets, (list, tuple)):
+            # If targets is a list or tuple, move each item to the device
+            targets = [tar.to(self.device) for tar in targets]
+            print("Targets are in a list or tuple.")
+        else:
+            print("Unexpected targets format.")
+            
+        return images, targets
     
     def prepare_feeding(self, targets: Any, output: Any) -> dict:
         ''' Method to prepare targets and output before feeding to the Metrics instance. 
@@ -448,7 +461,20 @@ class FasterRCNNEvaluator(Evaluator):
 @EVALUATORS.register()
 class TileEvaluator(Evaluator):
   
-    def prepare_data(self, images: Any, targets: Any) -> tuple:        
+    def prepare_data(self, images: Any, targets: Any) -> tuple: 
+        if isinstance(targets, dict):
+            # Move each tensor within the target dictionary to the device
+            print("Targets are a dictionary.")
+            if len(targets.keys())>1:
+                targets = {k: v.to(self.device) for k, v in targets.items()}
+            else:
+                targets = [v.to(self.device) for k, v in targets.items()]
+        elif isinstance(targets, (list, tuple)):
+            # If targets is a list or tuple, move each item to the device
+            targets = [tar.to(self.device) for tar in targets]
+            print("Targets are in a list or tuple.")
+        else:
+            print("Unexpected targets format.")       
         return images.to(self.device), targets
 
     def prepare_feeding(self, targets: Dict[str, torch.Tensor], output: torch.Tensor) -> dict:
