@@ -520,7 +520,7 @@ class TileEvaluator(Evaluator):
 
         targets_float = targets.float()
 
-        # Convert model output to probabilities via sigmoid if not already probabilities
+        # Convert model output to probabilities via sigmoid 
         # output_probs = torch.sigmoid(output).float()
         scores= list(chain.from_iterable(output.tolist()))
         # convert probabilities to binary predictions 
