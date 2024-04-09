@@ -25,23 +25,7 @@ NUM_WORKERS= 8
 
 csv_path = '/herdnet/DATASETS/Train_patches_stratified/gt.csv'
 image_path = '/herdnet/DATASETS/Train_patches_stratified'
-dataset = FolderDataset(csv_path, image_path, [A.Normalize()])
 
-# dataloader = DataLoader(dataset, batch_size=batch_size, collate_fn=collate_fn, shuffle=True, num_workers= NUM_WORKERS)
-
-# sample_batch = next(iter(dataloader))
-# for i in range(len(sample_batch[1])):
-#   points = sample_batch[1][i]['points'].numpy()
-#   bbox= []
-#   for pt in points:
-#       bbox.append([pt[0]-2,pt[1]-2,pt[0]+2,pt[1]+2])
-#   print(len(sample_batch[1][i]['labels']))
-#   sample_batch[1][i]['annotations']=torch.tensor(bbox)
-# plt.figure(figsize=(16,2))
-# show_batch(sample_batch)
-# plt.savefig('/herdnet/show_annotation_patch.pdf')
-
-# Training, validation and test datasets
 import albumentations as A
 binary=True
 patch_size = 512
@@ -83,7 +67,7 @@ test_dataset = BinaryFolderDataset(
     )
 # Dataloaders
 from torch.utils.data import DataLoader
-batch_size= 32
+batch_size= 8
 train_dataloader = DataLoader(dataset = train_dataset, batch_size= 32 , num_workers= 2, shuffle= True)
 
 val_dataloader = DataLoader(dataset = val_dataset, batch_size=batch_size , num_workers= 2, shuffle= False)
@@ -99,7 +83,7 @@ print(torch.cuda.mem_get_info())
 cls= dla_encoder(image)
 
 losses = [
-      {'loss': BCEWithLogitsLoss(reduction='mean'), 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'bce_loss'},
+      {'loss': BCEWithLogitsLoss(reduction='mean'), 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'bce_loss'}
       ]
 
     
@@ -155,7 +139,7 @@ params_to_update = freeze_parts(dla_encoder.model,param_dict, layers_to_freeze,l
 from torch.optim import Adam
 
 from animaloc.train import Trainer
-from animaloc.eval import ImageLevelMetrics, HerdNetStitcher, HerdNetEvaluator, TileEvaluator
+from animaloc.eval import ImageLevelMetrics, HerdNetStitcher, TileEvaluator
 from animaloc.utils.useful_funcs import mkdir
 
 work_dir = '/content/drive/MyDrive/output'
@@ -163,13 +147,13 @@ mkdir(work_dir)
 
 lr = 1e-4
 weight_decay = 1e-3
-epochs = 15
+epochs = 5
 
 optimizer = Adam(params=dla_encoder.parameters(), lr=lr, weight_decay=weight_decay)
 # optimizer = Adam(params=params_to_update, lr=lr, weight_decay=weight_decay)
-
+####### Adding Binrya Option #######
 metrics = ImageLevelMetrics(num_classes=num_classes)
-
+metrics.binary_annotations = True
 evaluator = TileEvaluator(
     model=dla_encoder,
     dataloader=val_dataloader,
@@ -197,11 +181,15 @@ wandb.init(project="herdnet_pretrain")
 trainer.start(warmup_iters=100, checkpoints='best', select='max', validate_on='f1_score', wandb_flag =True)
 
 ##### Evaluator ############
+if wandb.run is not None:
+  wandb.finish()
+wandb.init(project="herdnet_pretrain")
 
-val_f1_score=evaluator.evaluate(returns='f1_score', viz=True, wandb_flag =True )
+val_f1_score=evaluator.evaluate(returns='f1_score', viz=False, wandb_flag =True )
 
 #Detections and Results
 df_val_r=evaluator.results
 df_val_r.to_csv('/herdnet/Binary_results.csv')
 df_train_d=evaluator.detections
 df_train_d.to_csv('/herdnet/Binary_detections.csv')
+

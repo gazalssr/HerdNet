@@ -131,7 +131,7 @@ class Evaluator:
         '''
         if isinstance(targets, dict):
             # Move each tensor within the target dictionary to the device
-            print("Targets are a dictionary.")
+            # print("Targets are a dictionary.")
             if len(targets.keys())>1:
                 targets = {k: v.to(self.device) for k, v in targets.items()}
             else:
@@ -206,14 +206,14 @@ class Evaluator:
                 output = self.stitcher(images[0])
                 output = self.post_stitcher(output)
             else:
-                # output, _ = self.model(images, targets)  
-                output, _ = self.model(images)
+                output, _ = self.model(images, targets)  
+                # output, _ = self.model(images)
 
             if viz and self.vizual_fn is not None:
                 if i % self.print_freq == 0 or i == len(self.dataloader) - 1:
                     fig = self._vizual(image = images, target = targets, output = output)
                     wandb.log({'validation_vizuals': fig})
-
+            #UPDATE######################
             output = self.prepare_feeding(targets, output)
 
             iter_metrics.feed(**output)
@@ -302,19 +302,19 @@ class Evaluator:
             }
             res.append(metrics)
         
-        metrics_cpy.aggregate()
-        res.append({
-            'class': 'binary',
-            'n': metrics_cpy.tp[0] + metrics_cpy.fn[0],
-            'recall': metrics_cpy.recall(),
-            'precision': metrics_cpy.precision(),
-            'f1_score': metrics_cpy.fbeta_score(),
-            'confusion': metrics_cpy.confusion(),
-            'mae': metrics_cpy.mae(),
-            'mse': metrics_cpy.mse(),
-            'rmse': metrics_cpy.rmse(),
-            'ap': metrics_cpy.ap()
-        })
+        # metrics_cpy.aggregate()
+        # res.append({
+        #     'class': 'binary',
+        #     'n': metrics_cpy.tp[0] + metrics_cpy.fn[0],
+        #     'recall': metrics_cpy.recall(),
+        #     'precision': metrics_cpy.precision(),
+        #     'f1_score': metrics_cpy.fbeta_score(),
+        #     'confusion': metrics_cpy.confusion(),
+        #     'mae': metrics_cpy.mae(),
+        #     'mse': metrics_cpy.mse(),
+        #     'rmse': metrics_cpy.rmse(),
+        #     'ap': metrics_cpy.ap()
+        # })
 
         return pandas.DataFrame(data = res)
     
@@ -459,8 +459,39 @@ class FasterRCNNEvaluator(Evaluator):
         return dict(gt = gt, preds = preds, est_count = counts)
     
 @EVALUATORS.register()
-class TileEvaluator(Evaluator):
+# class TileEvaluator(Evaluator):
   
+#     def prepare_data(self, images: Any, targets: Any) -> tuple: 
+#         if isinstance(targets, dict):
+#             # Move each tensor within the target dictionary to the device
+#             # print("Targets are a dictionary.")
+#             if len(targets.keys())>1:
+#                 targets = {k: v.to(self.device) for k, v in targets.items()}
+#             else:
+#                 targets = [v.to(self.device) for k, v in targets.items()]
+#         elif isinstance(targets, (list, tuple)):
+#             # If targets is a list or tuple, move each item to the device
+#             targets = [tar.to(self.device) for tar in targets]
+#             print("Targets are in a list or tuple.")
+#         else:
+#             print("Unexpected targets format.")       
+#         return images.to(self.device), targets
+
+#     def prepare_feeding(self, targets: Dict[str, torch.Tensor], output: torch.Tensor) -> dict:
+
+       
+        # gt_labels = list(chain.from_iterable(targets[0].tolist()))
+        # gt_labels = [int(l+1) for l in gt_labels]
+        # gt = dict(loc = [], labels = gt_labels)
+        # preds = dict(loc = [], labels = [], scores = [])
+
+        # scores= list(chain.from_iterable(output.tolist()))
+        # labels= [2 if s>0 else 1 for s in scores]
+        # preds = dict(loc = [], labels = labels, scores = scores)
+        # return dict(gt = gt_labels, preds = labels)
+    ################### NEW ###########################
+class TileEvaluator(Evaluator):
+    
     def prepare_data(self, images: Any, targets: Any) -> tuple: 
         if isinstance(targets, dict):
             # Move each tensor within the target dictionary to the device
@@ -476,16 +507,33 @@ class TileEvaluator(Evaluator):
         else:
             print("Unexpected targets format.")       
         return images.to(self.device), targets
+    
+    def prepare_feeding(self, targets: Any, output: torch.Tensor) -> dict:
+        """
+        Adjust targets and output for feeding into metrics.
+        This version assumes targets are provided in a suitable format for binary classification.
+        """
 
-    def prepare_feeding(self, targets: Dict[str, torch.Tensor], output: torch.Tensor) -> dict:
+        # If targets come as a list of tensors, convert to a single tensor
+        if isinstance(targets, list):
+            targets = torch.stack(targets).to(self.device)
 
-       
-        gt_labels = list(chain.from_iterable(targets[0].tolist()))
-        gt_labels = [int(l+1) for l in gt_labels]
-        gt = dict(loc = [], labels = gt_labels)
-        preds = dict(loc = [], labels = [], scores = [])
+        targets_float = targets.float()
 
+        # Convert model output to probabilities via sigmoid if not already probabilities
+        # output_probs = torch.sigmoid(output).float()
         scores= list(chain.from_iterable(output.tolist()))
-        labels= [2 if s>0 else 1 for s in scores]
-        preds = dict(loc = [], labels = labels, scores = scores)
-        return dict(gt = gt_labels, preds = labels)
+        # convert probabilities to binary predictions 
+        # pred_binary = (scores > 0.5).float()
+        pred_binary = torch.tensor([1 if s > 0 else 0 for s in scores], dtype=torch.float32).to(output.device)
+        # Prepare dictionary for feeding into metrics
+        feeding_dict = {
+            'gt': {'binary': targets_float},
+            'preds': {'binary': pred_binary}
+        }
+
+        return feeding_dict
+
+
+
+

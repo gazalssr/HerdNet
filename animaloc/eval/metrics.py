@@ -62,7 +62,7 @@ class Metrics:
             num_classes (int, optional): number of classes, background included. 
                 Defaults to 2 (binary case).
         '''
-        
+        self.binary_annotations = False
         self.threshold = threshold
         self.num_classes = num_classes
 
@@ -98,27 +98,36 @@ class Metrics:
             est_count (list, optional): list containing estimated count for each
                 class, background excluded. Defaults to None.
         '''
-
-        assert isinstance(est_count, (type(None), list))
-        for o in [gt, preds]:
-            assert isinstance(o, dict)
-            assert len(o['loc']) == len(o['labels'])
         
-        self.score_flag = 0
-        if 'scores' in preds.keys():
-            self.score_flag = 1
-            assert len(preds['scores']) == len(preds['loc'])
+        self.binary_annotations = 'binary' in gt and 'binary' in preds
+        if self.binary_annotations:
+            self.matching(gt, preds)  # Direct comparison as in ImageLevelMetrics
+        else:
+            assert isinstance(est_count, (type(None), list))
+            for o in [gt, preds]:
+                assert isinstance(o, dict)
+                assert len(o['loc']) == len(o['labels'])
+            
+            self.score_flag = 0
+            if 'scores' in preds.keys():
+                self.score_flag = 1
+                assert len(preds['scores']) == len(preds['loc'])
+            
+            if len(gt['loc']) == 0:
+                self._no_gt(gt, preds)
+            
+            if len(preds['loc']) == 0:
+                self._no_preds(gt, preds)
+            
+            if len(gt['loc']) > 0 and len(preds['loc']) > 0:
+                self.matching(gt, preds)
+        if est_count is None:
+            non_empty_preds = (preds['binary'] == 1).sum().item()  # Count of non-empty patches
+            empty_preds = (preds['binary'] == 0).sum().item()  # Count of empty patches
+            est_count = [empty_preds, non_empty_preds]
         
-        if len(gt['loc']) == 0:
-            self._no_gt(gt, preds)
-        
-        if len(preds['loc']) == 0:
-            self._no_preds(gt, preds)
-        
-        if len(gt['loc']) > 0 and len(preds['loc']) > 0:
-            self.matching(gt, preds)
-        
-        if est_count is not None:
+     
+        else:
             gt_count = self._init_attr(0)
             if len(gt['loc']) > 0:
                 gt_count = [gt['labels'].count(i+1) for i in range(self.num_classes-1)]
@@ -190,147 +199,377 @@ class Metrics:
         self._confusion_matrix = numpy.array([[1.]])
         self._total_count = [sum(self._total_count)]
 
+    # def precision(self, c: int = 2) -> float:
+    #     ''' Precision 
+    #     Args:
+    #         c (int, optional): class id. Defaults to 1.
+        
+    #     Returns:
+    #         float
+    #     '''
+
+    #     c = c - 1
+    #     if self.tp[c] > 0:
+    #         return float(self.tp[c] / (self.tp[c] + self.fp[c]))
+    #     else:
+    #         return float(0)
+    ################## NEW Adapted Precision Code ###################
     def precision(self, c: int = 1) -> float:
         ''' Precision 
         Args:
-            c (int, optional): class id. Defaults to 1.
+            c (int, optional): For object detection, class id starting from 1. For binary classification, 0 for negative class and 1 for positive class. Defaults to 1 for binary.
         
         Returns:
-            float
+            float: Precision value.
         '''
+        # Binary classification case
+        if hasattr(self, 'binary_annotations') and self.binary_annotations:
+            # Assuming binary classification (0: negative, 1: positive)
+            tp = self.tp[0] if c == 1 else 0  # True positives for binary are stored at index 0, assuming c=1 for positive class
+            fp = self.fp[0] if c == 1 else 0  # False positives for binary are also stored at index 0
+            total = tp + fp
+            return float(tp) / total if total > 0 else 0.0
 
-        c = c - 1
-        if self.tp[c] > 0:
-            return float(self.tp[c] / (self.tp[c] + self.fp[c]))
+        # Object detection or multiclass classification case (unchanged)
         else:
-            return float(0)
+            c = c - 1  
+            if self.tp[c] > 0:
+                return float(self.tp[c] / (self.tp[c] + self.fp[c]))
+            else:
+                return float(0)
+
+
     
+    # def recall(self, c: int = 2) -> float:
+    #     ''' Recall 
+    #     Args:
+    #         c (int, optional): class id. Defaults to 1.
+        
+    #     Returns:
+    #         float
+    #     '''
+        
+    #     c = c - 1
+    #     if self.tp[c] > 0:
+    #         return float(self.tp[c] / (self.tp[c] + self.fn[c]))
+    #     else:
+    #         return float(0)
+    ######################## NEW code for Recall ###########
     def recall(self, c: int = 1) -> float:
         ''' Recall 
         Args:
-            c (int, optional): class id. Defaults to 1.
+            c (int, optional): For object detection, class id starting from 1. For binary classification, 0 for negative class and 1 for positive class. Defaults to 1 for binary.
         
         Returns:
-            float
+            float: Recall value.
         '''
-        
-        c = c - 1
-        if self.tp[c] > 0:
-            return float(self.tp[c] / (self.tp[c] + self.fn[c]))
+        # Binary classification case
+        if hasattr(self, 'binary_annotations') and self.binary_annotations:
+            # Assuming binary classification (0: negative, 1: positive)
+            # Note: Ensure tp, fn are calculated correctly in the binary context before calling this
+            tp = self.tp[0] if c == 1 else 0  # True positives for binary are stored at index 0, assuming c=1 for positive class
+            fn = self.fn[0] if c == 1 else 0  # False negatives for binary are also stored at index 0
+            total = tp + fn
+            return float(tp) / total if total > 0 else 0.0
+
+        # Object detection or multiclass classification case (unchanged)
         else:
-            return float(0)
-    
+            c = c - 1  # Adjust for 0-based indexing
+            if self.tp[c] > 0:
+                return float(self.tp[c] / (self.tp[c] + self.fn[c]))
+            else:
+                return float(0)
+
+    # def fbeta_score(self, c: int = 2, beta: int = 1) -> float:
+    #     ''' F-beta score 
+    #     Args:
+    #         c (int, optional): class id. Defaults to 1.
+    #         beta (int, optional): beta value. Defaults to 1.
+        
+    #     Returns:
+    #         float
+    #     '''
+        
+    #     if self.tp[c-1] > 0:
+    #         return float(
+    #             (1 + beta**2)*self.precision(c)*self.recall(c) / 
+    #             ((beta**2)*self.precision(c) + self.recall(c))
+    #             )
+    #     else:
+    #         return float(0)        
+    ############## New f-beta code ##############
     def fbeta_score(self, c: int = 1, beta: int = 1) -> float:
         ''' F-beta score 
         Args:
-            c (int, optional): class id. Defaults to 1.
-            beta (int, optional): beta value. Defaults to 1.
+            c (int, optional): For object detection, class id starting from 1. For binary classification, 0 for negative class and 1 for positive class. Defaults to 1 for binary.
+            beta (int, optional): Beta value, which determines the weight of recall in the combined score. Defaults to 1.
         
         Returns:
-            float
+            float: The F-beta score.
         '''
-        
-        if self.tp[c-1] > 0:
-            return float(
-                (1 + beta**2)*self.precision(c)*self.recall(c) / 
-                ((beta**2)*self.precision(c) + self.recall(c))
+        # Binary classification case
+        if hasattr(self, 'binary_annotations') and self.binary_annotations:
+            # Assuming binary classification (0: negative, 1: positive)
+            precision = self.precision(c)
+            recall = self.recall(c)
+            if precision + recall > 0:
+                return float(
+                    (1 + beta**2) * precision * recall / 
+                    ((beta**2) * precision + recall)
                 )
+            else:
+                return float(0)
+        # Object detection or multiclass classification case (unchanged)
         else:
-            return float(0)        
-    
-    def mae(self, c: int = 1) -> float:
-        ''' Mean Absolute Error 
-        Args:
-            c (int, optional): class id. Defaults to 1.
-        
-        Returns:
-            float
-        '''
+            c = c - 1  # Adjust for 0-based indexing
+            if self.tp[c] > 0:
+                precision = self.precision(c + 1)  # Adjusting c back for the precision and recall calls
+                recall = self.recall(c + 1)
+                return float(
+                    (1 + beta**2) * precision * recall / 
+                    ((beta**2) * precision + recall)
+                )
+            else:
+                return float(0)
 
-        c = c - 1
-        return float(self._sum_absolute_error[c] / self._n_calls[c]) \
-            if self._n_calls[c] else 0.
+
+    # def mae(self, c: int = 1) -> float:
+    #     ''' Mean Absolute Error 
+    #     Args:
+    #         c (int, optional): class id. Defaults to 1.
+        
+    #     Returns:
+    #         float
+    #     '''
+
+    #     c = c - 1
+    #     return float(self._sum_absolute_error[c] / self._n_calls[c]) \
+    #         if self._n_calls[c] else 0.
+    ############# new mae code #######
+    def mae(self, c: int = 1) -> float:
+        ''' Mean Absolute Error
+        Args:
+            c (int, optional): class id. Defaults to 1 for binary, but this parameter is ignored in binary cases as MAE is not calculated.
+            
+        Returns:
+            float: The mean absolute error for object detection tasks, or a predefined value (e.g., None) for binary classification tasks.
+        '''
+        # Binary classification case: Skip calculation and return None or 0.0
+        if hasattr(self, 'binary_annotations') and self.binary_annotations:
+            return 0.0  # or return 0.0, depending on how you wish to handle this in logging/aggregation
+
+        # Object detection or multiclass classification case: Perform usual MAE calculation
+        else:
+            c = c - 1  # Adjust for 0-based indexing
+            if c < 0 or c >= len(self._sum_absolute_error):
+                raise ValueError("Class index out of range.")
+            if self._n_calls[c] > 0:
+                return float(self._sum_absolute_error[c] / self._n_calls[c])
+            else:
+                return 0.0
+
     
+    # def mse(self, c: int = 1) -> float:
+    #     ''' Mean Squared Error 
+    #     Args:
+    #         c (int, optional): class id. Defaults to 1.
+        
+    #     Returns:
+    #         float
+    #     '''
+    #     c = c - 1
+    #     return float(self._sum_squared_error[c] / self._n_calls[c]) \
+    #         if self._n_calls[c] else 0.
+    ############ NEW MSE code ##################
     def mse(self, c: int = 1) -> float:
-        ''' Mean Squared Error 
+        ''' Mean Squared Error
         Args:
-            c (int, optional): class id. Defaults to 1.
-        
+            c (int, optional): For object detection, class id starting from 1. For binary classification, ignored since MSE is not typically calculated.
+            
         Returns:
-            float
+            float: The mean squared error for object detection tasks, or a predefined value (e.g., 0.0) for binary classification tasks.
         '''
-        c = c - 1
-        return float(self._sum_squared_error[c] / self._n_calls[c]) \
-            if self._n_calls[c] else 0.
-    
+        if hasattr(self, 'binary_annotations') and self.binary_annotations:
+            return 0.0  # Return a default float value
+
+        else:
+            c = c - 1
+            if c < 0 or c >= len(self._sum_squared_error):
+                raise ValueError("Class index out of range.")
+            return float(self._sum_squared_error[c] / self._n_calls[c]) if self._n_calls[c] else 0.0
+
+    # def rmse(self, c: int = 2) -> float:
+    #     ''' Root Mean Squared Error 
+    #     Args:
+    #         c (int, optional): class id. Defaults to 1.
+        
+    #     Returns:
+    #         float
+    #     '''
+    #     return float(math.sqrt(self.mse(c)))
+    ################## New RMSE Code ########
     def rmse(self, c: int = 1) -> float:
-        ''' Root Mean Squared Error 
+        ''' Root Mean Squared Error
         Args:
-            c (int, optional): class id. Defaults to 1.
+            c (int, optional): For object detection, class id starting from 1. For binary classification, ignored since RMSE is not typically calculated.
         
         Returns:
-            float
+            float: The root mean squared error for object detection tasks, or 0.0 for binary classification tasks.
         '''
-        return float(math.sqrt(self.mse(c)))
-    
-    def ap(self, c: int = 1) -> float:
-        ''' Average Precision
+        # Binary classification case: Skip calculation and return 0.0
+        if hasattr(self, 'binary_annotations') and self.binary_annotations:
+            return 0.0  # Bypass RMSE calculation for binary classification
+
+        # Object detection or multiclass classification case: Perform usual RMSE calculation
+        else:
+            # Ensure mse(c) is calculated only once and used both for the condition check and the return statement
+            mse_value = self.mse(c)
+            return float(math.sqrt(mse_value)) if mse_value is not None else 0.0
+
+    # def ap(self, c: int = 2) -> float:
+    #     ''' Average Precision
+    #     Args: 
+    #         c (int, optional): class id. Defaults to 1.
+        
+    #     Returns:
+    #         float
+    #     '''
+
+    #     recalls, precisions = self.rec_pre_lists(c)
+        
+    #     if len(recalls) == 0 or len(precisions) == 0:
+    #         return 0.
+    #     else:
+    #         return self._compute_AP(recalls, precisions)
+    ############### NEW AP code ##################
+    def ap(self, c: int = 2) -> float:
+        '''Average Precision
         Args: 
             c (int, optional): class id. Defaults to 1.
-        
+            
         Returns:
-            float
+            float: Calculated average precision, or a placeholder if not applicable.
         '''
-
         recalls, precisions = self.rec_pre_lists(c)
         
-        if len(recalls) == 0 or len(precisions) == 0:
+        # For binary classification scenarios where rec_pre_lists is not implemented
+        if hasattr(self, 'binary_annotations') and self.binary_annotations:
+            
+            return 0.0  
+        
+        # For non-binary tasks, proceed with AP calculation if recall and precision values exist
+        elif len(recalls) == 0 or len(precisions) == 0:
             return 0.
         else:
             return self._compute_AP(recalls, precisions)
+
     
+    # def rec_pre_lists(self, c: int = 2) -> tuple:
+    #     ''' Recalls and Precisions lists
+    #     Args: 
+    #         c (int, optional): class id. Defaults to 1.
+        
+    #     Returns:
+    #         tuple
+    #             recalls and precisions
+    #     '''
+
+    #     c = c - 1
+
+    #     if len(self._ap_tables[c]) == 0:
+    #         return [], []
+
+    #     else:
+    #         n_gt = self.fn[c] + self.tp[c]
+
+    #         sorted_table = sorted(self._ap_tables[c], key=lambda x: x[1], reverse=True)
+    #         sorted_table = numpy.array(sorted_table)
+    #         sorted_table[:,2] = numpy.cumsum(sorted_table[:,2], axis=0)
+    #         sorted_table[:,3] = numpy.cumsum(sorted_table[:,3], axis=0)
+
+    #         precisions = sorted_table[:,2] / (sorted_table[:,2]+sorted_table[:,3])
+    #         recalls = sorted_table[:,2] / n_gt
+
+    #         return recalls.tolist(), precisions.tolist()
+    ################################## NEW rec_pre_lists ###########################
     def rec_pre_lists(self, c: int = 1) -> tuple:
-        ''' Recalls and Precisions lists
+        '''Recalls and Precisions lists for both binary and object detection tasks.
+        
         Args: 
-            c (int, optional): class id. Defaults to 1.
+            c (int, optional): class id. Defaults to 1 for binary and specific class IDs for object detection/multiclass.
         
         Returns:
-            tuple
-                recalls and precisions
+            tuple: recalls and precisions lists.
         '''
-
-        c = c - 1
-
-        if len(self._ap_tables[c]) == 0:
+        # Check if we're in a binary classification scenario
+        if hasattr(self, 'binary_annotations') and self.binary_annotations:
+            # Instead of 'pass', return a pair of empty lists to avoid TypeError
+            # when unpacking the returned value in the `ap` method.
             return [], []
 
-        else:
-            n_gt = self.fn[c] + self.tp[c]
+        else:  # Object detection or multiclass classification case
+            c = c - 1  # Adjust for 0-based indexing
 
+            if len(self._ap_tables[c]) == 0:
+                return [], []
+
+            # Proceed with the original logic for non-binary tasks
+            n_gt = self.fn[c] + self.tp[c]
             sorted_table = sorted(self._ap_tables[c], key=lambda x: x[1], reverse=True)
             sorted_table = numpy.array(sorted_table)
-            sorted_table[:,2] = numpy.cumsum(sorted_table[:,2], axis=0)
-            sorted_table[:,3] = numpy.cumsum(sorted_table[:,3], axis=0)
+            sorted_table[:, 2] = numpy.cumsum(sorted_table[:, 2], axis=0)  # Cumulative true positives
+            sorted_table[:, 3] = numpy.cumsum(sorted_table[:, 3], axis=0)  # Cumulative false positives
 
-            precisions = sorted_table[:,2] / (sorted_table[:,2]+sorted_table[:,3])
-            recalls = sorted_table[:,2] / n_gt
+            precisions = sorted_table[:, 2] / (sorted_table[:, 2] + sorted_table[:, 3])
+            recalls = sorted_table[:, 2] / n_gt
 
             return recalls.tolist(), precisions.tolist()
-    
+
+        
+    # def confusion(self, c: int = 2) -> float:
+    #     ''' Interclass confusion
+    #     Args: 
+    #         c (int, optional): class id. Defaults to 1.
+        
+    #     Returns:
+    #         float
+    #             interclass confusion
+    #     '''
+    #     c = c - 1
+    #     cm_row = self._confusion_matrix[c]
+    #     p = cm_row[c]/sum(cm_row) if sum(cm_row) else 0.
+    #     return 1 - p
+    ##################### New Confusion Code #############################
     def confusion(self, c: int = 1) -> float:
-        ''' Interclass confusion
-        Args: 
-            c (int, optional): class id. Defaults to 1.
+        ''' Construct the confusion matrix for binary classification tasks
+        or return interclass confusion for a specified class in object detection tasks.
+
+        Args:
+            c (int, optional): The class id for which to calculate interclass confusion in non-binary tasks. Defaults to 1 for binary.
         
         Returns:
-            float
-                interclass confusion
+            For binary classification: A dictionary representing the confusion matrix with TP, TN, FP, FN.
+            For object detection or multiclass classification: Float representing interclass confusion for the specified class.
         '''
-        c = c - 1
-        cm_row = self._confusion_matrix[c]
-        p = cm_row[c]/sum(cm_row) if sum(cm_row) else 0.
-        return 1 - p
-    
+        # Binary classification case
+        if hasattr(self, 'binary_annotations') and self.binary_annotations:
+            # Construct and return a confusion matrix dictionary for binary classification
+            return {
+                'TP': self.tp[0],  # True Positives
+                'TN': self.tn[0],  # True Negatives
+                'FP': self.fp[0],  # False Positives
+                'FN': self.fn[0],  # False Negatives
+            }
+
+        # Object detection or multiclass classification case
+        else:
+            c = c - 1  # Adjust for 0-based indexing
+            if c < 0 or c >= len(self._confusion_matrix):
+                raise ValueError("Class index out of range.")
+            cm_row = self._confusion_matrix[c]
+            p = cm_row[c] / sum(cm_row) if sum(cm_row) else 0.
+            return 1 - p
+############ No Need To Change ##########
     def accuracy(self) -> float:
         ''' Classification accuracy 
         
@@ -345,17 +584,39 @@ class Metrics:
         else:
             return 0.
     
-    def total_count(self, c: int = 1) -> float:
+    # def total_count(self, c: int = 2) -> float:
+    #     ''' Total class count
+    #     Args: 
+    #         c (int, optional): class id. Defaults to 1.
+        
+    #     Returns:
+    #         float
+    #             count
+    #     '''
+    #     c = c - 1
+    #     return self._total_count[c]
+    ######## New total count function ###########
+    def total_count(self, c: int = 1) -> int:
         ''' Total class count
         Args: 
-            c (int, optional): class id. Defaults to 1.
+            c (int, optional): For object detection, class id starting from 1. For binary classification, this can be ignored or set to 1 for positive class.
         
         Returns:
-            float
-                count
+            int: The total count of instances for the specified class (in object detection) or the total count of positive instances (in binary classification).
         '''
-        c = c - 1
-        return self._total_count[c]
+        # Binary classification case
+        if hasattr(self, 'binary_annotations') and self.binary_annotations:
+            # For binary classification, you might simply want the count of positive instances
+            # Assuming index 0 stores the count for the positive class (class 1)
+            return self._total_count[0]
+
+        # Object detection or multiclass classification case
+        else:
+            c = c - 1  # Adjust for 0-based indexing
+            if c < 0 or c >= len(self._total_count):
+                raise ValueError("Class index out of range.")
+            return self._total_count[c]
+
         
     def _init_attr(self, val: int = 0) -> list:
         return [val] * (self.num_classes - 1)
@@ -630,37 +891,77 @@ class BoxesMetrics(Metrics):
             self.detections.append({'images': self.idx, **counts})
 
 @METRICS.register()
-class ImageLevelMetrics(Metrics):
-    ''' Metrics class for image-level classification '''
+# class ImageLevelMetrics(Metrics):
+#     ''' Metrics class for image-level classification '''
 
-    def __init__(self, num_classes: int = 2) -> None:
+#     def __init__(self, num_classes: int = 2) -> None:
+#         num_classes = num_classes + 1 # for convenience
+#         super().__init__(0, num_classes)
+    
+#     def feed(self, gt: int, preds: int) -> tuple:
+#         '''
+#         Args:
+#             gt (int): numeric ground truth label
+#             pred (int): numeric predicted label
+#         '''
+
+#         gt = dict(labels=[gt], loc=[(0,0)])
+#         preds = dict(labels=[preds], loc=[(0,0)])
+        
+#         super().feed(gt, preds)
+    
+#     def matching(self, gt: dict, pred: dict) -> None:
+#         gt_lab = gt['labels'][0]
+#         p_lab = pred['labels'][0]
+#         for g, p in zip(gt_lab, p_lab): #TODO: To be confirmed
+#             if g == p:
+#                 self.tp[g-1] += 1
+#             else:
+#                 self.fp[p-1] += 1
+#                 self.fn[g-1] += 1
+        
+#         self._confusion_matrix += confusion_matrix(gt_lab, p_lab, labels=list(range(1, self.num_classes)))
+      ################# NEW ##################
+class ImageLevelMetrics(Metrics):
+    '''Metrics class for image-level classification for binary tasks.'''
+
+    def __init__(self, num_classes: int = 2):
+        '''Initialize metrics for binary classification tasks.'''
         num_classes = num_classes + 1 # for convenience
         super().__init__(0, num_classes)
-    
-    def feed(self, gt: int, preds: int) -> tuple:
-        '''
-        Args:
-            gt (int): numeric ground truth label
-            pred (int): numeric predicted label
-        '''
-
-        gt = dict(labels=[gt], loc=[(0,0)])
-        preds = dict(labels=[preds], loc=[(0,0)])
+        if not hasattr(self, 'tn'):
+            self.tn = self._init_attr()
         
+    def feed(self, gt: dict, preds: dict):
+        '''Feed metrics with ground truth and predictions.'''
         super().feed(gt, preds)
-    
-    def matching(self, gt: dict, pred: dict) -> None:
-        gt_lab = gt['labels'][0]
-        p_lab = pred['labels'][0]
-        for g, p in zip(gt_lab, p_lab): #TODO: To be confirmed
-            if g == p:
-                self.tp[g-1] += 1
-            else:
-                self.fp[p-1] += 1
-                self.fn[g-1] += 1
         
-        self._confusion_matrix += confusion_matrix(gt_lab, p_lab, labels=list(range(1, self.num_classes)))
+    def matching(self, gt: dict, preds: dict):
+        '''Compare binary ground truth labels to binary predictions.'''
+        gt_binary = gt['binary'][0].squeeze()  # Squeeze to ensure 1D tensor
+        pred_binary = preds['binary'][0].squeeze()
+
+        # Convert to boolean for logical operations
+        gt_binary_bool = gt_binary > 0.5
+        pred_binary_bool = pred_binary > 0.5
+
+        # Calculate True Positives, False Positives, False Negatives, True Negatives
+        self.tp[0] += ((gt_binary_bool & pred_binary_bool).sum().item())
+        self.fp[0] += ((~gt_binary_bool & pred_binary_bool).sum().item())
+        self.fn[0] += ((gt_binary_bool & ~pred_binary_bool).sum().item())
+        self.tn[0] += ((~gt_binary_bool & ~pred_binary_bool).sum().item())
+  
+
+        # confusion_matrix = numpy.zeros((2, 2), dtype=int)
         
+        # # # Update the confusion matrix
+        self.confusion_matrix[0, 0] = self.tp[0]  # True Positive count
+        self.confusion_matrix[0, 1] = self.fp[0]  # False Positive count
+        self.confusion_matrix[1, 0] = self.fn[0]  # False Negative count
+        self.confusion_matrix[1, 1] = self.tn[0]  # True Negative count
+       
+
+       
 @METRICS.register()
 class RegressionMetrics(Metrics):
     ''' Metrics class for regression type tasks '''

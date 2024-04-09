@@ -217,7 +217,7 @@ class Trainer:
     #     return images, targets
     ############# New Preparedata Class #################
     def prepare_data(self, images, targets) -> tuple:
-        print(f"Targets type before processing: {type(targets)}")
+        # print(f"Targets type before processing: {type(targets)}")
         ''' Method to prepare the data before feeding to the model. 
         Can be override by subclass to create a custom Trainer.
 
@@ -233,7 +233,7 @@ class Trainer:
 
         if isinstance(targets, dict):
             # Move each tensor within the target dictionary to the device
-            print("Targets are a dictionary.")
+            # print("Targets are a dictionary.")
             if len(targets.keys())>1:
                 targets = {k: v.to(self.device) for k, v in targets.items()}
             else:

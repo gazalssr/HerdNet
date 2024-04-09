@@ -1,5 +1,6 @@
 __pycache__/
 *.pyc
+*.pdf
 .vscode/
 dist/
 *.egg-info/
@@ -13,6 +14,7 @@ exp/
 handling/
 tests/
 wandb/
+data/
 *.code-workspace
 
 configs/train/*
@@ -20,3 +22,4 @@ configs/test/*
 !configs/*/faster_rcnn.yaml
 !configs/*/dla34.yaml
 !configs/*/herdnet.yaml
+show_annotation_patch.pdf
