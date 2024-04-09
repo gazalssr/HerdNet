@@ -82,6 +82,8 @@ class Metrics:
         self._total_count = self._init_attr()
 
         self._ap_tables = self._init_attr(val=[])
+
+        self.confusion_matrix = numpy.zeros((2, 2), dtype=int)
         
         self.confusion_matrix = numpy.zeros((self.num_classes-1,self.num_classes-1))
         self._confusion_matrix = self.confusion_matrix
@@ -266,7 +268,7 @@ class Metrics:
         # Binary classification case
         if hasattr(self, 'binary_annotations') and self.binary_annotations:
             # Assuming binary classification (0: negative, 1: positive)
-            # Note: Ensure tp, fn are calculated correctly in the binary context before calling this
+    
             tp = self.tp[0] if c == 1 else 0  # True positives for binary are stored at index 0, assuming c=1 for positive class
             fn = self.fn[0] if c == 1 else 0  # False negatives for binary are also stored at index 0
             total = tp + fn
@@ -356,7 +358,7 @@ class Metrics:
         '''
         # Binary classification case: Skip calculation and return None or 0.0
         if hasattr(self, 'binary_annotations') and self.binary_annotations:
-            return 0.0  # or return 0.0, depending on how you wish to handle this in logging/aggregation
+            return 0.0  
 
         # Object detection or multiclass classification case: Perform usual MAE calculation
         else:
@@ -422,7 +424,7 @@ class Metrics:
 
         # Object detection or multiclass classification case: Perform usual RMSE calculation
         else:
-            # Ensure mse(c) is calculated only once and used both for the condition check and the return statement
+    
             mse_value = self.mse(c)
             return float(math.sqrt(mse_value)) if mse_value is not None else 0.0
 
@@ -503,8 +505,7 @@ class Metrics:
         '''
         # Check if we're in a binary classification scenario
         if hasattr(self, 'binary_annotations') and self.binary_annotations:
-            # Instead of 'pass', return a pair of empty lists to avoid TypeError
-            # when unpacking the returned value in the `ap` method.
+
             return [], []
 
         else:  # Object detection or multiclass classification case
@@ -606,7 +607,7 @@ class Metrics:
         '''
         # Binary classification case
         if hasattr(self, 'binary_annotations') and self.binary_annotations:
-            # For binary classification, you might simply want the count of positive instances
+            # count of positive instances
             # Assuming index 0 stores the count for the positive class (class 1)
             return self._total_count[0]
 
@@ -928,18 +929,21 @@ class ImageLevelMetrics(Metrics):
     def __init__(self, num_classes: int = 2):
         '''Initialize metrics for binary classification tasks.'''
         num_classes = num_classes + 1 # for convenience
-        super().__init__(0, num_classes)
-        if not hasattr(self, 'tn'):
-            self.tn = self._init_attr()
-        
+        super().__init__(threshold=None, num_classes=num_classes)  # Adjusted according to the Metrics class definition
+        self.confusion_matrix = numpy.zeros((2, 2), dtype=int)
+ 
+        self.tp = [0]  
+        self.fp = [0]  
+        self.fn = [0]  
+        self.tn = [0]  
     def feed(self, gt: dict, preds: dict):
         '''Feed metrics with ground truth and predictions.'''
         super().feed(gt, preds)
-        
+
     def matching(self, gt: dict, preds: dict):
         '''Compare binary ground truth labels to binary predictions.'''
-        gt_binary = gt['binary'][0].squeeze()  # Squeeze to ensure 1D tensor
-        pred_binary = preds['binary'][0].squeeze()
+        gt_binary = gt['binary'][0].squeeze()
+        pred_binary = preds['binary'].squeeze()
 
         # Convert to boolean for logical operations
         gt_binary_bool = gt_binary > 0.5
@@ -950,18 +954,14 @@ class ImageLevelMetrics(Metrics):
         self.fp[0] += ((~gt_binary_bool & pred_binary_bool).sum().item())
         self.fn[0] += ((gt_binary_bool & ~pred_binary_bool).sum().item())
         self.tn[0] += ((~gt_binary_bool & ~pred_binary_bool).sum().item())
-  
-
-        # confusion_matrix = numpy.zeros((2, 2), dtype=int)
         
-        # # # Update the confusion matrix
-        self.confusion_matrix[0, 0] = self.tp[0]  # True Positive count
-        self.confusion_matrix[0, 1] = self.fp[0]  # False Positive count
-        self.confusion_matrix[1, 0] = self.fn[0]  # False Negative count
-        self.confusion_matrix[1, 1] = self.tn[0]  # True Negative count
-       
-
-       
+        print(self.confusion_matrix)
+        # Update the confusion matrix
+        self.confusion_matrix[0, 0] = self.tp[0]
+        self.confusion_matrix[0, 1] = self.fp[0]
+        self.confusion_matrix[1, 0] = self.fn[0]
+        self.confusion_matrix[1, 1] = self.tn[0]
+  
 @METRICS.register()
 class RegressionMetrics(Metrics):
     ''' Metrics class for regression type tasks '''
