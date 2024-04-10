@@ -217,7 +217,7 @@ class Evaluator:
             output = self.prepare_feeding(targets, output)
 
             iter_metrics.feed(**output)
-            iter_metrics.aggregate()
+            # iter_metrics.aggregate()
             if log_meters:
                 logger.add_meter('n', sum(iter_metrics.tp) + sum(iter_metrics.fn))
                 logger.add_meter('recall', round(iter_metrics.recall(),2))
@@ -246,7 +246,7 @@ class Evaluator:
 
         mAP = numpy.mean([self.metrics.ap(c) for c in range(1, self.metrics.num_classes)]).item()
         
-        self.metrics.aggregate()
+        # self.metrics.aggregate()
 
         if wandb_flag:
             wandb.run.summary['recall'] =  self.metrics.recall()

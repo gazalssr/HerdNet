@@ -72,7 +72,8 @@ class Metrics:
         self.tp = self._init_attr()
         self.fp = self._init_attr()
         self.fn = self._init_attr()
-    
+        self.tn = self._init_attr()
+        
         self._sum_absolute_error = self._init_attr()
         self._sum_squared_error = self._init_attr()
         self._n_calls = self._init_attr()
@@ -164,11 +165,7 @@ class Metrics:
 
         self.detections = []
         self.idx = 0
-        
-        self.tp = self._init_attr()
-        self.fp = self._init_attr()
-        self.fn = self._init_attr()
-    
+
         self._sum_absolute_error = self._init_attr()
         self._sum_squared_error = self._init_attr()
         self._n_calls = self._init_attr()
@@ -179,7 +176,7 @@ class Metrics:
 
         self._ap_tables = self._init_attr(val=[])
 
-        self.confusion_matrix = numpy.zeros((self.num_classes-1,self.num_classes-1))
+        # self.confusion_matrix = numpy.zeros((self.num_classes-1,self.num_classes-1))
         self._confusion_matrix = self.confusion_matrix
     
     def aggregate(self) -> None:
@@ -190,7 +187,7 @@ class Metrics:
         '''
 
         inter = int(self._confusion_matrix.sum()) - sum(self.tp)
-        
+
         self.fp = [sum(self.fp) - inter]
         self.fn = [sum(self.fn) - inter]
         self.tp = [int(self._confusion_matrix.sum())]
@@ -930,12 +927,6 @@ class ImageLevelMetrics(Metrics):
         '''Initialize metrics for binary classification tasks.'''
         num_classes = num_classes + 1 # for convenience
         super().__init__(threshold=None, num_classes=num_classes)  # Adjusted according to the Metrics class definition
-        self.confusion_matrix = numpy.zeros((2, 2), dtype=int)
- 
-        self.tp = [0]  
-        self.fp = [0]  
-        self.fn = [0]  
-        self.tn = [0]  
     def feed(self, gt: dict, preds: dict):
         '''Feed metrics with ground truth and predictions.'''
         super().feed(gt, preds)
@@ -954,14 +945,15 @@ class ImageLevelMetrics(Metrics):
         self.fp[0] += ((~gt_binary_bool & pred_binary_bool).sum().item())
         self.fn[0] += ((gt_binary_bool & ~pred_binary_bool).sum().item())
         self.tn[0] += ((~gt_binary_bool & ~pred_binary_bool).sum().item())
-        
+        print("TP:", self.tp[0], "FP:", self.fp[0], "FN:", self.fn[0], "TN:", self.tn[0])
         print(self.confusion_matrix)
+        
         # Update the confusion matrix
         self.confusion_matrix[0, 0] = self.tp[0]
         self.confusion_matrix[0, 1] = self.fp[0]
         self.confusion_matrix[1, 0] = self.fn[0]
         self.confusion_matrix[1, 1] = self.tn[0]
-  
+        print(self.confusion_matrix)
 @METRICS.register()
 class RegressionMetrics(Metrics):
     ''' Metrics class for regression type tasks '''
