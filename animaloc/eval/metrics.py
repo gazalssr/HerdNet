@@ -873,6 +873,7 @@ class BoxesMetrics(Metrics):
             [(k, v) for v in value]
             for k, value in preds.items()
             ]))
+        
         m, m_copy = tee(m)
         
         counts = {}
@@ -887,6 +888,8 @@ class BoxesMetrics(Metrics):
                 self.detections.append({'images': self.idx, **det, **counts})
         else:
             self.detections.append({'images': self.idx, **counts})
+    ###############@@@@@@@@@@@@@@@@@####################
+    
 
 @METRICS.register()
 # class ImageLevelMetrics(Metrics):
@@ -935,7 +938,7 @@ class ImageLevelMetrics(Metrics):
         '''Compare binary ground truth labels to binary predictions.'''
         gt_binary = gt['binary'][0].squeeze()
         pred_binary = preds['binary'].squeeze()
-
+        # print('gt_binary:',gt_binary)
         # Convert to boolean for logical operations
         gt_binary_bool = gt_binary > 0.5
         pred_binary_bool = pred_binary > 0.5
@@ -946,7 +949,7 @@ class ImageLevelMetrics(Metrics):
         self.fn[0] += ((gt_binary_bool & ~pred_binary_bool).sum().item())
         self.tn[0] += ((~gt_binary_bool & ~pred_binary_bool).sum().item())
         print("TP:", self.tp[0], "FP:", self.fp[0], "FN:", self.fn[0], "TN:", self.tn[0])
-        print(self.confusion_matrix)
+    
         
         # Update the confusion matrix
         self.confusion_matrix[0, 0] = self.tp[0]

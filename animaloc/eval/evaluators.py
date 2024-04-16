@@ -319,19 +319,53 @@ class Evaluator:
         return pandas.DataFrame(data = res)
     
     @property
-    def detections(self) -> pandas.DataFrame:
-        ''' Returns detections (image id, location, label and score) in a pandas
-        dataframe '''
+    # Previous Code
+    # def detections(self) -> pandas.DataFrame:
+    #     ''' Returns detections (image id, location, label and score) in a pandas
+    #     dataframe '''
         
-        assert self._stored_metrics is not None, \
-            'No detections have been stored, please use the evaluate method first.'
+    #     assert self._stored_metrics is not None, \
+    #         'No detections have been stored, please use the evaluate method first.'
+
+    #     img_names = self.dataloader.dataset._img_names
+    #     dets = self._stored_metrics.detections
+    #     for det in dets:
+    #         det['images'] = img_names[det['images']]
+
+    #     return pandas.DataFrame(data = dets)
+    ########## NEW Code ########
+    
+    def detections(self) -> pandas.DataFrame:
+        '''Returns detections (image id, location, label, and score) in a pandas dataframe.'''
+
+        assert self._stored_metrics is not None, 'No detections have been stored'
 
         img_names = self.dataloader.dataset._img_names
         dets = self._stored_metrics.detections
+
+        # Proceed with the original code
         for det in dets:
             det['images'] = img_names[det['images']]
+            # Check and convert 'binary' field to simple 0 or 1 if present
+            if 'binary' in det:
+                det['binary'] = int(det['binary'].item() if hasattr(det['binary'], 'item') else det['binary'])
 
-        return pandas.DataFrame(data = dets)
+        # Create DataFrame from detections
+        df = pandas.DataFrame(data=dets)
+
+        # This part is conditional based on whether it's a binary detection case
+        if 'binary' in df.columns:
+            # Add ground truth labels 
+            if hasattr(self, 'targets_float'):
+                gt_labels_list = self.targets_float.squeeze().cpu().tolist()
+                df['ground_truth'] = gt_labels_list
+
+            # Rename columns for binary case if applicable
+            df.rename(columns={'count_1': 'empty_count', 'count_2': 'non_empty_count'}, inplace=True)
+
+        return df
+
+
     
     def _vizual(self, image: Any, target: Any, output: Any):
         fig = self.vizual_fn(image=image, target=target, output=output)
@@ -491,7 +525,7 @@ class FasterRCNNEvaluator(Evaluator):
         # return dict(gt = gt_labels, preds = labels)
     ################### NEW ###########################
 class TileEvaluator(Evaluator):
-    
+    #new lines
     def prepare_data(self, images: Any, targets: Any) -> tuple: 
         if isinstance(targets, dict):
             # Move each tensor within the target dictionary to the device
@@ -508,6 +542,34 @@ class TileEvaluator(Evaluator):
             print("Unexpected targets format.")       
         return images.to(self.device), targets
     
+    # def prepare_feeding(self, targets: Any, output: torch.Tensor) -> dict:
+    #     """
+    #     Adjust targets and output for feeding into metrics.
+    #     This version assumes targets are provided in a suitable format for binary classification.
+    #     """
+        
+
+    #     # If targets come as a list of tensors, convert to a single tensor
+    #     if isinstance(targets, list):
+    #         targets = torch.stack(targets).to(self.device)
+
+    #     targets_float = targets.float()
+        
+    #     # Store targets_float as a class attribute
+    #     self.targets_float = targets_float
+    #     if self.targets_float.nelement() != 0:
+    #         self.targets_float = torch.cat((self.targets_float, targets_float), dim=0)
+    #     else:
+    #         self.targets_float = targets_float
+    #     scores= list(chain.from_iterable(output.tolist()))
+    #     pred_binary = torch.tensor([1 if s > 0 else 0 for s in scores], dtype=torch.float32).to(output.device)
+    #     # Prepare dictionary for feeding into metrics
+    #     feeding_dict = {
+    #         'gt': {'binary': targets_float},
+    #         'preds': {'binary': pred_binary}
+    #     }
+
+    #     return feeding_dict
     def prepare_feeding(self, targets: Any, output: torch.Tensor) -> dict:
         """
         Adjust targets and output for feeding into metrics.
@@ -533,6 +595,7 @@ class TileEvaluator(Evaluator):
         }
 
         return feeding_dict
+
 
 
 

@@ -1,0 +1,14 @@
+11-04-2024 13:27:47 - test [ 1/48] eta: 0:00:26 n: 54 recall: 0.24 precision: 0.22 f1-score: 0.23 MAE: 0.0 MSE: 0.0 RMSE: 0.0 time: 0.5439 data: 0.5231 max mem: 8102
+11-04-2024 13:27:48 - test [11/48] eta: 0:00:04 n: 89 recall: 0.29 precision: 0.32 f1-score: 0.3 MAE: 0.0 MSE: 0.0 RMSE: 0.0 time: 0.1209 data: 0.1041 max mem: 8102
+11-04-2024 13:27:48 - test [21/48] eta: 0:00:02 n: 128 recall: 0.29 precision: 0.35 f1-score: 0.31 MAE: 0.0 MSE: 0.0 RMSE: 0.0 time: 0.0509 data: 0.0345 max mem: 8102
+11-04-2024 13:27:48 - test [31/48] eta: 0:00:01 n: 165 recall: 0.27 precision: 0.35 f1-score: 0.31 MAE: 0.0 MSE: 0.0 RMSE: 0.0 time: 0.0236 data: 0.0073 max mem: 8102
+11-04-2024 13:27:49 - test [41/48] eta: 0:00:00 n: 210 recall: 0.25 precision: 0.37 f1-score: 0.3 MAE: 0.0 MSE: 0.0 RMSE: 0.0 time: 0.0237 data: 0.0076 max mem: 8102
+11-04-2024 13:27:49 - test [48/48] eta: 0:00:00 n: 245 recall: 0.29 precision: 0.41 f1-score: 0.34 MAE: 0.0 MSE: 0.0 RMSE: 0.0 time: 0.0227 data: 0.0068 max mem: 8102
+11-04-2024 13:27:49 - test Total time: 0:00:02 (0.0585 s / it)
+11-04-2024 14:24:26 - test [ 1/48] eta: 0:00:26 n: 54 recall: 0.24 precision: 0.22 f1-score: 0.23 MAE: 0.0 MSE: 0.0 RMSE: 0.0 time: 0.5541 data: 0.5388 max mem: 8102
+11-04-2024 14:24:27 - test [11/48] eta: 0:00:04 n: 89 recall: 0.29 precision: 0.32 f1-score: 0.3 MAE: 0.0 MSE: 0.0 RMSE: 0.0 time: 0.1135 data: 0.0967 max mem: 8102
+11-04-2024 14:24:27 - test [21/48] eta: 0:00:02 n: 128 recall: 0.29 precision: 0.35 f1-score: 0.31 MAE: 0.0 MSE: 0.0 RMSE: 0.0 time: 0.0474 data: 0.0304 max mem: 8102
+11-04-2024 14:24:27 - test [31/48] eta: 0:00:01 n: 165 recall: 0.27 precision: 0.35 f1-score: 0.31 MAE: 0.0 MSE: 0.0 RMSE: 0.0 time: 0.0250 data: 0.0082 max mem: 8102
+11-04-2024 14:24:27 - test [41/48] eta: 0:00:00 n: 210 recall: 0.25 precision: 0.37 f1-score: 0.3 MAE: 0.0 MSE: 0.0 RMSE: 0.0 time: 0.0246 data: 0.0080 max mem: 8102
+11-04-2024 14:24:28 - test [48/48] eta: 0:00:00 n: 245 recall: 0.29 precision: 0.41 f1-score: 0.34 MAE: 0.0 MSE: 0.0 RMSE: 0.0 time: 0.0237 data: 0.0073 max mem: 8102
+11-04-2024 14:24:28 - test Total time: 0:00:03 (0.0628 s / it)
