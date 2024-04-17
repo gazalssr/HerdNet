@@ -21,7 +21,7 @@ from animaloc.train.losses import FocalLoss
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss, L1Loss
 wandb.init(project='HerdNet', entity='ghazaleh-serati')
 
-NUM_WORKERS= 8
+NUM_WORKERS= 2
 import albumentations as A
 binary=True
 patch_size = 512
@@ -29,7 +29,7 @@ num_classes = 2
 batch_size=32
 down_ratio = 2
 train_dataset = BinaryFolderDataset(
-    csv_file = '/herdnet/DATASETS/Train_patches_stratified/gt.csv',
+    csv_file = '/herdnet/DATASETS/Train_patches_stratified/Train_binary_gt.csv',
     root_dir = '/herdnet/DATASETS/Train_patches_stratified',
     albu_transforms = [
         A.VerticalFlip(p=0.5),
@@ -43,11 +43,11 @@ train_dataset = BinaryFolderDataset(
         BinaryTransform(),
         ])]
     )
-train_dataset.data.to_csv('/herdnet/DATASETS/Train_patches_stratified/Train_binary_gt.csv', index=False)
+# train_dataset.data.to_csv('/herdnet/DATASETS/Train_patches_stratified/Train_binary_gt.csv', index=False)
 
 
 val_dataset = BinaryFolderDataset(
-    csv_file = '/herdnet/DATASETS/val_patches_stratified/gt.csv',
+    csv_file = '/herdnet/DATASETS/val_patches_stratified/Val_binary_gt.csv',
     root_dir = '/herdnet/DATASETS/val_patches_stratified',
     albu_transforms = [
         A.Normalize(p=1.0)
@@ -56,28 +56,52 @@ val_dataset = BinaryFolderDataset(
         BinaryTransform(),
         ])]
     )
-val_dataset.data.to_csv('/herdnet/DATASETS/val_patches_stratified/Val_binary_gt.csv', index=False)
+# val_dataset.data.to_csv('/herdnet/DATASETS/val_patches_stratified/Val_binary_gt.csv', index=False)
 
 
 test_dataset = BinaryFolderDataset(
-    csv_file = '/herdnet/DATASETS/test_patches_stratified/gt.csv',
+    csv_file = '/herdnet/DATASETS/test_patches_stratified/Test_binary_gt.csv',
     root_dir = '/herdnet/DATASETS/test_patches_stratified',
     albu_transforms = [A.Normalize(p=1.0)],
     end_transforms = [BinaryMultiTransformsWrapper([
         BinaryTransform(),
         ])]
     )
-test_dataset.data.to_csv('/herdnet/DATASETS/test_patches_stratified/Test_binary_gt.csv', index=False)
+# test_dataset.data.to_csv('/herdnet/DATASETS/test_patches_stratified/Test_binary_gt.csv', index=False)
 # Dataloaders
 from torch.utils.data import DataLoader
 train_dataloader = DataLoader(dataset = train_dataset, batch_size= 32 , num_workers= 2, shuffle= True)
 
-val_dataloader = DataLoader(dataset = val_dataset, batch_size=1 , num_workers= 2, shuffle= True)
+val_dataloader = DataLoader(dataset = val_dataset, batch_size=8 , num_workers= 2, shuffle= False)
 
-test_dataloader= DataLoader(dataset = test_dataset, batch_size=1 , num_workers= 2, shuffle= False)
+test_dataloader= DataLoader(dataset = test_dataset, batch_size=8 , num_workers= 2, shuffle= False)
 num_classes=2
 dla_encoder = DLAEncoder(num_classes=num_classes).cuda()
+################### PRINT DATALOADER INFO ###################
+def print_dataloader_info(dataloader):
+    total_batches = len(dataloader)
+    total_images = len(dataloader.dataset)
+    batch_size = dataloader.batch_size
 
+    print(f"Total number of images: {total_images}")
+    print(f"Batch size: {batch_size}")
+    print(f"Total number of batches: {total_batches}")
+
+    # Fetch the first batch to check targets
+    first_batch = next(iter(dataloader))
+    images, targets = first_batch
+    print(f"Number of images in the first batch: {len(images)}")
+    print(f"Number of targets in the first batch: {len(targets)}")
+
+print("Train DataLoader:")
+print_dataloader_info(train_dataloader)
+
+print("Validation DataLoader:")
+print_dataloader_info(val_dataloader)
+
+print("Test DataLoader:")
+print_dataloader_info(test_dataloader)
+#####################################
 # Define DLAENCODER for training
 image= torch.ones([1,3,512,512]).cuda()
 print(torch.cuda.mem_get_info())
@@ -149,7 +173,7 @@ mkdir(work_dir)
 
 lr = 1e-4
 weight_decay = 1e-3
-epochs = 100
+epochs = 10
 
 optimizer = Adam(params=dla_encoder.parameters(), lr=lr, weight_decay=weight_decay)
 # optimizer = Adam(params=params_to_update, lr=lr, weight_decay=weight_decay)
@@ -244,7 +268,22 @@ test_detections=test_evaluator.detections
 test_detections.to_csv('/herdnet/test_output/Binary_test_detections.csv', index=False)
 
 # TEST_DATASETS
-detections_df=pd.read_csv('/herdnet/test_output/test_detections.csv')
-root_dir = '/herdnet/DATASETS/test_patches_stratified'
+detections_df=pd.read_csv('/herdnet/test_output/Binary_test_detections.csv')
+############### Comparison of the detections and gt #########
+gt_df = pd.read_csv('/herdnet/DATASETS/test_patches_stratified/Test_binary_gt.csv')
+# Create a new column 'Ground_truth' in df_detection and initialize with NaN
+detections_df['Ground_truth'] = pd.NA
 
+# Create a dictionary from the gt DataFrame for quick lookup
+gt_dict = pd.Series(gt_df['binary'].values, index=gt_df['images']).to_dict()
 
+# Iterate over each row in the detection DataFrame
+for index, row in detections_df.iterrows():
+    image_id = row['images']
+    # Check if the current image_id is in the gt_dict and assign the corresponding binary value
+    if image_id in gt_dict:
+        detections_df.at[index, 'Ground_truth'] = gt_dict[image_id]
+
+# Save the updated DataFrame back to a new CSV 
+detections_df.to_csv('/herdnet/Test_updated_detection_file.csv', index=False)
+######

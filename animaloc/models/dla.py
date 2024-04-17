@@ -18,7 +18,7 @@ __copyright__ = \
 __authors__ = "Xingyi Zhou, Dequan Wang, Philipp Krähenbühl"
 __license__ = "MIT"
 
-
+import os
 import math
 from os.path import join
 from posixpath import basename
@@ -26,14 +26,13 @@ from posixpath import basename
 import torch
 from torch import nn
 import torch.utils.model_zoo as model_zoo
-
+import os
 import numpy as np
 
 BatchNorm = nn.BatchNorm2d
 
 def get_model_url(data='imagenet', name='dla34', hash='ba72cf86'):
     return join('http://dl.yf.io/dla/models', data, '{}-{}.pth'.format(name, hash))
-
 
 def conv3x3(in_planes, out_planes, stride=1):
     "3x3 convolution with padding"
@@ -317,19 +316,54 @@ class DLA(nn.Module):
 
             return x
 
-    def load_pretrained_model(self,  data='imagenet', name='dla34', hash='ba72cf86'):
-        fc = self.fc
-        if name.endswith('.pth'):
-            model_weights = torch.load(data + name)
+    # def load_pretrained_model(self,  data='imagenet', name='dla34', hash='ba72cf86'):
+    #     fc = self.fc
+    #     if name.endswith('.pth'):
+    #         model_weights = torch.load(data + name)
+    #     else:
+    #         model_url = get_model_url(data, name, hash)
+    #         model_weights = model_zoo.load_url(model_url)
+    #     num_classes = len(model_weights[list(model_weights.keys())[-1]])
+    #     self.fc = nn.Conv2d(
+    #         self.channels[-1], num_classes,
+    #         kernel_size=1, stride=1, padding=0, bias=True)
+    #     self.load_state_dict(model_weights)
+    #     self.fc = fc
+    ######################UPDATED load_trained_parameters ###########################
+   
+    def load_pretrained_model(self, data='imagenet', name='dla34', hash='ba72cf86', local_path=None):
+        fc = self.fc  # Save the final classification layer to restore later
+
+        # Check if local path is provided and valid
+        if local_path and os.path.isfile(local_path):
+            print("Loading weights from local file:", local_path)
+            model_weights = torch.load(local_path)
         else:
-            model_url = get_model_url(data, name, hash)
-            model_weights = model_zoo.load_url(model_url)
-        num_classes = len(model_weights[list(model_weights.keys())[-1]])
-        self.fc = nn.Conv2d(
-            self.channels[-1], num_classes,
-            kernel_size=1, stride=1, padding=0, bias=True)
-        self.load_state_dict(model_weights)
-        self.fc = fc
+            # Build path for local storage or URL
+            if name.endswith('.pth'):
+                model_path = os.path.join(data, name)
+                if os.path.isfile(model_path):
+                    print("Loading weights from local path:", model_path)
+                    model_weights = torch.load(model_path)
+                else:
+                    print("Local file not found. Downloading from URL...")
+                    model_url = get_model_url(data, name, hash)
+                    model_weights = model_zoo.load_url(model_url)
+            else:
+                model_url = get_model_url(data, name, hash)
+                model_weights = model_zoo.load_url(model_url)
+
+        # Handle different numbers of classes in the pretrained model
+        try:
+            num_classes = model_weights['fc.weight'].size(0)
+        except KeyError:  # Adapt this key based on your model's specific state dict
+            num_classes = len(model_weights[list(model_weights.keys())[-1]])
+
+        # Reinitialize the fc layer to match the number of classes from the weights
+        self.fc = nn.Conv2d(self.channels[-1], num_classes, kernel_size=1, stride=1, padding=0, bias=True)
+        self.load_state_dict(model_weights, strict=False)
+        self.fc = fc  # Restore the original fc layer
+#################################################################
 
 
 def dla34(pretrained, **kwargs):  # DLA-34
