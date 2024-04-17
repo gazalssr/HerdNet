@@ -54,7 +54,7 @@ def objects_from_df(df: pandas.DataFrame) -> List[Union[Point, BoundingBox, Bina
         
     # Binary
     elif 'binary' in df.columns:
-        data = df['binary']
+        data = df[['binary']]
         objects=[BinaryAnnotation(int(r['binary'])) for i, r in data.iterrows()]
     else:
         raise Exception('Wrong columns\' names for defining the objects in DataFrame. ' \

@@ -78,29 +78,29 @@ test_dataloader= DataLoader(dataset = test_dataset, batch_size=8 , num_workers= 
 num_classes=2
 dla_encoder = DLAEncoder(num_classes=num_classes).cuda()
 ################### PRINT DATALOADER INFO ###################
-def print_dataloader_info(dataloader):
-    total_batches = len(dataloader)
-    total_images = len(dataloader.dataset)
-    batch_size = dataloader.batch_size
+# def print_dataloader_info(dataloader):
+#     total_batches = len(dataloader)
+#     total_images = len(dataloader.dataset)
+#     batch_size = dataloader.batch_size
 
-    print(f"Total number of images: {total_images}")
-    print(f"Batch size: {batch_size}")
-    print(f"Total number of batches: {total_batches}")
+#     print(f"Total number of images: {total_images}")
+#     print(f"Batch size: {batch_size}")
+#     print(f"Total number of batches: {total_batches}")
 
-    # Fetch the first batch to check targets
-    first_batch = next(iter(dataloader))
-    images, targets = first_batch
-    print(f"Number of images in the first batch: {len(images)}")
-    print(f"Number of targets in the first batch: {len(targets)}")
+#     # Fetch the first batch to check targets
+#     first_batch = next(iter(dataloader))
+#     images, targets = first_batch
+#     print(f"Number of images in the first batch: {len(images)}")
+#     print(f"Number of targets in the first batch: {len(targets)}")
 
-print("Train DataLoader:")
-print_dataloader_info(train_dataloader)
+# print("Train DataLoader:")
+# print_dataloader_info(train_dataloader)
 
-print("Validation DataLoader:")
-print_dataloader_info(val_dataloader)
+# print("Validation DataLoader:")
+# print_dataloader_info(val_dataloader)
 
-print("Test DataLoader:")
-print_dataloader_info(test_dataloader)
+# print("Test DataLoader:")
+# print_dataloader_info(test_dataloader)
 #####################################
 # Define DLAENCODER for training
 image= torch.ones([1,3,512,512]).cuda()

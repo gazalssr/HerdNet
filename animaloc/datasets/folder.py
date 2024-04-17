@@ -233,50 +233,53 @@ class BalancedFolderDataset(CSVDataset):
     
 ########################## BinaryFolderDataset (new) #######################
 class BinaryFolderDataset(CSVDataset):
-    def __init__(self, csv_file, root_dir, albu_transforms=None, end_transforms=None):
+    def __init__(self, csv_file, root_dir, albu_transforms=None, end_transforms=None, preprocess=False):
         super(BinaryFolderDataset, self).__init__(csv_file, root_dir, albu_transforms, end_transforms)
-        self.create_binary_dataframe()
-        self.anno_type = 'binary'  # Specify the annotation type as 'Binary'
-        self.anno_keys = ['binary']
-        self._ordered_img_names = group_by_image(self.data)['images'].values.tolist()
-    def create_binary_dataframe(self):
-        # Get all image files in the root directory
-        self.folder_images = [i for i in os.listdir(self.root_dir) if i.endswith(('.JPG', '.jpg', '.JPEG', '.jpeg'))]
-        
-        # Mark all current images with 'from_folder' = 0 
-        self.data['from_folder'] = 0
+        if preprocess:
+            self.create_binary_dataframe()
+        else:
+            self.data = pd.read_csv(csv_file)
+        self.anno_type = 'binary'
+        self._ordered_img_names = self.data['images'].values.tolist()
 
-        # Identify images in the folder that are not in the CSV annotations
-        folder_only_images = numpy.setdiff1d(self.folder_images, self.data['images'].unique().tolist())
-        
-        # Create a new dataframe for folder-only images with 'from_folder' = 1
-        folder_df = pandas.DataFrame({'images': folder_only_images, 'from_folder': 1, 'binary': 0})
-        # Derive 'base_images' IDs for empty patches
+    def create_binary_dataframe(self):
+        self.folder_images = [i for i in os.listdir(self.root_dir) if i.endswith(('.JPG', '.jpg', '.JPEG', '.jpeg'))]
+        self.data['from_folder'] = 0
+        folder_only_images = np.setdiff1d(self.folder_images, self.data['images'].unique().tolist())
         base_images_ids = [self.derive_base_image_id(image_name) for image_name in folder_only_images]
-        # Create a DataFrame for folder-only images, assigning derived 'base_images' IDs
-        folder_df = pandas.DataFrame({
+        folder_df = pd.DataFrame({
             'images': folder_only_images,
             'base_images': base_images_ids,
             'from_folder': 1,
             'binary': 0
         })
-        # Combine CSV data with folder-only images
-        self.data = pandas.concat([self.data, folder_df], ignore_index=True)
-
-        # Set 'binary' = 1 for all rows that are not marked as 'from_folder' = 1
-        self.data['binary'] = numpy.where(self.data['from_folder'] == 1, 0, 1)
-
-        # Remove specified columns that are not needed
+        self.data = pd.concat([self.data, folder_df], ignore_index=True)
+        self.data['binary'] = np.where(self.data['from_folder'] == 1, 0, 1)
         columns_to_remove = ['annos', 'subset', 'from_folder', 'labels', 'species']
         self.data.drop(columns=columns_to_remove, errors='ignore', inplace=True)
 
-        # Handle duplicates for non-empty patches (binary = 1)
-        non_empty_patches = self.data[self.data['binary'] == 1]
-        unique_non_empty_patches = non_empty_patches.drop_duplicates(subset=['images'])
+    def _load_image(self, index: int) -> Image.Image:
+        img_name = self.data.at[index, 'images']
+        img_path = os.path.join(self.root_dir, img_name)
+        return Image.open(img_path).convert('RGB')
 
-        # Reassemble the DataFrame to only include unique non-empty patches and all empty patches
-        empty_patches = self.data[self.data['binary'] == 0]
-        self.data = pandas.concat([unique_non_empty_patches, empty_patches], ignore_index=True)
+    def _load_target(self, index: int) -> dict:
+        img_name = self._ordered_img_names[index]
+        binary_label = self.data.loc[self.data['images'] == img_name, 'binary'].iloc[0]
+        return {
+            'image_id': index,
+            'image_name': img_name,
+            'binary': torch.tensor([binary_label], dtype=torch.int64)
+        }
+
+    def derive_base_image_id(self, image_name):
+        if "_" in image_name:
+            parts = image_name.rsplit("_", 1)
+            return parts[0] + '.jpg'
+        return image_name
+
+    def save_binary_csv(self, save_path):
+        self.data.to_csv(save_path, index=False)
 
     def _load_image(self, index: int) -> Image.Image:
         img_name = self.data.at[index, 'images']
