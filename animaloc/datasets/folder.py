@@ -263,14 +263,15 @@ class BinaryFolderDataset(CSVDataset):
         img_path = os.path.join(self.root_dir, img_name)
         return Image.open(img_path).convert('RGB')
 
-    def _load_target(self, index: int) -> dict:
+    def _load_target(self, index: int) -> Dict[str, Any]:
         img_name = self._ordered_img_names[index]
         binary_label = self.data.loc[self.data['images'] == img_name, 'binary'].iloc[0]
         return {
             'image_id': index,
             'image_name': img_name,
-            'binary': torch.tensor([binary_label], dtype=torch.int64)
+            'labels': torch.tensor([binary_label], dtype=torch.int64)  # Using 'labels' as key for consistency
         }
+
 
     def derive_base_image_id(self, image_name):
         if "_" in image_name:

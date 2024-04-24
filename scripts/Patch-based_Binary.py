@@ -20,10 +20,11 @@ from animaloc.models import LossWrapper
 from animaloc.train.losses import FocalLoss
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss, L1Loss
 wandb.init(project='HerdNet', entity='ghazaleh-serati')
-
+from albumentations.pytorch import ToTensorV2
 NUM_WORKERS= 2
 import albumentations as A
 binary=True
+preprocess=False
 patch_size = 512
 num_classes = 2
 batch_size=32
@@ -50,7 +51,8 @@ val_dataset = BinaryFolderDataset(
     csv_file = '/herdnet/DATASETS/val_patches_stratified/Val_binary_gt.csv',
     root_dir = '/herdnet/DATASETS/val_patches_stratified',
     albu_transforms = [
-        A.Normalize(p=1.0)
+        A.Normalize(p=1.0),
+        ToTensorV2()
         ],
     end_transforms = [BinaryMultiTransformsWrapper([
         BinaryTransform(),
@@ -62,7 +64,7 @@ val_dataset = BinaryFolderDataset(
 test_dataset = BinaryFolderDataset(
     csv_file = '/herdnet/DATASETS/test_patches_stratified/Test_binary_gt.csv',
     root_dir = '/herdnet/DATASETS/test_patches_stratified',
-    albu_transforms = [A.Normalize(p=1.0)],
+    albu_transforms = [A.Normalize(p=1.0)], 
     end_transforms = [BinaryMultiTransformsWrapper([
         BinaryTransform(),
         ])]
@@ -72,39 +74,63 @@ test_dataset = BinaryFolderDataset(
 from torch.utils.data import DataLoader
 train_dataloader = DataLoader(dataset = train_dataset, batch_size= 32 , num_workers= 2, shuffle= True)
 
-val_dataloader = DataLoader(dataset = val_dataset, batch_size=8 , num_workers= 2, shuffle= False)
+val_dataloader = DataLoader(dataset = val_dataset, batch_size=8 , num_workers= 2, shuffle= True)
 
 test_dataloader= DataLoader(dataset = test_dataset, batch_size=8 , num_workers= 2, shuffle= False)
 num_classes=2
-dla_encoder = DLAEncoder(num_classes=num_classes).cuda()
+dla_encoder = DLAEncoder(num_classes=num_classes, pretrained=False).cuda()
+dla_encoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pth')
 ################### PRINT DATALOADER INFO ###################
-# def print_dataloader_info(dataloader):
-#     total_batches = len(dataloader)
-#     total_images = len(dataloader.dataset)
-#     batch_size = dataloader.batch_size
+for i, (images, targets) in enumerate(train_dataloader):
+    print(f"Batch {i+1}")
+    print(f"Images shape: {images.shape}")  # Should be (32, 3, 512, 512)
+    print(f"Targets shape: {targets['binary'].shape}")  # Should be (32, 1)
 
-#     print(f"Total number of images: {total_images}")
-#     print(f"Batch size: {batch_size}")
-#     print(f"Total number of batches: {total_batches}")
+    # Print the target tensors for the entire batch
+    print("Targets list for the current batch:")
+    print(targets['binary'])
 
-#     # Fetch the first batch to check targets
-#     first_batch = next(iter(dataloader))
-#     images, targets = first_batch
-#     print(f"Number of images in the first batch: {len(images)}")
-#     print(f"Number of targets in the first batch: {len(targets)}")
+    # If you want to limit the output to the first few batches, you can break after a few iterations
+    if i == 0:  # This will only print details for the first batch
+        break
+for i, (images, targets) in enumerate(test_dataloader):
+    print(f"Batch {i+1}")
+    print(f"Images shape: {images.shape}")  # Should be (batch_size, C, H, W)
+    print(f"Targets shape: {targets['binary'].shape}")  # Should be (batch_size, 1)
+    if i == 0:  # Limiting output to first batch for brevity
+        break
+    
+    
+def print_dataloader_info(dataloader):
+    total_batches = len(dataloader)
+    total_images = len(dataloader.dataset)
+    batch_size = dataloader.batch_size
 
-# print("Train DataLoader:")
-# print_dataloader_info(train_dataloader)
+    print(f"Total number of images: {total_images}")
+    print(f"Batch size: {batch_size}")
+    print(f"Total number of batches: {total_batches}")
 
-# print("Validation DataLoader:")
-# print_dataloader_info(val_dataloader)
+    # Fetch the first batch to check targets
+    first_batch = next(iter(dataloader))
+    images, targets = first_batch
+    print(f"Number of images in the first batch: {len(images)}")
+    
+    if 'binary' in targets:
+        print(f"Number of targets in the first batch: {len(targets['binary'])}")
+    else:
+        print("Target key 'binary' not found in the targets dictionary.")
 
-# print("Test DataLoader:")
-# print_dataloader_info(test_dataloader)
+print("Train DataLoader:")
+print_dataloader_info(train_dataloader)
+print("Val DataLoader:")
+print_dataloader_info(val_dataloader)
+print("Test DataLoader:")
+print_dataloader_info(test_dataloader)
+
 #####################################
 # Define DLAENCODER for training
 image= torch.ones([1,3,512,512]).cuda()
-print(torch.cuda.mem_get_info())
+# print(torch.cuda.mem_get_info())
 
 cls= dla_encoder(image)
 
@@ -173,7 +199,7 @@ mkdir(work_dir)
 
 lr = 1e-4
 weight_decay = 1e-3
-epochs = 10
+epochs = 3
 
 optimizer = Adam(params=dla_encoder.parameters(), lr=lr, weight_decay=weight_decay)
 # optimizer = Adam(params=params_to_update, lr=lr, weight_decay=weight_decay)
@@ -204,7 +230,7 @@ if wandb.run is not None:
 wandb.init(project="herdnet_pretrain")
 
 ####### Trainer ############
-trainer.start(warmup_iters=100, checkpoints='best', select='max', validate_on='f1_score', wandb_flag =True)
+trainer.start(warmup_iters=100, checkpoints='best', select='max', validate_on='recall', wandb_flag =True)
 
 ##### Evaluator on validation ############
 if wandb.run is not None:
@@ -215,13 +241,13 @@ val_f1_score=evaluator.evaluate(returns='f1_score', viz=False, wandb_flag =True 
 
 #Detections and Results
 df_val_r=evaluator.results
-df_val_r.to_csv('/herdnet/Binary_results.csv')
-df_train_d=evaluator.detections
-df_train_d.rename(columns={'count_1': 'empty_count', 'count_2': 'non_empty_count'}, inplace=True)
-df_train_d.to_csv('/herdnet/Binary_detections.csv')
+df_val_r.to_csv('/herdnet/Validation_Binary_results.csv')
+df_val_d=evaluator.detections
+df_val_d.rename(columns={'count_1': 'empty_count', 'count_2': 'non_empty_count'}, inplace=True)
+df_val_d.to_csv('/herdnet/Validation_Binary_detections.csv')
 
 ############### Comparison of the detections and gt #########
-detections_df = pd.read_csv('/herdnet/Binary_detections.csv')
+detections_df = pd.read_csv('/herdnet/Validation_Binary_detections.csv')
 gt_df = pd.read_csv('/herdnet/DATASETS/val_patches_stratified/Val_binary_gt.csv')
 # Create a new column 'Ground_truth' in df_detection and initialize with NaN
 detections_df['Ground_truth'] = pd.NA
@@ -237,7 +263,7 @@ for index, row in detections_df.iterrows():
         detections_df.at[index, 'Ground_truth'] = gt_dict[image_id]
 
 # Save the updated DataFrame back to a new CSV (optional)
-detections_df.to_csv('/herdnet/VAL_updated_detection_file.csv', index=False)
+detections_df.to_csv('/herdnet/22_Validation_Final_detection_file.csv', index=False)
 #################### Test data and evaluation ###########
 # Create output folder
 test_dir = '/herdnet/test_output'
@@ -285,5 +311,5 @@ for index, row in detections_df.iterrows():
         detections_df.at[index, 'Ground_truth'] = gt_dict[image_id]
 
 # Save the updated DataFrame back to a new CSV 
-detections_df.to_csv('/herdnet/Test_updated_detection_file.csv', index=False)
+detections_df.to_csv('/herdnet/Test_Final_detection_file.csv', index=False)
 ######

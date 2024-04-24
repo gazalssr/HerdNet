@@ -69,7 +69,15 @@ class DLAEncoder(nn.Module):
         )
         self.pooling= nn.AvgPool2d(kernel_size= 16, stride=1, padding=0) # we take the average of each filter
         self.cls_head = nn.Linear(512, 1) # binary head
-        
+        ####### Loading pretrain weights localy ######3
+    def load_custom_pretrained_weights(self, weight_path):
+        ''' Load custom pretrained weights into the model. '''
+        pretrained_dict = torch.load(weight_path)
+        model_dict = self.state_dict()
+        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
+        model_dict.update(pretrained_dict)
+        self.load_state_dict(model_dict)
+        print("Custom pretrained weights loaded successfully.")    
     def forward(self, input: torch.Tensor):
 
         encode = self.base_0(input) # Nx512x16x16
@@ -115,7 +123,7 @@ class DLAEncoderDecoder(nn.Module):
         base_name = 'dla{}'.format(num_layers)
         self.num_classes = num_classes
         self.down_ratio = down_ratio
-
+        
         # backbone
         base = dla_modules.__dict__[base_name](pretrained=pretrained, return_levels=True)
         self.base_0 = base
@@ -138,10 +146,18 @@ class DLAEncoderDecoder(nn.Module):
         )
         self.pooling = nn.AvgPool2d(kernel_size=16, stride=1, padding=0)
 
-            
         # Classification head (original)
         self.cls_head = nn.Linear(512, num_classes)
-
+        ######## Load pth from File #####################
+    def load_custom_pretrained_weights(self, weight_path):
+        ''' Load custom pretrained weights into the model. '''
+        pretrained_dict = torch.load(weight_path)
+        model_dict = self.state_dict()
+        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
+        model_dict.update(pretrained_dict)
+        self.load_state_dict(model_dict)
+        print("Custom pretrained weights loaded successfully.")
+        
     def forward(self, input: torch.Tensor):
         encode = self.base_0(input) # Nx512x16x16-get feature maps from the encoder
         bottleneck = self.bottleneck_conv(encode[-1])

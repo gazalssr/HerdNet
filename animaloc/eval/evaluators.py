@@ -240,7 +240,7 @@ class Evaluator:
 
             iter_metrics.flush()
 
-            self.metrics.feed(**output)
+            # self.metrics.feed(**output)
         
         self._stored_metrics = self.metrics.copy()
 
