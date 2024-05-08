@@ -19,7 +19,7 @@ import math
 import copy
 import sklearn.neighbors
 import numpy
-
+import torch
 from sklearn.metrics import confusion_matrix
 from itertools import tee
 from typing import Optional, List
@@ -165,7 +165,6 @@ class Metrics:
 
         self.detections = []
         self.idx = 0
-
         self._sum_absolute_error = self._init_attr()
         self._sum_squared_error = self._init_attr()
         self._n_calls = self._init_attr()
@@ -198,20 +197,6 @@ class Metrics:
         self._confusion_matrix = numpy.array([[1.]])
         self._total_count = [sum(self._total_count)]
 
-    # def precision(self, c: int = 2) -> float:
-    #     ''' Precision 
-    #     Args:
-    #         c (int, optional): class id. Defaults to 1.
-        
-    #     Returns:
-    #         float
-    #     '''
-
-    #     c = c - 1
-    #     if self.tp[c] > 0:
-    #         return float(self.tp[c] / (self.tp[c] + self.fp[c]))
-    #     else:
-    #         return float(0)
     ################## NEW Adapted Precision Code ###################
     def precision(self, c: int = 1) -> float:
         ''' Precision 
@@ -238,21 +223,6 @@ class Metrics:
                 return float(0)
 
 
-    
-    # def recall(self, c: int = 2) -> float:
-    #     ''' Recall 
-    #     Args:
-    #         c (int, optional): class id. Defaults to 1.
-        
-    #     Returns:
-    #         float
-    #     '''
-        
-    #     c = c - 1
-    #     if self.tp[c] > 0:
-    #         return float(self.tp[c] / (self.tp[c] + self.fn[c]))
-    #     else:
-    #         return float(0)
     ######################## NEW code for Recall ###########
     def recall(self, c: int = 1) -> float:
         ''' Recall 
@@ -278,24 +248,7 @@ class Metrics:
                 return float(self.tp[c] / (self.tp[c] + self.fn[c]))
             else:
                 return float(0)
-
-    # def fbeta_score(self, c: int = 2, beta: int = 1) -> float:
-    #     ''' F-beta score 
-    #     Args:
-    #         c (int, optional): class id. Defaults to 1.
-    #         beta (int, optional): beta value. Defaults to 1.
-        
-    #     Returns:
-    #         float
-    #     '''
-        
-    #     if self.tp[c-1] > 0:
-    #         return float(
-    #             (1 + beta**2)*self.precision(c)*self.recall(c) / 
-    #             ((beta**2)*self.precision(c) + self.recall(c))
-    #             )
-    #     else:
-    #         return float(0)        
+   
     ############## New f-beta code ##############
     def fbeta_score(self, c: int = 1, beta: int = 1) -> float:
         ''' F-beta score 
@@ -331,19 +284,6 @@ class Metrics:
             else:
                 return float(0)
 
-
-    # def mae(self, c: int = 1) -> float:
-    #     ''' Mean Absolute Error 
-    #     Args:
-    #         c (int, optional): class id. Defaults to 1.
-        
-    #     Returns:
-    #         float
-    #     '''
-
-    #     c = c - 1
-    #     return float(self._sum_absolute_error[c] / self._n_calls[c]) \
-    #         if self._n_calls[c] else 0.
     ############# new mae code #######
     def mae(self, c: int = 1) -> float:
         ''' Mean Absolute Error
@@ -368,17 +308,6 @@ class Metrics:
                 return 0.0
 
     
-    # def mse(self, c: int = 1) -> float:
-    #     ''' Mean Squared Error 
-    #     Args:
-    #         c (int, optional): class id. Defaults to 1.
-        
-    #     Returns:
-    #         float
-    #     '''
-    #     c = c - 1
-    #     return float(self._sum_squared_error[c] / self._n_calls[c]) \
-    #         if self._n_calls[c] else 0.
     ############ NEW MSE code ##################
     def mse(self, c: int = 1) -> float:
         ''' Mean Squared Error
@@ -397,15 +326,6 @@ class Metrics:
                 raise ValueError("Class index out of range.")
             return float(self._sum_squared_error[c] / self._n_calls[c]) if self._n_calls[c] else 0.0
 
-    # def rmse(self, c: int = 2) -> float:
-    #     ''' Root Mean Squared Error 
-    #     Args:
-    #         c (int, optional): class id. Defaults to 1.
-        
-    #     Returns:
-    #         float
-    #     '''
-    #     return float(math.sqrt(self.mse(c)))
     ################## New RMSE Code ########
     def rmse(self, c: int = 1) -> float:
         ''' Root Mean Squared Error
@@ -425,22 +345,7 @@ class Metrics:
             mse_value = self.mse(c)
             return float(math.sqrt(mse_value)) if mse_value is not None else 0.0
 
-    # def ap(self, c: int = 2) -> float:
-    #     ''' Average Precision
-    #     Args: 
-    #         c (int, optional): class id. Defaults to 1.
-        
-    #     Returns:
-    #         float
-    #     '''
-
-    #     recalls, precisions = self.rec_pre_lists(c)
-        
-    #     if len(recalls) == 0 or len(precisions) == 0:
-    #         return 0.
-    #     else:
-    #         return self._compute_AP(recalls, precisions)
-    ############### NEW AP code ##################
+    
     def ap(self, c: int = 2) -> float:
         '''Average Precision
         Args: 
@@ -463,33 +368,6 @@ class Metrics:
             return self._compute_AP(recalls, precisions)
 
     
-    # def rec_pre_lists(self, c: int = 2) -> tuple:
-    #     ''' Recalls and Precisions lists
-    #     Args: 
-    #         c (int, optional): class id. Defaults to 1.
-        
-    #     Returns:
-    #         tuple
-    #             recalls and precisions
-    #     '''
-
-    #     c = c - 1
-
-    #     if len(self._ap_tables[c]) == 0:
-    #         return [], []
-
-    #     else:
-    #         n_gt = self.fn[c] + self.tp[c]
-
-    #         sorted_table = sorted(self._ap_tables[c], key=lambda x: x[1], reverse=True)
-    #         sorted_table = numpy.array(sorted_table)
-    #         sorted_table[:,2] = numpy.cumsum(sorted_table[:,2], axis=0)
-    #         sorted_table[:,3] = numpy.cumsum(sorted_table[:,3], axis=0)
-
-    #         precisions = sorted_table[:,2] / (sorted_table[:,2]+sorted_table[:,3])
-    #         recalls = sorted_table[:,2] / n_gt
-
-    #         return recalls.tolist(), precisions.tolist()
     ################################## NEW rec_pre_lists ###########################
     def rec_pre_lists(self, c: int = 1) -> tuple:
         '''Recalls and Precisions lists for both binary and object detection tasks.
@@ -523,20 +401,6 @@ class Metrics:
 
             return recalls.tolist(), precisions.tolist()
 
-        
-    # def confusion(self, c: int = 2) -> float:
-    #     ''' Interclass confusion
-    #     Args: 
-    #         c (int, optional): class id. Defaults to 1.
-        
-    #     Returns:
-    #         float
-    #             interclass confusion
-    #     '''
-    #     c = c - 1
-    #     cm_row = self._confusion_matrix[c]
-    #     p = cm_row[c]/sum(cm_row) if sum(cm_row) else 0.
-    #     return 1 - p
     ##################### New Confusion Code #############################
     def confusion(self, c: int = 1) -> float:
         ''' Construct the confusion matrix for binary classification tasks
@@ -582,17 +446,7 @@ class Metrics:
         else:
             return 0.
     
-    # def total_count(self, c: int = 2) -> float:
-    #     ''' Total class count
-    #     Args: 
-    #         c (int, optional): class id. Defaults to 1.
-        
-    #     Returns:
-    #         float
-    #             count
-    #     '''
-    #     c = c - 1
-    #     return self._total_count[c]
+   
     ######## New total count function ###########
     def total_count(self, c: int = 1) -> int:
         ''' Total class count
@@ -888,48 +742,19 @@ class BoxesMetrics(Metrics):
                 self.detections.append({'images': self.idx, **det, **counts})
         else:
             self.detections.append({'images': self.idx, **counts})
-    ###############@@@@@@@@@@@@@@@@@####################
-    
-
+   
 @METRICS.register()
-# class ImageLevelMetrics(Metrics):
-#     ''' Metrics class for image-level classification '''
 
-#     def __init__(self, num_classes: int = 2) -> None:
-#         num_classes = num_classes + 1 # for convenience
-#         super().__init__(0, num_classes)
-    
-#     def feed(self, gt: int, preds: int) -> tuple:
-#         '''
-#         Args:
-#             gt (int): numeric ground truth label
-#             pred (int): numeric predicted label
-#         '''
-
-#         gt = dict(labels=[gt], loc=[(0,0)])
-#         preds = dict(labels=[preds], loc=[(0,0)])
-        
-#         super().feed(gt, preds)
-    
-#     def matching(self, gt: dict, pred: dict) -> None:
-#         gt_lab = gt['labels'][0]
-#         p_lab = pred['labels'][0]
-#         for g, p in zip(gt_lab, p_lab): #TODO: To be confirmed
-#             if g == p:
-#                 self.tp[g-1] += 1
-#             else:
-#                 self.fp[p-1] += 1
-#                 self.fn[g-1] += 1
-        
-#         self._confusion_matrix += confusion_matrix(gt_lab, p_lab, labels=list(range(1, self.num_classes)))
-      ################# NEW ##################
 class ImageLevelMetrics(Metrics):
     '''Metrics class for image-level classification for binary tasks.'''
-
-    def __init__(self, num_classes: int = 2):
+####### updated ##### there was no init in this class before 
+# (for the problem of the repeated detections in batchsize more than 1)
+    def __init__(self, img_names, num_classes: int = 2):
         '''Initialize metrics for binary classification tasks.'''
-        num_classes = num_classes + 1 # for convenience
-        super().__init__(threshold=None, num_classes=num_classes)  # Adjusted according to the Metrics class definition
+        num_classes = num_classes + 1  # Adjust for binary classification
+        super().__init__(threshold=None, num_classes=num_classes)
+        self.img_names = img_names  # Passed image names directly
+        
     def feed(self, gt: dict, preds: dict):
         '''Feed metrics with ground truth and predictions.'''
         super().feed(gt, preds)
@@ -948,7 +773,7 @@ class ImageLevelMetrics(Metrics):
         self.fp[0] += ((~gt_binary_bool & pred_binary_bool).sum().item())
         self.fn[0] += ((gt_binary_bool & ~pred_binary_bool).sum().item())
         self.tn[0] += ((~gt_binary_bool & ~pred_binary_bool).sum().item())
-        print("TP:", self.tp[0], "FP:", self.fp[0], "FN:", self.fn[0], "TN:", self.tn[0])
+        # print("TP:", self.tp[0], "FP:", self.fp[0], "FN:", self.fn[0], "TN:", self.tn[0])
     
         
         # Update the confusion matrix
@@ -956,7 +781,55 @@ class ImageLevelMetrics(Metrics):
         self.confusion_matrix[0, 1] = self.fp[0]
         self.confusion_matrix[1, 0] = self.fn[0]
         self.confusion_matrix[1, 1] = self.tn[0]
-        print(self.confusion_matrix)
+        # print(self.confusion_matrix)
+    def _store_detections(self, preds: dict, est_count: Optional[list] = None) -> None:
+        ''' Store detections internally (1 row = 1 detection), convert tensor to int. '''
+
+        # Convert tensor predictions to integers before storing them
+        preds = {k: [v.item() if torch.is_tensor(v) else v for v in vals] for k, vals in preds.items()}
+
+        m = map(dict, zip(*[
+            [(k, v) for v in value]
+            for k, value in preds.items()
+        ]))
+        m, m_copy = tee(m)
+
+        counts = {}
+        if est_count is not None:
+            counts = {f'count_{i+1}': x for i, x in enumerate(est_count)}
+
+        if len([x for x in m_copy]) > 0:
+            for det in m:
+                self.detections.append({'images': self.idx, **det, **counts})
+        else:
+            self.detections.append({'images': self.idx, **counts})
+ 
+    def _store_detections_binary(self, preds: dict, est_count: Optional[list] = None):
+        ''' Store detections for binary classification internally '''
+
+        # Calculate estimated counts if not provided
+        if est_count is None:
+            non_empty_preds = (preds['binary'] == 1).sum().item()  # Count of positive detections
+            empty_preds = (preds['binary'] == 0).sum().item()      # Count of negative detections
+            est_count = [empty_preds, non_empty_preds]
+
+        counts = {'empty_count': est_count[0], 'non_empty_count': est_count[1]}
+
+        # Flatten binary values
+        binary_values = preds['binary'].view(-1).cpu().tolist() if isinstance(preds['binary'], torch.Tensor) else [int(x) for x in preds['binary']]
+
+        # Process each binary detection value
+        for idx, binary_value in enumerate(binary_values):
+            if idx < len(self.img_names):
+                image_name = self.img_names[idx]
+                self.detections.append({'images': image_name, 'binary': binary_value, **counts})
+            else:
+                print(f"Skipping idx {idx}: Out of range for img_names with length {len(self.img_names)}")
+                break  # Stop processing if index exceeds the range of img_names
+
+
+
+
 @METRICS.register()
 class RegressionMetrics(Metrics):
     ''' Metrics class for regression type tasks '''

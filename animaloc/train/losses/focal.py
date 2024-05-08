@@ -136,3 +136,52 @@ class FocalLoss(torch.nn.Module):
             return loss.mean()
         elif self.reduction == 'sum':
             return loss.sum()
+###########################BinaryFocal loss####################
+
+import torch.nn as nn
+import torch.nn.functional as F
+
+class BinaryFocalLoss(nn.Module):
+    def __init__(
+        self, 
+         alpha_pos=0.75, 
+         alpha_neg=0.25, 
+         beta=2, 
+         reduction='mean', 
+         weights=None, 
+         eps=1e-6):
+        super(BinaryFocalLoss, self).__init__()
+        self.alpha_pos = alpha_pos  # Alpha for controlling emphasis on positive samples
+        self.alpha_neg = alpha_neg  # Alpha for controlling emphasis on negative samples
+        self.beta = beta    # beta focuses more on hard examples
+        self.reduction = reduction
+        self.weights = weights  # Weights for each class
+        self.eps = eps
+    
+
+    def forward(self, outputs, targets):
+        # Ensuring outputs are clamped to avoid log(0)
+        outputs = torch.clamp(outputs, min=self.eps, max=1 - self.eps)
+
+        # Calculate the basic binary cross entropy loss
+        bce_loss = F.binary_cross_entropy_with_logits(outputs, targets, reduction='none')
+        probas = torch.sigmoid(outputs)
+        p_t = torch.where(targets == 1, probas, 1 - probas)
+        focal_factor = (1 - p_t) ** self.beta
+        focal_loss = focal_factor * bce_loss
+        alpha_factor = torch.where(targets == 1, self.alpha_pos, self.alpha_neg)
+        focal_loss = alpha_factor * focal_loss
+
+        # Apply class-specific weights if provided
+        if self.weights is not None:
+            weight_factor = torch.where(targets == 1, self.weights[1], self.weights[0])
+            focal_loss = weight_factor * focal_loss
+
+        if self.reduction == 'mean':
+            return focal_loss.mean()
+        elif self.reduction == 'sum':
+            return focal_loss.sum()
+        return focal_loss
+
+
+

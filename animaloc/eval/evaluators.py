@@ -25,7 +25,7 @@ from itertools import chain
 
 matplotlib.use('Agg')
 
-from typing import Any, Optional, Dict, List, Callable
+from typing import Any, Optional, Dict, List, Callable, Type
 
 import torch.nn.functional as F
 
@@ -56,6 +56,7 @@ class Evaluator:
         vizual_fn: Optional[Callable] = None,
         work_dir: Optional[str] = None,
         header: Optional[str] = None
+        
         ):
         '''
         Args:
@@ -206,18 +207,18 @@ class Evaluator:
                 output = self.stitcher(images[0])
                 output = self.post_stitcher(output)
             else:
-                output, _ = self.model(images, targets)  
-                # output, _ = self.model(images)
+                # output, _ = self.model(images, targets)  
+                output, _ = self.model(images)
 
             if viz and self.vizual_fn is not None:
                 if i % self.print_freq == 0 or i == len(self.dataloader) - 1:
                     fig = self._vizual(image = images, target = targets, output = output)
                     wandb.log({'validation_vizuals': fig})
-            #UPDATE######################
+
             output = self.prepare_feeding(targets, output)
 
             iter_metrics.feed(**output)
-            # iter_metrics.aggregate()
+            iter_metrics.aggregate()
             if log_meters:
                 logger.add_meter('n', sum(iter_metrics.tp) + sum(iter_metrics.fn))
                 logger.add_meter('recall', round(iter_metrics.recall(),2))
@@ -240,13 +241,13 @@ class Evaluator:
 
             iter_metrics.flush()
 
-            # self.metrics.feed(**output)
+            self.metrics.feed(**output)
         
         self._stored_metrics = self.metrics.copy()
 
         mAP = numpy.mean([self.metrics.ap(c) for c in range(1, self.metrics.num_classes)]).item()
         
-        # self.metrics.aggregate()
+        self.metrics.aggregate()
 
         if wandb_flag:
             wandb.run.summary['recall'] =  self.metrics.recall()
@@ -275,7 +276,9 @@ class Evaluator:
             return self.metrics.accuracy()
         elif returns == 'mAP':
             return mAP
-    
+
+
+        
     @property
     def results(self) -> pandas.DataFrame:
         ''' Returns metrics by class (recall, precision, f1_score, mse, mae, and rmse) 
@@ -319,7 +322,6 @@ class Evaluator:
         return pandas.DataFrame(data = res)
     
     @property
-    # Previous Code
     # def detections(self) -> pandas.DataFrame:
     #     ''' Returns detections (image id, location, label and score) in a pandas
     #     dataframe '''
@@ -333,43 +335,53 @@ class Evaluator:
     #         det['images'] = img_names[det['images']]
 
     #     return pandas.DataFrame(data = dets)
-    ########## NEW Code ########
-    
-    def detections(self) -> pandas.DataFrame:
-        '''Returns detections (image id, location, label, and score) in a pandas dataframe.'''
+  
+    # def _vizual(self, image: Any, target: Any, output: Any):
+    #     fig = self.vizual_fn(image=image, target=target, output=output)
+    #     return fig
+    # def detections(self) -> pandas.DataFrame:
+    #     ''' Returns detections (image id, location, label and score) in a pandas
+    #     dataframe '''
 
-        assert self._stored_metrics is not None, 'No detections have been stored'
+    #     assert self._stored_metrics is not None, \
+    #         'No detections have been stored, please use the evaluate method first.'
+
+    #     img_names = self.dataloader.dataset._img_names
+    #     dets = self._stored_metrics.detections
+        
+    #     for det in dets:
+    #         index = det['images']
+    #         if index < len(img_names):
+    #             det['images'] = img_names[index]
+    #         else:
+    #             print(f"IndexError: {index} is out of range for img_names with length {len(img_names)}")
+    #             det['images'] = 'IndexError'  # You might want to handle this more gracefully
+
+    #     return pandas.DataFrame(data=dets)
+    ##################### NEWWWWWWWWWWWWWWWWW# 
+    def detections(self) -> pandas.DataFrame:
+        ''' Returns detections (image id, location, label, and score) in a pandas dataframe '''
+
+        assert self._stored_metrics is not None, \
+            'No detections have been stored, please use the evaluate method first.'
 
         img_names = self.dataloader.dataset._img_names
         dets = self._stored_metrics.detections
 
-        # Proceed with the original code
+        # Update to check if 'images' contains a valid index or is already the name
         for det in dets:
-            det['images'] = img_names[det['images']]
-            # Check and convert 'binary' field to simple 0 or 1 if present
-            if 'binary' in det:
-                det['binary'] = int(det['binary'].item() if hasattr(det['binary'], 'item') else det['binary'])
+            index = det['images']
+            # Check if 'index' is actually an integer index; if not, assume it's a valid image name
+            if isinstance(index, int) and index < len(img_names):
+                det['images'] = img_names[index]
+            elif isinstance(index, str):
+                # 'index' is already the image name, so no need to change it
+                continue
+            else:
+                print(f"IndexError or TypeError: {index} is not a valid index or image name")
+                det['images'] = 'InvalidIndexOrName'  # Placeholder for error cases
 
-        # Create DataFrame from detections
-        df = pandas.DataFrame(data=dets)
-
-        # This part is conditional based on whether it's a binary detection case
-        if 'binary' in df.columns:
-            # Add ground truth labels 
-            if hasattr(self, 'targets_float'):
-                gt_labels_list = self.targets_float.squeeze().cpu().tolist()
-                df['ground_truth'] = gt_labels_list
-
-            # Rename columns for binary case if applicable
-            df.rename(columns={'count_1': 'empty_count', 'count_2': 'non_empty_count'}, inplace=True)
-
-        return df
-
-
-    
-    def _vizual(self, image: Any, target: Any, output: Any):
-        fig = self.vizual_fn(image=image, target=target, output=output)
-        return fig
+        return pandas.DataFrame(data=dets)
 
 @EVALUATORS.register()
 class HerdNetEvaluator(Evaluator):
@@ -493,43 +505,12 @@ class FasterRCNNEvaluator(Evaluator):
         return dict(gt = gt, preds = preds, est_count = counts)
     
 @EVALUATORS.register()
-# class TileEvaluator(Evaluator):
-  
-#     def prepare_data(self, images: Any, targets: Any) -> tuple: 
-#         if isinstance(targets, dict):
-#             # Move each tensor within the target dictionary to the device
-#             # print("Targets are a dictionary.")
-#             if len(targets.keys())>1:
-#                 targets = {k: v.to(self.device) for k, v in targets.items()}
-#             else:
-#                 targets = [v.to(self.device) for k, v in targets.items()]
-#         elif isinstance(targets, (list, tuple)):
-#             # If targets is a list or tuple, move each item to the device
-#             targets = [tar.to(self.device) for tar in targets]
-#             print("Targets are in a list or tuple.")
-#         else:
-#             print("Unexpected targets format.")       
-#         return images.to(self.device), targets
-
-#     def prepare_feeding(self, targets: Dict[str, torch.Tensor], output: torch.Tensor) -> dict:
-
-       
-        # gt_labels = list(chain.from_iterable(targets[0].tolist()))
-        # gt_labels = [int(l+1) for l in gt_labels]
-        # gt = dict(loc = [], labels = gt_labels)
-        # preds = dict(loc = [], labels = [], scores = [])
-
-        # scores= list(chain.from_iterable(output.tolist()))
-        # labels= [2 if s>0 else 1 for s in scores]
-        # preds = dict(loc = [], labels = labels, scores = scores)
-        # return dict(gt = gt_labels, preds = labels)
-    ################### NEW ###########################
 class TileEvaluator(Evaluator):
-    #new lines
+
     def prepare_data(self, images: Any, targets: Any) -> tuple: 
         if isinstance(targets, dict):
             # Move each tensor within the target dictionary to the device
-            print("Targets are a dictionary.")
+            # print("Targets are a dictionary.")
             if len(targets.keys())>1:
                 targets = {k: v.to(self.device) for k, v in targets.items()}
             else:
@@ -583,11 +564,11 @@ class TileEvaluator(Evaluator):
         targets_float = targets.float()
 
         # Convert model output to probabilities via sigmoid 
-        # output_probs = torch.sigmoid(output).float()
-        scores= list(chain.from_iterable(output.tolist()))
-        # convert probabilities to binary predictions 
-        # pred_binary = (scores > 0.5).float()
-        pred_binary = torch.tensor([1 if s > 0 else 0 for s in scores], dtype=torch.float32).to(output.device)
+        scores = torch.sigmoid(output).float()
+        # scores= list(chain.from_iterable(output.tolist()))
+        # convert probabilities to binary predictions (threshold)
+        pred_binary = (scores > 0.5).float()
+        # pred_binary = torch.tensor([1 if s > 0 else 0 for s in scores], dtype=torch.float32).to(output.device)
         # Prepare dictionary for feeding into metrics
         feeding_dict = {
             'gt': {'binary': targets_float},
@@ -596,7 +577,267 @@ class TileEvaluator(Evaluator):
 
         return feeding_dict
 
+    def evaluate(self, returns: str = 'recall', wandb_flag: bool = False, viz: bool = False,
+        log_meters: bool = True) -> float:
+        ''' Evaluate the model
+        
+        Args:
+            returns (str, optional): metric to be returned. Possible values are:
+                'recall', 'precision', 'f1_score', 'mse', 'mae', 'rmse', 'accuracy'
+                and 'mAP'. Defauts to 'recall'
+            wandb_flag (bool, optional): set to True to log on Weight & Biases. 
+                Defaults to False.
+            viz (bool, optional): set to True to save vizual predictions on original
+                images. Defaults to False.
+            log_meters (bool, optional): set to False to disable meters logging. 
+                Defaults to True.
+        
+        Returns:
+            float
+        '''
+        
+        self.model.eval()
 
+        self.metrics.flush()
+        logger = CustomLogger(delimiter=' ', filename=self.logs_filename, work_dir=self.work_dir)
+        iter_metrics = self.metrics.copy()
 
+        for i, (images, targets) in enumerate(logger.log_every(self.dataloader, self.print_freq, self.header)):
 
+            images, targets = self.prepare_data(images, targets)
 
+            if self.stitcher is not None:
+                output = self.stitcher(images[0])
+                output = self.post_stitcher(output)
+            else:
+                output, _ = self.model(images, targets)  
+                # output, _ = self.model(images)
+
+            if viz and self.vizual_fn is not None:
+                if i % self.print_freq == 0 or i == len(self.dataloader) - 1:
+                    fig = self._vizual(image = images, target = targets, output = output)
+                    wandb.log({'validation_vizuals': fig})
+            #UPDATE######################
+            output = self.prepare_feeding(targets, output)
+
+            iter_metrics.feed(**output)
+            # iter_metrics.aggregate()
+            if log_meters:
+                logger.add_meter('n', sum(iter_metrics.tp) + sum(iter_metrics.fn))
+                logger.add_meter('recall', round(iter_metrics.recall(),2))
+                logger.add_meter('precision', round(iter_metrics.precision(),2))
+                logger.add_meter('f1-score', round(iter_metrics.fbeta_score(),2))
+                logger.add_meter('MAE', round(iter_metrics.mae(),2))
+                logger.add_meter('MSE', round(iter_metrics.mse(),2))
+                logger.add_meter('RMSE', round(iter_metrics.rmse(),2))
+
+            if wandb_flag:
+                wandb.init()
+                wandb.log({
+                    'n': sum(iter_metrics.tp) + sum(iter_metrics.fn),
+                    'recall': iter_metrics.recall(),
+                    'precision': iter_metrics.precision(),
+                    'f1_score': iter_metrics.fbeta_score(),
+                    'MAE': iter_metrics.mae(),
+                    'MSE': iter_metrics.mse(),
+                    'RMSE': iter_metrics.rmse()
+                    })
+
+            iter_metrics.flush()
+
+            self.metrics.feed(**output)
+   
+        self._stored_metrics = self.metrics.copy()
+            
+        print("Recall:", self._stored_metrics.recall())
+        print("Precision:", self._stored_metrics.precision())
+        mAP = numpy.mean([self.metrics.ap(c) for c in range(1, self.metrics.num_classes)]).item()
+        # self.metrics.aggregate()
+
+        if wandb_flag:
+            wandb.run.summary['recall'] =  self.metrics.recall()
+            wandb.run.summary['precision'] =  self.metrics.precision()
+            wandb.run.summary['f1_score'] =  self.metrics.fbeta_score()
+            wandb.run.summary['MAE'] =  self.metrics.mae()
+            wandb.run.summary['MSE'] =  self.metrics.mse()
+            wandb.run.summary['RMSE'] =  self.metrics.rmse()
+            wandb.run.summary['accuracy'] =  self.metrics.accuracy()
+            wandb.run.summary['mAP'] =  mAP
+            wandb.run.finish()
+
+        if returns == 'recall':
+            return self.metrics.recall()
+        elif returns == 'precision':
+            return self.metrics.precision()
+        elif returns == 'f1_score':
+            return self.metrics.fbeta_score()
+        elif returns == 'mse':
+            return self.metrics.mse()
+        elif returns == 'mae':
+            return self.metrics.mae()
+        elif returns == 'rmse':
+            return self.metrics.rmse()
+        elif returns == 'accuracy':
+            return self.metrics.accuracy()
+        elif returns == 'mAP':
+            return mAP
+####################### TileEvaluator for DLA Autoencoder ########################
+@EVALUATORS.register()
+class AutoTileEvaluator(Evaluator):
+    ##### tileevaluator does not have def init at forst i just added that
+   
+    def __init__(
+        self,
+        model: torch.nn.Module,
+        dataloader: torch.utils.data.DataLoader,
+        metrics_class: Type[Metrics],
+        num_classes: int,
+        device_name: str = 'cuda',
+        print_freq: int = 10,
+        stitcher: Optional[Stitcher] = None,
+        vizual_fn: Optional[Callable] = None,
+        work_dir: Optional[str] = None,
+        header: Optional[str] = None
+    ):
+        # Extract img_names from the dataloader's dataset
+        img_names = dataloader.dataset._img_names
+
+        # Create an instance of the metrics using the modified constructor
+        metrics = metrics_class(img_names=img_names, num_classes=num_classes)
+
+        super().__init__(
+            model=model,
+            dataloader=dataloader,
+            metrics=metrics,
+            device_name=device_name,
+            print_freq=print_freq,
+            stitcher=stitcher,
+            vizual_fn=vizual_fn,
+            work_dir=work_dir,
+            header=header
+        )
+    def prepare_data(self, images: Any, targets: Any) -> tuple: 
+        if isinstance(targets, dict):
+            # Move each tensor within the target dictionary to the device
+            # print("Targets are a dictionary.")
+            if len(targets.keys())>1:
+                targets = {k: v.to(self.device) for k, v in targets.items()}
+            else:
+                targets = [v.to(self.device) for k, v in targets.items()]
+        elif isinstance(targets, (list, tuple)):
+            # If targets is a list or tuple, move each item to the device
+            targets = [tar.to(self.device) for tar in targets]
+            print("Targets are in a list or tuple.")
+        else:
+            print("Unexpected targets format.")       
+        return images.to(self.device), targets
+    def prepare_feeding(self, targets: Any, output: Any) -> dict:
+        """
+        Adjust targets and output for feeding into metrics.
+        Assumes targets are provided in a suitable format for binary classification.
+        This version unpacks the model's output tuple and processes the classification output.
+        """
+
+        if isinstance(targets, list):
+            targets = torch.stack(targets).to(self.device)
+        targets_float = targets.float()
+
+        if isinstance(output, tuple):
+            cls_output, _ = output  # Assuming cls_output is the classification output
+        else:
+            cls_output = output  # Compatibility with single output models
+
+        scores = torch.sigmoid(cls_output).float()
+        pred_binary = (scores > 0.3).float()  # Threshold for binary classification
+
+        feeding_dict = {
+            'gt': {'binary': targets_float},
+            'preds': {'binary': pred_binary}
+        }
+
+        return feeding_dict
+
+    def evaluate(self, returns: str = 'recall', wandb_flag: bool = False, viz: bool = False, log_meters: bool = True) -> float:
+        ''' Evaluate the model '''
+        self.model.eval()
+        self.metrics.flush()
+        logger = CustomLogger(delimiter=' ', filename=self.logs_filename, work_dir=self.work_dir)
+        iter_metrics = self.metrics.copy()
+
+        for i, (images, targets) in enumerate(logger.log_every(self.dataloader, self.print_freq, self.header)):
+            images, targets = self.prepare_data(images, targets)
+
+            with torch.no_grad():  # Ensure computation is done in no_grad context to save memory and computation
+                outputs = self.model(images)
+            
+            # Unpack outputs if model returns multiple outputs, assuming first output is classification logits
+            if isinstance(outputs, tuple):
+                output = outputs[0]
+            else:
+                output = outputs
+
+            if viz and self.vizual_fn is not None:
+                if i % self.print_freq == 0 or i == len(self.dataloader) - 1:
+                    fig = self._vizual(image=images, target=targets, output=output)
+                    wandb.log({'validation_vizuals': fig})
+            
+            output = self.prepare_feeding(targets, output)  # Process output for metrics
+            iter_metrics.feed(**output)
+
+            if log_meters:
+                logger.add_meter('n', sum(iter_metrics.tp) + sum(iter_metrics.fn))
+                logger.add_meter('recall', round(iter_metrics.recall(),2))
+                logger.add_meter('precision', round(iter_metrics.precision(),2))
+                logger.add_meter('f1-score', round(iter_metrics.fbeta_score(),2))
+                logger.add_meter('MAE', round(iter_metrics.mae(),2))
+                logger.add_meter('MSE', round(iter_metrics.mse(),2))
+                logger.add_meter('RMSE', round(iter_metrics.rmse(),2))
+
+            if wandb_flag:
+                wandb.log({
+                    'n': sum(iter_metrics.tp) + sum(iter_metrics.fn),
+                    'recall': iter_metrics.recall(),
+                    'precision': iter_metrics.precision(),
+                    'f1_score': iter_metrics.fbeta_score(),
+                    'MAE': iter_metrics.mae(),
+                    'MSE': iter_metrics.mse(),
+                    'RMSE': iter_metrics.rmse()
+                })
+
+            iter_metrics.flush()
+            self.metrics.feed(**output)
+        self._stored_metrics = self.metrics.copy()
+
+        print("Recall:", self._stored_metrics.recall())
+        print("Precision:", self._stored_metrics.precision())
+        mAP = numpy.mean([self.metrics.ap(c) for c in range(1, self.metrics.num_classes)]).item()
+
+        if wandb_flag:
+            wandb.run.summary.update({
+                'recall': self.metrics.recall(),
+                'precision': self.metrics.precision(),
+                'f1_score': self.metrics.fbeta_score(),
+                'MAE': self.metrics.mae(),
+                'MSE': self.metrics.mse(),
+                'RMSE': self.metrics.rmse(),
+                'accuracy': self.metrics.accuracy(),
+                'mAP': mAP
+            })
+            wandb.finish()
+
+        if returns == 'recall':
+            return self.metrics.recall()
+        elif returns == 'precision':
+            return self.metrics.precision()
+        elif returns == 'f1_score':
+            return self.metrics.fbeta_score()
+        elif returns == 'mse':
+            return self.metrics.mse()
+        elif returns == 'mae':
+            return self.metrics.mae()
+        elif returns == 'rmse':
+            return self.metrics.rmse()
+        elif returns == 'accuracy':
+            return self.metrics.accuracy()
+        elif returns == 'mAP':
+            return mAP

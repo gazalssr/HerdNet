@@ -340,9 +340,6 @@ class CSVDataset(Dataset):
 
         return tr_image, tr_target
 
-
-
-
     def __getitem__(self, index: int) -> Tuple[torch.Tensor, dict]:        
         img = self._load_image(index)
         target = self._load_target(index)

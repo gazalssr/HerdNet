@@ -22,7 +22,6 @@ import numpy
 import torch
 
 from typing import Optional, List, Any, Dict, Tuple, Union
-
 from ..data.types import BoundingBox
 from ..data.utils import group_by_image
 
@@ -243,35 +242,51 @@ class BinaryFolderDataset(CSVDataset):
         self._ordered_img_names = self.data['images'].values.tolist()
 
     def create_binary_dataframe(self):
+        # Listing all image files in the directory
         self.folder_images = [i for i in os.listdir(self.root_dir) if i.endswith(('.JPG', '.jpg', '.JPEG', '.jpeg'))]
-        self.data['from_folder'] = 0
-        folder_only_images = np.setdiff1d(self.folder_images, self.data['images'].unique().tolist())
-        base_images_ids = [self.derive_base_image_id(image_name) for image_name in folder_only_images]
+        # print(f"Total patches in folder: {len(self.folder_images)}")  
+        unmatched_images = [img for img in self.folder_images if img not in self.data['images'].tolist()]
+        # print(f"Empty patches: {len(unmatched_images)}")
+        self.data = self.data.drop_duplicates(subset='images')
+        self.data['binary'] = 1  # Mark these as non-empty
+        if 'base_images' not in self.data.columns:
+            self.data['base_images'] = self.data['images'].apply(self.derive_base_image_id)
+        # Identify images that are only in the folder but not in the initial CSV
+        folder_only_images = np.setdiff1d(self.folder_images, self.data['images'].tolist())
+   
+        # Creating a DataFrame for the folder-only images, assumed empty
         folder_df = pd.DataFrame({
             'images': folder_only_images,
-            'base_images': base_images_ids,
-            'from_folder': 1,
-            'binary': 0
+            'binary': np.zeros(len(folder_only_images), dtype=int),  # Mark these as empty
+            'base_images': [self.derive_base_image_id(img) for img in folder_only_images]  # Derive base image IDs for folder-only images
         })
+        # Concatenate the original data with the new folder data
         self.data = pd.concat([self.data, folder_df], ignore_index=True)
-        self.data['binary'] = np.where(self.data['from_folder'] == 1, 0, 1)
+         # Update base_image column for all entries
+
+        # Clean up the data 
         columns_to_remove = ['annos', 'subset', 'from_folder', 'labels', 'species']
         self.data.drop(columns=columns_to_remove, errors='ignore', inplace=True)
+
 
     def _load_image(self, index: int) -> Image.Image:
         img_name = self.data.at[index, 'images']
         img_path = os.path.join(self.root_dir, img_name)
         return Image.open(img_path).convert('RGB')
-
+  
     def _load_target(self, index: int) -> Dict[str, Any]:
-        img_name = self._ordered_img_names[index]
-        binary_label = self.data.loc[self.data['images'] == img_name, 'binary'].iloc[0]
+        img_name = self.data.at[index, 'images']
+        binary_label = self.data.at[index, 'binary']
         return {
             'image_id': index,
             'image_name': img_name,
-            'labels': torch.tensor([binary_label], dtype=torch.int64)  # Using 'labels' as key for consistency
+            'binary': torch.tensor([binary_label], dtype=torch.int64)  
         }
-
+    
+    def collate_fn(batch):
+        images = [item[0] for item in batch]  # Assuming item[0] are images
+        binary_targets = torch.stack([item[1]['binary'] for item in batch])  # Collect 'binary' targets and stack them
+        return images, {'binary': binary_targets}
 
     def derive_base_image_id(self, image_name):
         if "_" in image_name:
@@ -281,28 +296,6 @@ class BinaryFolderDataset(CSVDataset):
 
     def save_binary_csv(self, save_path):
         self.data.to_csv(save_path, index=False)
-
-    def _load_image(self, index: int) -> Image.Image:
-        img_name = self.data.at[index, 'images']
-        img_path = os.path.join(self.root_dir, img_name)
-        pil_img = Image.open(img_path).convert('RGB')
-        pil_img.filename = img_name  
-        return pil_img
-    
-
-    def _load_target(self, index: int) -> dict:
-        img_name = self._ordered_img_names[index]
-        
-
-        binary_label = self.data.loc[self.data['images'] == img_name, 'binary'].iloc[0]
-        # Construct the target dictionary.
-        target = {
-            'image_id': index,
-            'image_name': img_name,
-            'binary': torch.tensor([binary_label], dtype=torch.int64)  # Ensure binary label is a tensor
-        }
-
-        return target
 
     
     def derive_base_image_id(self, image_name):
