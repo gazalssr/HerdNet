@@ -144,9 +144,9 @@ import torch.nn.functional as F
 class BinaryFocalLoss(nn.Module):
     def __init__(
         self, 
-         alpha_pos=0.75, 
-         alpha_neg=0.25, 
-         beta=2, 
+         alpha_pos=0.85, 
+         alpha_neg=0.15, 
+         beta=4, 
          reduction='mean', 
          weights=None, 
          eps=1e-6):
@@ -182,6 +182,56 @@ class BinaryFocalLoss(nn.Module):
         elif self.reduction == 'sum':
             return focal_loss.sum()
         return focal_loss
+####################################### Focal Combo Loss ###########################################
+class FocalComboLoss(nn.Module):
+    def __init__(
+        self, 
+        alpha_pos=0.75, 
+        alpha_neg=0.25, 
+        beta=4, 
+        reduction='mean', 
+        weights=None, 
+        dice_weight=0.5,  # New parameter to balance between focal loss and dice loss
+        eps=1e-6):
+        super(FocalComboLoss, self).__init__()
+        self.alpha_pos = alpha_pos
+        self.alpha_neg = alpha_neg
+        self.beta = beta
+        self.reduction = reduction
+        self.weights = weights
+        self.dice_weight = dice_weight  # Weight for dice loss component
+        self.eps = eps
 
+    def forward(self, outputs, targets):
+        # Calculate the Focal Loss as before
+        outputs = torch.clamp(outputs, min=self.eps, max=1 - self.eps)
+        bce_loss = F.binary_cross_entropy_with_logits(outputs, targets, reduction='none')
+        probas = torch.sigmoid(outputs)
+        p_t = torch.where(targets == 1, probas, 1 - probas)
+        focal_factor = (1 - p_t) ** self.beta
+        alpha_factor = torch.where(targets == 1, self.alpha_pos, self.alpha_neg)
+        focal_loss = alpha_factor * focal_factor * bce_loss
+
+        if self.weights is not None:
+            weight_factor = torch.where(targets == 1, self.weights[1], self.weights[0])
+            focal_loss = weight_factor * focal_loss
+
+        # Calculate the Dice Loss
+        smooth = 1e-6
+        inputs = torch.sigmoid(outputs)
+        intersection = (inputs * targets).sum()
+        total = (inputs + targets).sum()
+        dice_score = (2. * intersection + smooth) / (total + smooth)
+        dice_loss = 1 - dice_score
+
+        # Combine the losses
+        combined_loss = (1 - self.dice_weight) * focal_loss + self.dice_weight * dice_loss
+
+        if self.reduction == 'mean':
+            combined_loss = combined_loss.mean()
+        elif self.reduction == 'sum':
+            combined_loss = combined_loss.sum()
+
+        return combined_loss
 
 
