@@ -506,7 +506,38 @@ class FasterRCNNEvaluator(Evaluator):
     
 @EVALUATORS.register()
 class TileEvaluator(Evaluator):
+    def __init__(
+        self,
+        model: torch.nn.Module,
+        dataloader: torch.utils.data.DataLoader,
+        metrics_class: Type[Metrics],
+        num_classes: int,
+        device_name: str = 'cuda',
+        print_freq: int = 10,
+        stitcher: Optional[Stitcher] = None,
+        vizual_fn: Optional[Callable] = None,
+        work_dir: Optional[str] = None,
+        header: Optional[str] = None,
+        threshold: float = 0.3
+    ):
+        # Extract img_names from the dataloader's dataset
+        img_names = dataloader.dataset._img_names
 
+        # Create an instance of the metrics using the modified constructor
+        metrics = metrics_class(img_names=img_names, num_classes=num_classes)
+
+        super().__init__(
+            model=model,
+            dataloader=dataloader,
+            metrics=metrics,
+            device_name=device_name,
+            print_freq=print_freq,
+            stitcher=stitcher,
+            vizual_fn=vizual_fn,
+            work_dir=work_dir,
+            header=header
+        )
+        self.threshold = threshold
     def prepare_data(self, images: Any, targets: Any) -> tuple: 
         if isinstance(targets, dict):
             # Move each tensor within the target dictionary to the device
@@ -523,35 +554,8 @@ class TileEvaluator(Evaluator):
             print("Unexpected targets format.")       
         return images.to(self.device), targets
     
-    # def prepare_feeding(self, targets: Any, output: torch.Tensor) -> dict:
-    #     """
-    #     Adjust targets and output for feeding into metrics.
-    #     This version assumes targets are provided in a suitable format for binary classification.
-    #     """
-        
-
-    #     # If targets come as a list of tensors, convert to a single tensor
-    #     if isinstance(targets, list):
-    #         targets = torch.stack(targets).to(self.device)
-
-    #     targets_float = targets.float()
-        
-    #     # Store targets_float as a class attribute
-    #     self.targets_float = targets_float
-    #     if self.targets_float.nelement() != 0:
-    #         self.targets_float = torch.cat((self.targets_float, targets_float), dim=0)
-    #     else:
-    #         self.targets_float = targets_float
-    #     scores= list(chain.from_iterable(output.tolist()))
-    #     pred_binary = torch.tensor([1 if s > 0 else 0 for s in scores], dtype=torch.float32).to(output.device)
-    #     # Prepare dictionary for feeding into metrics
-    #     feeding_dict = {
-    #         'gt': {'binary': targets_float},
-    #         'preds': {'binary': pred_binary}
-    #     }
-
-    #     return feeding_dict
-    def prepare_feeding(self, targets: Any, output: torch.Tensor) -> dict:
+ 
+    def prepare_feeding(self, targets: Any, output: torch.Tensor, threshold: float = 0.5) -> dict:
         """
         Adjust targets and output for feeding into metrics.
         This version assumes targets are provided in a suitable format for binary classification.
@@ -565,9 +569,9 @@ class TileEvaluator(Evaluator):
 
         # Convert model output to probabilities via sigmoid 
         scores = torch.sigmoid(output).float()
-        # scores= list(chain.from_iterable(output.tolist()))
+
         # convert probabilities to binary predictions (threshold)
-        pred_binary = (scores > 0.5).float()
+        pred_binary = (scores > threshold).float()
         # pred_binary = torch.tensor([1 if s > 0 else 0 for s in scores], dtype=torch.float32).to(output.device)
         # Prepare dictionary for feeding into metrics
         feeding_dict = {
@@ -623,6 +627,7 @@ class TileEvaluator(Evaluator):
             iter_metrics.feed(**output)
             # iter_metrics.aggregate()
             if log_meters:
+                logger.add_meter('threshold', self.threshold)  # Log the current threshold
                 logger.add_meter('n', sum(iter_metrics.tp) + sum(iter_metrics.fn))
                 logger.add_meter('recall', round(iter_metrics.recall(),2))
                 logger.add_meter('precision', round(iter_metrics.precision(),2))
@@ -634,6 +639,7 @@ class TileEvaluator(Evaluator):
             if wandb_flag:
                 wandb.init()
                 wandb.log({
+                    'threshold': self.threshold,
                     'n': sum(iter_metrics.tp) + sum(iter_metrics.fn),
                     'recall': iter_metrics.recall(),
                     'precision': iter_metrics.precision(),
@@ -655,6 +661,7 @@ class TileEvaluator(Evaluator):
         # self.metrics.aggregate()
 
         if wandb_flag:
+            wandb.run.summary['threshold']= self.threshold()
             wandb.run.summary['recall'] =  self.metrics.recall()
             wandb.run.summary['precision'] =  self.metrics.precision()
             wandb.run.summary['f1_score'] =  self.metrics.fbeta_score()
@@ -684,7 +691,7 @@ class TileEvaluator(Evaluator):
 ####################### TileEvaluator for DLA Autoencoder ########################
 @EVALUATORS.register()
 class AutoTileEvaluator(Evaluator):
-    ##### tileevaluator does not have def init at forst i just added that
+    ##### tileevaluator does not have def init at first i just added that
    
     def __init__(
         self,
@@ -697,7 +704,8 @@ class AutoTileEvaluator(Evaluator):
         stitcher: Optional[Stitcher] = None,
         vizual_fn: Optional[Callable] = None,
         work_dir: Optional[str] = None,
-        header: Optional[str] = None
+        header: Optional[str] = None,
+        threshold: float = 0.3
     ):
         # Extract img_names from the dataloader's dataset
         img_names = dataloader.dataset._img_names
@@ -716,6 +724,7 @@ class AutoTileEvaluator(Evaluator):
             work_dir=work_dir,
             header=header
         )
+        self.threshold = threshold
     def prepare_data(self, images: Any, targets: Any) -> tuple: 
         if isinstance(targets, dict):
             # Move each tensor within the target dictionary to the device
@@ -748,7 +757,7 @@ class AutoTileEvaluator(Evaluator):
             cls_output = output  # Compatibility with single output models
 
         scores = torch.sigmoid(cls_output).float()
-        pred_binary = (scores > 0.3).float()  # Threshold for binary classification
+        pred_binary = (scores > self.threshold).float()  # Threshold for binary classification
 
         feeding_dict = {
             'gt': {'binary': targets_float},
@@ -767,7 +776,7 @@ class AutoTileEvaluator(Evaluator):
         for i, (images, targets) in enumerate(logger.log_every(self.dataloader, self.print_freq, self.header)):
             images, targets = self.prepare_data(images, targets)
 
-            with torch.no_grad():  # Ensure computation is done in no_grad context to save memory and computation
+            with torch.no_grad():  
                 outputs = self.model(images)
             
             # Unpack outputs if model returns multiple outputs, assuming first output is classification logits
@@ -785,6 +794,7 @@ class AutoTileEvaluator(Evaluator):
             iter_metrics.feed(**output)
 
             if log_meters:
+                logger.add_meter('threshold', self.threshold)  # Log the current threshold
                 logger.add_meter('n', sum(iter_metrics.tp) + sum(iter_metrics.fn))
                 logger.add_meter('recall', round(iter_metrics.recall(),2))
                 logger.add_meter('precision', round(iter_metrics.precision(),2))
@@ -795,6 +805,7 @@ class AutoTileEvaluator(Evaluator):
 
             if wandb_flag:
                 wandb.log({
+                    'threshold': self.threshold,
                     'n': sum(iter_metrics.tp) + sum(iter_metrics.fn),
                     'recall': iter_metrics.recall(),
                     'precision': iter_metrics.precision(),
@@ -814,6 +825,7 @@ class AutoTileEvaluator(Evaluator):
 
         if wandb_flag:
             wandb.run.summary.update({
+                'threshold': self.threshold,
                 'recall': self.metrics.recall(),
                 'precision': self.metrics.precision(),
                 'f1_score': self.metrics.fbeta_score(),

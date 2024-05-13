@@ -765,8 +765,8 @@ class ImageLevelMetrics(Metrics):
         pred_binary = preds['binary'].squeeze()
         # print('gt_binary:',gt_binary)
         # Convert to boolean for logical operations
-        gt_binary_bool = gt_binary > 0.5
-        pred_binary_bool = pred_binary > 0.5
+        gt_binary_bool = gt_binary.bool()
+        pred_binary_bool = pred_binary.bool()
 
         # Calculate True Positives, False Positives, False Negatives, True Negatives
         self.tp[0] += ((gt_binary_bool & pred_binary_bool).sum().item())
