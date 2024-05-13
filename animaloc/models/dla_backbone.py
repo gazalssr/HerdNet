@@ -147,21 +147,13 @@ class DLAEncoderDecoder(nn.Module):
 
         return cls, decode
 
-    # def load_custom_pretrained_weights(self, weight_path):
-    #     ''' Load custom pretrained weights into the model. '''
-    #     pretrained_dict = torch.load(weight_path)
-    #     model_dict = self.state_dict()
-    #     pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
-    #     model_dict.update(pretrained_dict)
-    #     self.load_state_dict(model_dict)
-    #     print("Custom pretrained weights loaded successfully.")
     ########################################################
     def adapt_keys(self, pretrained_dict):
         ''' Adapt keys from the pretrained model to fit the current model structure. '''
         new_keys = {}
         for k in pretrained_dict:
-            # Adapt the keys based on the structure of model_dict you've shown
-            new_key = 'base_0.' + k  # This now consistently applies 'base_0.' to all keys
+            # Adapt the keys based on the structure of model_dict
+            new_key = 'base_0.' + k 
             new_keys[new_key] = pretrained_dict[k]
         return new_keys
 
