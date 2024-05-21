@@ -306,7 +306,7 @@ class Trainer:
             # training
             train_output = self._train(epoch, warmup_iters, wandb_flag)
             if wandb_flag:
-                wandb.log({'train_loss': train_output, 'epoch': epoch})
+                wandb.log({'train_FComboloss': train_output, 'epoch': epoch})
                 wandb.log({'lr': self.optimizer.param_groups[0]["lr"]})
 
             # validation
@@ -321,8 +321,18 @@ class Trainer:
                     print(f'{self.evaluator.header} {validate_on}: {val_output:.4f}')
 
                     if wandb_flag:
-                        wandb.log({validate_on: val_output, 'epoch': epoch})
-
+                        # wandb.log({validate_on: val_output, 'epoch': epoch})
+                        wandb.log({
+                    'epoch': epoch,
+                    'recall': self.evaluator.metrics.recall(),
+                    'precision': self.evaluator.metrics.precision(),
+                    'f1_score': self.evaluator.metrics.fbeta_score(),
+                    'mse': self.evaluator.metrics.mse(),
+                    'mae': self.evaluator.metrics.mae(),
+                    'rmse': self.evaluator.metrics.rmse(),
+                    'accuracy': self.evaluator.metrics.accuracy(),
+                    # 'mAP': self.evaluator.metrics.mAP()
+                })
                 elif self.val_dataloader is not None:
                     val_flag = True
                     val_output = self.evaluate(epoch, wandb_flag=wandb_flag)
@@ -423,7 +433,7 @@ class Trainer:
             # training
             train_output = self._train(epoch, wandb_flag=wandb_flag) 
             if wandb_flag:
-                wandb.log({'train_loss': train_output, 'epoch': epoch})
+                wandb.log({'train_FCombo_loss': train_output, 'epoch': epoch})
                 wandb.log({'lr': self.optimizer.param_groups[0]["lr"]})
 
             # validation
@@ -444,8 +454,18 @@ class Trainer:
                     val_flag = True
                     val_output = self.evaluate(epoch, wandb_flag=wandb_flag)
                     if wandb_flag:
-                        wandb.log({'val_loss': val_output, 'epoch': epoch})
-                
+                        # wandb.log({'val_loss': val_output, 'epoch': epoch})
+                        wandb.log({
+                        'epoch': epoch,
+                        'recall': self.evaluator.metrics.recall(),
+                        'precision': self.evaluator.metrics.precision(),
+                        'f1_score': self.evaluator.metrics.fbeta_score(),
+                        'mse': self.evaluator.metrics.mse(),
+                        'mae': self.evaluator.metrics.mae(),
+                        'rmse': self.evaluator.metrics.rmse(),
+                        'accuracy': self.evaluator.metrics.accuracy(),
+                        # 'mAP': self.evaluator.metrics.mAP()
+                    })
                 # save checkpoint(s)
                 if val_flag and checkpoints =='best' and self._is_best(val_output, mode = select):
                     print('Best model saved - Epoch {} - Validation value: {:.6f}'.format(epoch, val_output))

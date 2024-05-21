@@ -197,7 +197,6 @@ class Metrics:
         self._confusion_matrix = numpy.array([[1.]])
         self._total_count = [sum(self._total_count)]
 
-    ################## NEW Adapted Precision Code ###################
     def precision(self, c: int = 1) -> float:
         ''' Precision 
         Args:
@@ -222,8 +221,6 @@ class Metrics:
             else:
                 return float(0)
 
-
-    ######################## NEW code for Recall ###########
     def recall(self, c: int = 1) -> float:
         ''' Recall 
         Args:
@@ -249,7 +246,7 @@ class Metrics:
             else:
                 return float(0)
    
-    ############## New f-beta code ##############
+  
     def fbeta_score(self, c: int = 1, beta: int = 1) -> float:
         ''' F-beta score 
         Args:
@@ -284,7 +281,7 @@ class Metrics:
             else:
                 return float(0)
 
-    ############# new mae code #######
+  
     def mae(self, c: int = 1) -> float:
         ''' Mean Absolute Error
         Args:
@@ -308,7 +305,6 @@ class Metrics:
                 return 0.0
 
     
-    ############ NEW MSE code ##################
     def mse(self, c: int = 1) -> float:
         ''' Mean Squared Error
         Args:
@@ -326,7 +322,7 @@ class Metrics:
                 raise ValueError("Class index out of range.")
             return float(self._sum_squared_error[c] / self._n_calls[c]) if self._n_calls[c] else 0.0
 
-    ################## New RMSE Code ########
+  
     def rmse(self, c: int = 1) -> float:
         ''' Root Mean Squared Error
         Args:
@@ -368,7 +364,7 @@ class Metrics:
             return self._compute_AP(recalls, precisions)
 
     
-    ################################## NEW rec_pre_lists ###########################
+   
     def rec_pre_lists(self, c: int = 1) -> tuple:
         '''Recalls and Precisions lists for both binary and object detection tasks.
         
@@ -384,7 +380,7 @@ class Metrics:
             return [], []
 
         else:  # Object detection or multiclass classification case
-            c = c - 1  # Adjust for 0-based indexing
+            c = c - 1 
 
             if len(self._ap_tables[c]) == 0:
                 return [], []
@@ -401,7 +397,7 @@ class Metrics:
 
             return recalls.tolist(), precisions.tolist()
 
-    ##################### New Confusion Code #############################
+   
     def confusion(self, c: int = 1) -> float:
         ''' Construct the confusion matrix for binary classification tasks
         or return interclass confusion for a specified class in object detection tasks.
@@ -431,7 +427,7 @@ class Metrics:
             cm_row = self._confusion_matrix[c]
             p = cm_row[c] / sum(cm_row) if sum(cm_row) else 0.
             return 1 - p
-############ No Need To Change ##########
+
     def accuracy(self) -> float:
         ''' Classification accuracy 
         
@@ -447,7 +443,7 @@ class Metrics:
             return 0.
     
    
-    ######## New total count function ###########
+ 
     def total_count(self, c: int = 1) -> int:
         ''' Total class count
         Args: 

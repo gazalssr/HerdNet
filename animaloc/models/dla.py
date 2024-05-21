@@ -316,20 +316,7 @@ class DLA(nn.Module):
 
             return x
 
-    # def load_pretrained_model(self,  data='imagenet', name='dla34', hash='ba72cf86'):
-    #     fc = self.fc
-    #     if name.endswith('.pth'):
-    #         model_weights = torch.load(data + name)
-    #     else:
-    #         model_url = get_model_url(data, name, hash)
-    #         model_weights = model_zoo.load_url(model_url)
-    #     num_classes = len(model_weights[list(model_weights.keys())[-1]])
-    #     self.fc = nn.Conv2d(
-    #         self.channels[-1], num_classes,
-    #         kernel_size=1, stride=1, padding=0, bias=True)
-    #     self.load_state_dict(model_weights)
-    #     self.fc = fc
-    ######################UPDATED load_trained_parameters ###########################
+ 
    
     def load_pretrained_model(self, data='imagenet', name='dla34', hash='ba72cf86', local_path=None):
         fc = self.fc  # Save the final classification layer to restore later
@@ -356,14 +343,13 @@ class DLA(nn.Module):
         # Handle different numbers of classes in the pretrained model
         try:
             num_classes = model_weights['fc.weight'].size(0)
-        except KeyError:  # Adapt this key based on your model's specific state dict
+        except KeyError:  
             num_classes = len(model_weights[list(model_weights.keys())[-1]])
 
         # Reinitialize the fc layer to match the number of classes from the weights
         self.fc = nn.Conv2d(self.channels[-1], num_classes, kernel_size=1, stride=1, padding=0, bias=True)
         self.load_state_dict(model_weights, strict=False)
         self.fc = fc  # Restore the original fc layer
-#################################################################
 
 
 def dla34(pretrained, **kwargs):  # DLA-34

@@ -124,26 +124,7 @@ class CSVDataset(Dataset):
         img_path = os.path.join(self.root_dir, img_name)
 
         return PIL.Image.open(img_path).convert('RGB')
-    ################# Previous Code for target function##########
-    # def _load_target(self, index: int) -> Dict[str,List[Any]]:
-    #     img_name = self._img_names[index]
-    #     annotations = self.data[self.data['images'] == img_name]
-    #     annotations = annotations.drop(columns='images')
-
-    #     target = {
-    #         'image_id': [index], 
-    #         'image_name': [img_name]
-    #         }
-
-    #     for key in annotations.columns:
-    #         target.update({key: list(annotations[key])})
-
-    #         # convert annotations to tuple
-    #         if key == 'annos': 
-    #             target.update({key: [list(a.get_tuple) for a in annotations[key]]})
-
-    #     return target
-############### New Target Function(adapted to binary) ######################
+ 
     def _load_target(self, index: int) -> Dict[str, Any]:
         img_name = self._img_names[index]
         annotations = self.data[self.data['images'] == img_name]
@@ -169,135 +150,7 @@ class CSVDataset(Dataset):
                     target[key] = annotations[key].tolist()
 
         return target
-   
-############### Previous code for transforms Function ####################
-#     def _transforms(
-#         self, 
-#         image: PIL.Image.Image, 
-#         target: dict
-#         ) -> Tuple[torch.Tensor, dict]:
 
-#         label_fields = target.copy()
-#         for key in ['annos','image_id','image_name']:
-#             label_fields.pop(key)
-
-#         if self.albu_transforms:
-
-#             # Bounding boxes
-#             if self.anno_type == 'BoundingBox':
-#                 transform_pipeline = albumentations.Compose(
-#                     self.albu_transforms, 
-#                     bbox_params=albumentations.BboxParams(
-#                         format='pascal_voc', 
-#                         label_fields=list(label_fields.keys())
-#                     )
-#                 )
-                
-#                 transformed = transform_pipeline(
-#                     image = numpy.array(image),
-#                     bboxes = target['annos'],
-#                     **label_fields
-#                 )
-
-#                 tr_image = numpy.asarray(transformed['image'])
-#                 transformed.pop('image')
-
-#                 transformed['boxes'] = transformed['bboxes']
-#                 transformed.pop('bboxes')
-
-#                 for key in ['image_id','image_name']:
-#                     transformed[key] = target[key]
-
-#                 tr_image,  tr_target = SampleToTensor()(tr_image, transformed)
-
-#                 if self.end_transforms is not None:
-#                     for trans in self.end_transforms:
-#                         tr_image, tr_target = trans(tr_image, tr_target)
-
-#                 return tr_image, tr_target
-            
-#             # Points
-#             if self.anno_type == 'Point':
-#                 transform_pipeline = albumentations.Compose(
-#                     self.albu_transforms, 
-#                     keypoint_params=albumentations.KeypointParams(
-#                         format='xy', 
-#                         label_fields=list(label_fields.keys())
-#                     )
-#                 )
-                
-#                 transformed = transform_pipeline(
-#                     image = numpy.array(image),
-#                     keypoints = target['annos'],
-#                     **label_fields
-#                 )
-            
-#                 tr_image = numpy.asarray(transformed['image'])
-#                 transformed.pop('image')
-
-#                 transformed['points'] = transformed['keypoints']
-#                 transformed.pop('keypoints')
-
-#                 for key in ['image_id','image_name']:
-#                     transformed[key] = target[key]
-
-#                 tr_image,  tr_target = SampleToTensor()(tr_image, transformed, 'point')
-
-#                 if self.end_transforms is not None:
-#                     for trans in self.end_transforms:
-#                         tr_image, tr_target = trans(tr_image, tr_target)
-
-#                 return tr_image, tr_target
-        
-#         else:
-#             return image, target
- 
-#  ################################# New code for Transforms function ##############################
-#     def _transforms(self, image: PIL.Image.Image, target: dict) -> Tuple[torch.Tensor, dict]:
-#         label_fields = target.copy()
-#         for key in ['annos', 'image_id', 'image_name']:
-#             label_fields.pop(key, None)  # Adjust or handle annotation fields as needed
-
-#         # Default to untransformed image if no albumentations transformations
-#         transformed = {'image': image}
-
-#         if self.albu_transforms:
-#             # Initialize albumentations parameters based on annotation type
-#             albumentations_params = {}
-#             # Conditional setup for bbox_params or keypoint_params based on 'annos' presence
-#             if self.anno_type == 'BoundingBox' and 'annos' in target and target['annos']:
-#                 albumentations_params['bbox_params'] = albumentations.BboxParams(format='pascal_voc', label_fields=['labels'])
-#             elif self.anno_type == 'Point' and 'annos' in target and target['annos']:
-#                 albumentations_params['keypoint_params'] = albumentations.KeypointParams(format='xy', label_fields=['labels'])
-
-#             # Setup the transformation pipeline with conditional parameters
-#             transform_pipeline = albumentations.Compose(self.albu_transforms, **albumentations_params)
-#             # Prepare data for transformation, including conditionally bboxes or keypoints
-#             albumentations_input = {'image': numpy.array(image)}
-#             if 'annos' in target:
-#                 if self.anno_type == 'BoundingBox':
-#                     albumentations_input['bboxes'] = target['annos']
-#                 elif self.anno_type == 'Point':
-#                     albumentations_input['keypoints'] = target['annos']
-
-#             # Apply the transformation pipeline
-#             transformed = transform_pipeline(**albumentations_input, **label_fields)
-#             transformed['image'] = numpy.asarray(transformed['image'])  
-
-#         # If no albumentations transformations are specified, directly convert image to tensor format
-#         else:
-#             transformed['image'] = torchvision.transforms.ToTensor()(image)
-
-#         # Convert transformed image and target to tensors, handling annotation type
-#         tr_image, tr_target = SampleToTensor()(transformed['image'], target, anno_type=None if self.anno_type == 'binary' else self.anno_type.lower())
-
-#         # Apply any additional transformations specified in `end_transforms`
-#         if self.end_transforms is not None:
-#             for trans in self.end_transforms:
-#                 tr_image, tr_target = trans(tr_image, tr_target)
-
-#         return tr_image, tr_target
-########################## NEWWWWWWWWWWWWWW #################
     def _transforms(self, image: PIL.Image.Image, target: dict) -> Tuple[torch.Tensor, dict]:
         label_fields = target.copy()
         for key in ['annos', 'image_id', 'image_name']:
@@ -315,8 +168,7 @@ class CSVDataset(Dataset):
                     albumentations_params['keypoint_params'] = albumentations.KeypointParams(format='xy', label_fields=['labels'])
                     transform_pipeline = albumentations.Compose(self.albu_transforms, **albumentations_params)
                 elif self.anno_type == 'Binary':
-                    # For binary annotations, you might not need to modify the target,
-                    # so you can directly apply image transformations without target transformations
+
                     transform_pipeline = albumentations.Compose(self.albu_transforms)
                 
                 # Prepare data for transformation

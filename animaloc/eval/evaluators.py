@@ -322,43 +322,7 @@ class Evaluator:
         return pandas.DataFrame(data = res)
     
     @property
-    # def detections(self) -> pandas.DataFrame:
-    #     ''' Returns detections (image id, location, label and score) in a pandas
-    #     dataframe '''
-        
-    #     assert self._stored_metrics is not None, \
-    #         'No detections have been stored, please use the evaluate method first.'
-
-    #     img_names = self.dataloader.dataset._img_names
-    #     dets = self._stored_metrics.detections
-    #     for det in dets:
-    #         det['images'] = img_names[det['images']]
-
-    #     return pandas.DataFrame(data = dets)
-  
-    # def _vizual(self, image: Any, target: Any, output: Any):
-    #     fig = self.vizual_fn(image=image, target=target, output=output)
-    #     return fig
-    # def detections(self) -> pandas.DataFrame:
-    #     ''' Returns detections (image id, location, label and score) in a pandas
-    #     dataframe '''
-
-    #     assert self._stored_metrics is not None, \
-    #         'No detections have been stored, please use the evaluate method first.'
-
-    #     img_names = self.dataloader.dataset._img_names
-    #     dets = self._stored_metrics.detections
-        
-    #     for det in dets:
-    #         index = det['images']
-    #         if index < len(img_names):
-    #             det['images'] = img_names[index]
-    #         else:
-    #             print(f"IndexError: {index} is out of range for img_names with length {len(img_names)}")
-    #             det['images'] = 'IndexError'  # You might want to handle this more gracefully
-
-    #     return pandas.DataFrame(data=dets)
-    ##################### NEWWWWWWWWWWWWWWWWW# 
+   
     def detections(self) -> pandas.DataFrame:
         ''' Returns detections (image id, location, label, and score) in a pandas dataframe '''
 
@@ -625,7 +589,7 @@ class TileEvaluator(Evaluator):
             output = self.prepare_feeding(targets, output)
 
             iter_metrics.feed(**output)
-            # iter_metrics.aggregate()
+
             if log_meters:
                 logger.add_meter('threshold', self.threshold)  # Log the current threshold
                 logger.add_meter('n', sum(iter_metrics.tp) + sum(iter_metrics.fn))
@@ -637,7 +601,6 @@ class TileEvaluator(Evaluator):
                 logger.add_meter('RMSE', round(iter_metrics.rmse(),2))
 
             if wandb_flag:
-                wandb.init()
                 wandb.log({
                     'threshold': self.threshold,
                     'n': sum(iter_metrics.tp) + sum(iter_metrics.fn),
@@ -658,10 +621,9 @@ class TileEvaluator(Evaluator):
         print("Recall:", self._stored_metrics.recall())
         print("Precision:", self._stored_metrics.precision())
         mAP = numpy.mean([self.metrics.ap(c) for c in range(1, self.metrics.num_classes)]).item()
-        # self.metrics.aggregate()
-
+    
         if wandb_flag:
-            wandb.run.summary['threshold']= self.threshold()
+            wandb.run.summary['threshold']= self.threshold
             wandb.run.summary['recall'] =  self.metrics.recall()
             wandb.run.summary['precision'] =  self.metrics.precision()
             wandb.run.summary['f1_score'] =  self.metrics.fbeta_score()

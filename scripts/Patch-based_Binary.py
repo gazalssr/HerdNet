@@ -9,6 +9,7 @@ set_seed(9292)
 import matplotlib.pyplot as plt
 from animaloc.datasets import FolderDataset, CSVDataset, BinaryFolderDataset
 from animaloc.data.batch_utils import show_batch, collate_fn
+from animaloc.data.samplers import BinaryBatchSampler
 from torch.utils.data import DataLoader
 import torch
 import albumentations as A
@@ -17,9 +18,8 @@ import wandb
 import torch
 from animaloc.models import DLAEncoder, DLAEncoderDecoder
 from animaloc.models import LossWrapper
-from animaloc.train.losses import FocalLoss, BinaryFocalLoss, FocalComboLoss
+from animaloc.train.losses import FocalLoss, BinaryFocalLoss, FocalComboLoss_M, FocalComboLoss_P
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss, L1Loss
-wandb.init(project='HerdNet', entity='ghazaleh-serati')
 from albumentations.pytorch import ToTensorV2
 NUM_WORKERS= 2
 import albumentations as A
@@ -30,8 +30,8 @@ num_classes = 2
 batch_size=32
 down_ratio = 2
 train_dataset = BinaryFolderDataset(preprocess=preprocess,
-    csv_file = '/herdnet/DATASETS/train_complete_CAH/Train_binary_gt.csv',
-    root_dir = '/herdnet/DATASETS/train_complete_CAH',
+    csv_file = '/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/train_CF/Train_binary_gt.csv',
+    root_dir = '/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/train_CF',
     albu_transforms = [
         A.VerticalFlip(p=0.5),
         A.HorizontalFlip(p=0.5),
@@ -44,12 +44,12 @@ train_dataset = BinaryFolderDataset(preprocess=preprocess,
         BinaryTransform(),
         ])]
     )
-# train_dataset.data.to_csv('/herdnet/DATASETS/train_complete_CAH/Train_binary_gt.csv', index=False)
+# train_dataset.data.to_csv('/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/train_CF/Train_binary_gt.csv', index=False)
 import os
 
 val_dataset = BinaryFolderDataset(preprocess=preprocess,
-    csv_file = '/herdnet/DATASETS/val_complete_CAH/Val_binary_gt.csv',
-    root_dir = '/herdnet/DATASETS/val_complete_CAH',
+    csv_file = '/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/val_CF/Val_binary_gt.csv',
+    root_dir = '/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/val_CF/',
     albu_transforms = [
         A.Normalize(p=1.0),
         ToTensorV2()
@@ -58,21 +58,29 @@ val_dataset = BinaryFolderDataset(preprocess=preprocess,
         BinaryTransform(),
         ])]
     )
-# val_dataset.data.to_csv('/herdnet/DATASETS/val_complete_CAH/Val_binary_gt.csv', index=False)
+# val_dataset.data.to_csv('/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/val_CF/Val_binary_gt.csv', index=False)
 
 
 test_dataset = BinaryFolderDataset(preprocess=preprocess,
-    csv_file = '/herdnet/DATASETS/test_complete_CAH/Test_binary_gt.csv',
-    root_dir = '/herdnet/DATASETS/test_complete_CAH',
+    csv_file = '/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/test_W/Test_binary_gt.csv',
+    root_dir = '/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/test_W/',
     albu_transforms = [A.Normalize(p=1.0)], 
     end_transforms = [BinaryMultiTransformsWrapper([
         BinaryTransform(),
         ])]
     )
-# test_dataset.data.to_csv('/herdnet/DATASETS/test_complete_CAH/Test_binary_gt.csv', index=False)
+
+# Initialize BinaryBatchSampler for training
+train_sampler = BinaryBatchSampler(
+    dataset=train_dataset,
+    col='binary',  
+    batch_size=32,  # Even batch_size
+    shuffle=True
+)
+# test_dataset.data.to_csv('/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/test_W/Test_binary_gt.csv', index=False)
 # Dataloaders
 from torch.utils.data import DataLoader
-train_dataloader = DataLoader(dataset = train_dataset, batch_size= 15 , num_workers= 2, shuffle= True)
+train_dataloader = DataLoader(dataset = train_dataset, batch_sampler=train_sampler, num_workers= 2)
 
 val_dataloader = DataLoader(dataset = val_dataset, batch_size=1 , num_workers= 2, shuffle= False)
 
@@ -108,7 +116,7 @@ dla_encoder = DLAEncoder(num_classes=num_classes, pretrained=True).cuda()
     #         print(f"Number of targets in this batch: {len(targets['binary'])}")
     #         print("Targets tensor:")
     #         print(targets['binary'])
-    #     elif isinstance(targets, torch.Tensor):  # Assuming you're using PyTorch
+    #     elif isinstance(targets, torch.Tensor):  
     #         print(f"Number of targets in this batch: {len(targets)}")
     #         print("Targets tensor:")
     #         print(targets)
@@ -135,6 +143,7 @@ non_empty_patches = 1100
 # # Class weights
 weight_for_empty = total_patches / (2 * empty_patches)
 weight_for_non_empty = total_patches / (2 * non_empty_patches)
+################## BCEWithLogitsLoss ############################
 
 # # # Create a tensor of weights for use in BCEWithLogitsLoss
 # # # weights = torch.tensor([weight_for_empty, weight_for_non_empty], dtype=torch.float32).cuda()
@@ -148,11 +157,11 @@ weight_for_non_empty = total_patches / (2 * non_empty_patches)
 # losses = [
 #     {'loss': bce_loss_with_weights, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'bce_loss'}
 # ]
-######## Scenario2: using one loss without weights
+######## Scenario2: using BCELoss without weights
 # losses = [
 #       {'loss': BCEWithLogitsLoss(reduction='mean'), 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'bce_loss'}
 #       ]
-###### Scenario 3: using two losses with weights 
+###### Scenario 3: using FCLoss and BCELoss with weights 
 # Initialize FocalLoss with appropriate alpha and weights
 # focal_loss = BinaryFocalLoss(alpha_pos=0.85, alpha_neg=0.15, beta=3, reduction='mean')
 
@@ -162,21 +171,26 @@ weight_for_non_empty = total_patches / (2 * non_empty_patches)
 #     {'loss': bce_loss_with_weights, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'bce_loss'}
 # ]
 ###### Scenario 4: using weighted Focal-loss only
-focal_loss = BinaryFocalLoss(alpha_pos=0.75, alpha_neg=0.25, beta=4, reduction='mean', weights=[weight_for_empty, weight_for_non_empty])
-losses = [
-    {'loss': focal_loss, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'focal_loss'}]
-################## Scenario 5: Focal cOmbo loss with weights #########################
-focal_combo_loss = FocalComboLoss(alpha_pos=0.75, alpha_neg=0.25, beta=4, reduction='mean', weights=[weight_for_empty, weight_for_non_empty], dice_weight=0.3  # Adjust the balance between focal and dice loss components
+# focal_loss = BinaryFocalLoss(alpha_pos=0.75, alpha_neg=0.25, beta=4, reduction='mean', weights=[weight_for_empty, weight_for_non_empty])
+# losses = [
+#     {'loss': focal_loss, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'focal_loss'}]
+# ################## Scenario 5: Focal combo loss with weights (My modified FCloss) 
+# focal_combo_loss = FocalComboLoss_M(alpha_pos=0.75, alpha_neg=0.25, gamma=4, reduction='mean', weights=[weight_for_empty, weight_for_non_empty], dice_weight=0.3  # Adjust the balance between focal and dice loss components
+# )
+# losses = [{'loss': focal_combo_loss, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'focal_combo_loss'}]
+################## Scenario 6: Focal combo loss with weights with 1/beta as denominator (FCLoss in the paper) 
+focal_combo_loss = FocalComboLoss_P(alpha=0.35,beta=3, gamma=2, reduction='mean', weights=[weight_for_empty, weight_for_non_empty] # Adjust the balance between focal and dice loss components
 )
 losses = [{'loss': focal_combo_loss, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'focal_combo_loss'}]
-
 # else:
 #   losses = [
 #       {'loss': L1Loss(reduction='mean'), 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'bce_loss'},
 #       ]
     
 dla_encoder = LossWrapper(dla_encoder, losses=losses)
-##########################################################
+
+######################################################################################################################
+# DLA Auto_Encoder
 # dla_encoder_decoder = LossWrapper(dla_encoder_decoder, losses=losses)
 
 #Freezing the layers in the network
@@ -235,23 +249,20 @@ mkdir(work_dir)
 
 lr = 1e-4
 weight_decay = 1e-3
-epochs =10
+epochs =100
 # optimizer = Adam(params=dla_encoder_decoder.parameters(), lr=lr, weight_decay=weight_decay)
 optimizer = Adam(params=params_to_update, lr=lr, weight_decay=weight_decay)
-####### Adding Binry Option #######
-##### NEW ####
 img_names = val_dataloader.dataset._img_names
 metrics = ImageLevelMetrics(img_names=img_names, num_classes=2)
 # metrics = ImageLevelMetrics(num_classes=num_classes)
 metrics.binary_annotations = True
 #AutotileEvaluator for autoencoder and tileEvaluator for DLA encoder
 evaluator = TileEvaluator(
-    # metrics_class=ImageLevelMetrics,
-    # threshold=0.3,
+    metrics_class=ImageLevelMetrics,
+    threshold=0.3,
     model=dla_encoder,
     dataloader=val_dataloader,
-    # num_classes=num_classes,
-    metrics=metrics,
+    num_classes=num_classes,
     stitcher=None,
     work_dir=work_dir,
     header='validation',
@@ -311,20 +322,14 @@ detections_df.to_csv('/herdnet/CAH_COMPLETE_Val_Final_detection_file.csv', index
 
 ########################################## Threshold Tuning ################################################
 import numpy as np
-wandb.init(project="herdnet_pretrain_threshold_tuning", config={"thresholds": np.linspace(0.1, 0.9, 9).tolist()})
-
 thresholds = np.linspace(0.1, 0.9, 9)
 f1_scores = {}
 
 for threshold in thresholds:
     evaluator.threshold = threshold  # Update the threshold attribute of the evaluator
-    f1_score = evaluator.evaluate(returns='f1_score', viz=True, wandb_flag=True)
+    f1_score = evaluator.evaluate(returns='f1_score', viz=True)
     print(f"Threshold: {threshold}, F1 Score: {f1_score}")
     f1_scores[threshold] = f1_score
-    wandb.log({"Threshold": threshold, "F1 Score": f1_score})
-
-# Cleanup after threshold tuning
-wandb.finish()
 
 # Plotting F1 Score vs. Threshold
 plt.figure(figsize=(10, 5))
@@ -344,12 +349,11 @@ mkdir(test_dir)
 test_evaluator = TileEvaluator(
     model=dla_encoder,
     dataloader=test_dataloader,
-    # metrics_class=ImageLevelMetrics,
-    metrics=metrics,
-    ##### NEW @
-    # num_classes=num_classes,
+    metrics_class=ImageLevelMetrics,
+   num_classes=num_classes,
     stitcher=None,
     work_dir=test_dir,
+    threshold=0.3,
     header='test'
     )
 if wandb.run is not None:
@@ -374,7 +378,7 @@ test_detections.to_csv('/herdnet/test_output/Binary_test_detections_WAH.csv', in
 df_val_d.rename(columns={'binary': 'Ground truth','count_1': 'empty_count', 'count_2': 'non_empty_count'}, inplace=True)
 detections_df=pd.read_csv('/herdnet/test_output/Binary_test_detections_WAH.csv')
 ############### Comparison of the detections and gt #########
-gt_df = pd.read_csv('/herdnet/DATASETS/test_patches_stratified/Test_binary_gt.csv')
+gt_df = pd.read_csv('/herdnet/DATASETS/test_complete_CAH/Test_binary_gt.csv')
 # Create a new column 'Ground_truth' in df_detection and initialize with NaN
 detections_df['Ground_truth'] = pd.NA
 
