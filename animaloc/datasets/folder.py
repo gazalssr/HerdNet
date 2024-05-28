@@ -267,7 +267,12 @@ class BinaryFolderDataset(CSVDataset):
         # Clean up the data 
         columns_to_remove = ['annos', 'subset', 'from_folder', 'labels', 'species']
         self.data.drop(columns=columns_to_remove, errors='ignore', inplace=True)
-
+        # Print statements for weightening process
+        empty_patches_count = len(folder_only_images)
+        non_empty_patches_count = len(self.data[self.data['binary'] == 1])
+        
+        print(f"Number of empty patches: {empty_patches_count}")
+        print(f"Number of non-empty patches: {non_empty_patches_count}")
 
     def _load_image(self, index: int) -> Image.Image:
         img_name = self.data.at[index, 'images']
@@ -298,15 +303,3 @@ class BinaryFolderDataset(CSVDataset):
         self.data.to_csv(save_path, index=False)
 
     
-    def derive_base_image_id(self, image_name):
-        # Remove the patch number from the end of 'images' filenames
-        if "_" in image_name:
-            parts = image_name.rsplit("_", 1)  # Split from the right on the last underscore
-            base_image_id = parts[0] + '.jpg'  # Reattach '.jpg' to form the base image ID
-        else:
-            base_image_id = image_name  # Handle edge cases where the expected pattern does not match
-        return base_image_id
-    
-    def save_binary_csv(self, save_path):
-        # Save the DataFrame to a CSV file without the removed columns
-        self.data.to_csv(save_path, index=False)

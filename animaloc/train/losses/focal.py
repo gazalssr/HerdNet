@@ -251,7 +251,34 @@ class FocalComboLoss_P(nn.Module):
         self.reduction = reduction
         self.weights = weights  # Array or tuple with [weight_for_negative, weight_for_positive]
         self.eps = eps
+####################### unweighted diceloss #########################3
+    # def forward(self, outputs, targets):
+    #     outputs = torch.clamp(outputs, min=self.eps, max=1 - self.eps)
+    #     bce_loss = F.binary_cross_entropy_with_logits(outputs, targets, reduction='none')
+        
+    #     probas = torch.sigmoid(outputs)
+    #     p_t = torch.where(targets == 1, probas, 1 - probas)
+    #     focal_factor = (1 - p_t) ** self.gamma
+    #     weight_factor = torch.where(targets == 1, self.weights[1], self.weights[0])
+    #     focal_loss = weight_factor * focal_factor * bce_loss
 
+    #     # Calculate the modified Dice Loss
+    #     inputs = torch.sigmoid(outputs)
+    #     intersection = (inputs * targets).sum()
+    #     total = (inputs + targets).sum()
+    #     dice_score = (2. * intersection + self.eps) / (total + self.eps)
+    #     modified_dice_score = dice_score ** (1 / self.beta) # The change compared to standard dice loss
+    #     dice_loss = 1 - modified_dice_score
+
+    #     # Combine the losses using alpha as the balancing factor
+    #     combined_loss = self.alpha * focal_loss + (1 - self.alpha) * dice_loss
+    #     if self.reduction == 'mean':
+    #         combined_loss = combined_loss.mean()
+    #     elif self.reduction == 'sum':
+    #         combined_loss = combined_loss.sum()
+
+    #     return combined_loss
+    ############ weighted dice loss ##################
     def forward(self, outputs, targets):
         outputs = torch.clamp(outputs, min=self.eps, max=1 - self.eps)
         bce_loss = F.binary_cross_entropy_with_logits(outputs, targets, reduction='none')
@@ -262,16 +289,26 @@ class FocalComboLoss_P(nn.Module):
         weight_factor = torch.where(targets == 1, self.weights[1], self.weights[0])
         focal_loss = weight_factor * focal_factor * bce_loss
 
-        # Calculate the modified Dice Loss
+        # Calculate the modified Dice Loss with weights
         inputs = torch.sigmoid(outputs)
-        intersection = (inputs * targets).sum()
-        total = (inputs + targets).sum()
+
+        # Ensure that the tensors are 4-dimensional
+        if inputs.dim() == 4 and targets.dim() == 4:
+            intersection = (inputs * targets).sum(dim=(1, 2, 3))  #####
+            total = (inputs + targets).sum(dim=(1, 2, 3))  #####
+        else:
+            intersection = (inputs * targets).sum()  # For non-4D tensors, sum all elements
+            total = (inputs + targets).sum()  # For non-4D tensors, sum all elements
+        
         dice_score = (2. * intersection + self.eps) / (total + self.eps)
         modified_dice_score = dice_score ** (1 / self.beta) # The change compared to standard dice loss
         dice_loss = 1 - modified_dice_score
 
+        # Apply weights to dice loss
+        weighted_dice_loss = weight_factor.mean() * dice_loss  #####
+
         # Combine the losses using alpha as the balancing factor
-        combined_loss = self.alpha * focal_loss + (1 - self.alpha) * dice_loss
+        combined_loss = self.alpha * focal_loss + (1 - self.alpha) * weighted_dice_loss  #####
         if self.reduction == 'mean':
             combined_loss = combined_loss.mean()
         elif self.reduction == 'sum':
