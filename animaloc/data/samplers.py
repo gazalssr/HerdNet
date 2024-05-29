@@ -15,7 +15,7 @@ __license__ = "CC BY-NC-SA 4.0"
 __version__ = "0.2.0"
 
 import torch
-
+import matplotlib.pyplot as plt
 from torch.utils.data import Sampler
 from typing import Iterable, Iterator
 
@@ -102,3 +102,38 @@ class BinaryBatchSampler(Sampler):
     
     def _grouped(self, iterable: Iterable, n: int) -> Iterable:
         return zip(*[iter(iterable)]*n)
+
+@SAMPLERS.register()
+class DataAnalyzer:
+    def __init__(self):
+        pass
+
+    def analyze_batch_composition(self, dataloader, num_batches=10):
+        empty_counts = []
+        non_empty_counts = []
+        for i, (images, targets) in enumerate(dataloader):
+            if i >= num_batches:
+                break
+            if isinstance(targets, dict):
+                targets = targets['binary'] 
+            elif isinstance(targets, torch.Tensor):
+                targets = targets
+            else:
+                raise ValueError("Unexpected target format")
+            
+            batch_empty_count = (targets == 0).sum().item()
+            batch_non_empty_count = (targets == 1).sum().item()
+            empty_counts.append(batch_empty_count)
+            non_empty_counts.append(batch_non_empty_count)
+            # Print batch composition
+            print(f"Batch {i+1}: Empty count = {batch_empty_count}, Non-empty count = {batch_non_empty_count}")
+        return empty_counts, non_empty_counts
+
+    def analyze_precision_trend(self, precision_values):
+        plt.figure(figsize=(10, 5))
+        plt.plot(precision_values, label='Precision')
+        plt.xlabel('Epochs')
+        plt.ylabel('Precision')
+        plt.title('Precision Trend Over Epochs')
+        plt.legend()
+        plt.show()

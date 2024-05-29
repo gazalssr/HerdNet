@@ -150,6 +150,8 @@ class Trainer:
             'validation frequency must be lower or equal to the number of epochs'
         
         self.device = torch.device(device_name)
+        # NEW
+        self.precision_values = []
 
         self.model = model.to(self.device)
         self.train_dataloader = train_dataloader
@@ -195,26 +197,6 @@ class Trainer:
         self.train_logger = CustomLogger(delimiter=' ', filename='training', work_dir=self.work_dir, csv=self.csv_logger)
         self.val_logger = CustomLogger(delimiter=' ', filename='validation', work_dir=self.work_dir, csv=self.csv_logger)
     
-    # def prepare_data(self, images, targets) -> tuple:
-    #     ''' Method to prepare the data before feeding to the model. 
-    #     Can be override by subclass to create a custom Trainer.
-
-    #     Args:
-    #         images,
-    #         targets
-        
-    #     Returns:
-    #         tuple
-    #     '''
-
-    #     images = images.to(self.device)
-
-    #     if isinstance(targets, (list, tuple)):
-    #         targets = [tar.to(self.device) for tar in targets]
-    #     else:
-    #         targets = targets.to(self.device)
-
-    #     return images, targets
     ############# New Preparedata Class #################
     def prepare_data(self, images, targets) -> tuple:
         # print(f"Targets type before processing: {type(targets)}")
@@ -319,7 +301,9 @@ class Trainer:
                     self._prepare_evaluator('validation', epoch)
                     val_output = self.evaluator.evaluate(returns=validate_on, viz=viz)
                     print(f'{self.evaluator.header} {validate_on}: {val_output:.4f}')
-
+                    ## NEW
+                    precision = self.evaluator.metrics.precision()
+                    self.precision_values.append(precision)
                     if wandb_flag:
                         # wandb.log({validate_on: val_output, 'epoch': epoch})
                         wandb.log({
