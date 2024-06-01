@@ -107,7 +107,7 @@ test_dataloader = DataLoader(dataset = test_dataset, batch_size = 1, shuffle = F
 
 ## Define HerdNet for training
 
-# Path to your .pth file (initial pth file)
+
 
 import torch
 pth_path = None #'/herdnet/output/best_model.pth'

@@ -254,6 +254,8 @@ weight_decay = 1e-3
 epochs =1
 # optimizer = Adam(params=dla_encoder_decoder.parameters(), lr=lr, weight_decay=weight_decay)
 optimizer = Adam(params=params_to_update, lr=lr, weight_decay=weight_decay)
+lr_milestones = [30, 60, 90]  # Example milestones
+auto_lr = {'mode': 'min', 'factor': 0.1, 'patience': 10, 'verbose': True}
 img_names = val_dataloader.dataset._img_names
 metrics = ImageLevelMetrics(img_names=img_names, num_classes=2)
 # metrics = ImageLevelMetrics(num_classes=num_classes)
@@ -275,7 +277,9 @@ trainer = Trainer(
     train_dataloader=train_dataloader,
     optimizer=optimizer,
     num_epochs=epochs,
-    evaluator=evaluator,             # metric evaluation
+    evaluator=evaluator, 
+    lr_milestones=lr_milestones,  # Pass the milestones
+    auto_lr=auto_lr,# metric evaluation
     # val_dataloader= val_dataloader, # loss evaluation
     work_dir=work_dir
     )
@@ -382,25 +386,25 @@ data_analyzer.analyze_precision_trend(precision_values,save_path='herdnet/precis
 
 
 ########################################## Threshold Tuning ################################################
-import numpy as np
-thresholds = np.linspace(0.1, 0.9, 9)
-f1_scores = {}
+# import numpy as np
+# thresholds = np.linspace(0.1, 0.9, 9)
+# f1_scores = {}
 
-for threshold in thresholds:
-    evaluator.threshold = threshold  # Update the threshold attribute of the evaluator
-    f1_score = evaluator.evaluate(returns='f1_score', viz=True)
-    print(f"Threshold: {threshold}, F1 Score: {f1_score}")
-    f1_scores[threshold] = f1_score
+# for threshold in thresholds:
+#     evaluator.threshold = threshold  # Update the threshold attribute of the evaluator
+#     f1_score = evaluator.evaluate(returns='f1_score', viz=True)
+#     print(f"Threshold: {threshold}, F1 Score: {f1_score}")
+#     f1_scores[threshold] = f1_score
 
-# Plotting F1 Score vs. Threshold
-plt.figure(figsize=(10, 5))
-plt.plot(list(f1_scores.keys()), list(f1_scores.values()), marker='o', linestyle='-', color='b')
-plt.title('F1 Score vs. Threshold')
-plt.xlabel('Threshold')
-plt.ylabel('F1 Score')
-plt.grid(True)
-plt.show()
-plt.savefig('/herdnet/f1score_Confidence.pdf')
+# # Plotting F1 Score vs. Threshold
+# plt.figure(figsize=(10, 5))
+# plt.plot(list(f1_scores.keys()), list(f1_scores.values()), marker='o', linestyle='-', color='b')
+# plt.title('F1 Score vs. Threshold')
+# plt.xlabel('Threshold')
+# plt.ylabel('F1 Score')
+# plt.grid(True)
+# plt.show()
+# plt.savefig('/herdnet/f1score_Confidence.pdf')
 #################### Test data and evaluation ###########
 # Create output folder
 test_dir = '/herdnet/test_output'
