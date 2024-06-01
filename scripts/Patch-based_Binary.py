@@ -9,7 +9,7 @@ set_seed(9292)
 import matplotlib.pyplot as plt
 from animaloc.datasets import FolderDataset, CSVDataset, BinaryFolderDataset
 from animaloc.data.batch_utils import show_batch, collate_fn
-from animaloc.data.samplers import BinaryBatchSampler
+from animaloc.data.samplers import BinaryBatchSampler, DataAnalyzer
 from torch.utils.data import DataLoader
 import torch
 import albumentations as A
@@ -21,6 +21,8 @@ from animaloc.models import LossWrapper
 from animaloc.train.losses import FocalLoss, BinaryFocalLoss, FocalComboLoss_M, FocalComboLoss_P
 from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss, L1Loss
 from albumentations.pytorch import ToTensorV2
+from animaloc.vizual.plots import PlotTradeOff
+from animaloc.data.samplers import DataAnalyzer
 NUM_WORKERS= 2
 import albumentations as A
 binary=True
@@ -30,8 +32,8 @@ num_classes = 2
 batch_size=32
 down_ratio = 2
 train_dataset = BinaryFolderDataset(preprocess=preprocess,
-    csv_file = '/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/train_CF/Train_binary_gt.csv',
-    root_dir = '/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/train_CF',
+    csv_file = '/herdnet/DATASETS/CAH_no_margins_30/train/Train_binary_gt.csv',
+    root_dir = '/herdnet/DATASETS/CAH_no_margins_30/train/',
     albu_transforms = [
         A.VerticalFlip(p=0.5),
         A.HorizontalFlip(p=0.5),
@@ -48,8 +50,8 @@ train_dataset = BinaryFolderDataset(preprocess=preprocess,
 import os
 
 val_dataset = BinaryFolderDataset(preprocess=preprocess,
-    csv_file = '/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/val_CF/Val_binary_gt.csv',
-    root_dir = '/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/val_CF/',
+    csv_file = '/herdnet/DATASETS/CAH_no_margins_30/val/Val_binary_gt.csv',
+    root_dir = '/herdnet/DATASETS/CAH_no_margins_30/val/',
     albu_transforms = [
         A.Normalize(p=1.0),
         ToTensorV2()
@@ -62,8 +64,8 @@ val_dataset = BinaryFolderDataset(preprocess=preprocess,
 
 
 test_dataset = BinaryFolderDataset(preprocess=preprocess,
-    csv_file = '/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/test_W/Test_binary_gt.csv',
-    root_dir = '/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/test_W/',
+    csv_file = '/herdnet/DATASETS/CAH_no_margins_30/test/Test_binary_gt.csv',
+    root_dir = '/herdnet/DATASETS/CAH_no_margins_30/test/',
     albu_transforms = [A.Normalize(p=1.0)], 
     end_transforms = [BinaryMultiTransformsWrapper([
         BinaryTransform(),
@@ -138,8 +140,8 @@ image= torch.ones([1,3,512,512]).cuda()
 ################ Defining loss Functions ########################
 # Number of patches per class (train datset)
 total_patches = len(train_dataset)
-empty_patches = 9772
-non_empty_patches = 1100
+empty_patches = 1502
+non_empty_patches = 7960
 # # Class weights
 weight_for_empty = total_patches / (2 * empty_patches)
 weight_for_non_empty = total_patches / (2 * non_empty_patches)
@@ -249,7 +251,7 @@ mkdir(work_dir)
 
 lr = 1e-4
 weight_decay = 1e-3
-epochs =100
+epochs =1
 # optimizer = Adam(params=dla_encoder_decoder.parameters(), lr=lr, weight_decay=weight_decay)
 optimizer = Adam(params=params_to_update, lr=lr, weight_decay=weight_decay)
 img_names = val_dataloader.dataset._img_names
@@ -318,6 +320,65 @@ for index, row in detections_df.iterrows():
 
 # Save the updated DataFrame back to a new CSV (optional)
 detections_df.to_csv('/herdnet/CAH_COMPLETE_Val_Final_detection_file.csv', index=False)
+################################## Analyze batch composition for the sampler ##################
+data_analyzer = DataAnalyzer()
+# Collect precision values
+precision_values = [evaluator.metrics.precision() for _ in range(trainer.epochs)]
+train_empty_counts, train_non_empty_counts = data_analyzer.analyze_batch_composition(train_dataloader)
+val_empty_counts, val_non_empty_counts = data_analyzer.analyze_batch_composition(val_dataloader)
+
+# Plot precision trend
+data_analyzer.analyze_precision_trend(precision_values,save_path='herdnet/precision_trend.pdf')
+##################################### Plot gamma-beta tradeoff in focalcomboloss ############
+# beta_values = [2, 2.5, 3, 3.5, 4]
+# gamma_values = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
+# plot_trade_off = PlotTradeOff()
+# eval_epochs = 40
+# def train_and_evaluate_model(beta, gamma, train_dataloader, val_dataloader, model, epochs, work_dir):
+#     print(f"Training with beta={beta} and gamma={gamma}")
+#     focal_combo_loss = FocalComboLoss_P(alpha=0.35, beta=beta, gamma=gamma, reduction='mean', weights=[weight_for_empty, weight_for_non_empty])
+#     losses = [{'loss': focal_combo_loss, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'focal_combo_loss'}]
+
+#     # Initialize the model with the given loss
+#     model = LossWrapper(model, losses=losses)
+    
+#     optimizer = Adam(params=model.parameters(), lr=1e-4, weight_decay=1e-3)
+#     evaluator = TileEvaluator(
+#         metrics_class=ImageLevelMetrics,
+#         threshold=0.3,
+#         model=model,
+#         dataloader=val_dataloader,
+#         num_classes=2,
+#         stitcher=None,
+#         work_dir=work_dir,
+#         header='validation',
+#     )
+    
+#     trainer = Trainer(
+#         model=model,
+#         train_dataloader=train_dataloader,
+#         optimizer=optimizer,
+#         num_epochs=eval_epochs,
+#         evaluator=evaluator,
+#         work_dir=work_dir
+#     )
+    
+#     trainer.start(warmup_iters=100, checkpoints='best', select='max', validate_on='f1_score', wandb_flag=False)
+    
+#     f1_score = evaluator.evaluate(returns='f1_score')
+#     return f1_score
+
+# for beta in beta_values:
+#     f1_scores = []
+#     for gamma in gamma_values:
+#         f1_score = train_and_evaluate_model(beta, gamma, train_dataloader, val_dataloader, dla_encoder, epochs, work_dir)
+#         f1_scores.append(f1_score)
+#     plot_trade_off.feed(beta, gamma_values, f1_scores)
+#     print(f"Results for beta={beta}:")
+#     print(f"F1 Scores: {f1_scores}")
+
+# plot_trade_off.plot()
+# plot_trade_off.save('/herdnet/trade_off_f1_score.pdf')
 
 
 ########################################## Threshold Tuning ################################################

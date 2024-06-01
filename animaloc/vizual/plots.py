@@ -156,20 +156,20 @@ class PlotF1ScoreCurve:
     
     def _markers(self) -> itertools.cycle:
         return itertools.cycle(('^', 'o', 's', 'x', 'D', 'v', '>'))
-
+##############################################################################
 class PlotTradeOff:
     def __init__(self, figsize=(10, 6), legend=True):
         self.figsize = figsize
         self.legend = legend
         self.data = []
 
-    def feed(self, beta, gamma_values, f1_scores):
-        self.data.append((beta, gamma_values, f1_scores))
+    def feed(self, beta, gamma_values, scores):
+        self.data.append((beta, gamma_values, scores))
 
     def plot(self):
         plt.figure(figsize=self.figsize)
-        for beta, gamma_values, f1_scores in self.data:
-            plt.plot(gamma_values, f1_scores, marker='o', label=f'beta={beta}')
+        for beta, gamma_values, scores in self.data:
+            plt.plot(gamma_values, scores, marker='o', label=f'beta={beta}')
         plt.xlabel('Gamma')
         plt.ylabel('F1 Score')
         plt.title('Trade-Off between Beta, Gamma and F1 Score')
