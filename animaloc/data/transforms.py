@@ -80,63 +80,46 @@ class BinaryMultiTransformsWrapper:
     """
     def __init__(self, transforms: List[object]) -> None:
         self.transforms = transforms
+    
     def __call__(self, image: Union[Image.Image, torch.Tensor], target: Dict[str, torch.Tensor]) -> Tuple[torch.Tensor, Tuple[torch.Tensor]]:
         for trans in self.transforms:
             image, _ = trans(image, target)  # Ignore transformed target, apply transformation to image.
         
         # Convert each key-value pair in the target dict to a tensor and store in a new dict
+        target = {key: torch.tensor(val, dtype=torch.int64) if key != 'image_name' and not isinstance(val, torch.Tensor) else val for key, val in target.items()}
+        
+        # Debug print statements to verify the targets
+        print(f"Transformed Image: {image.shape}")
+        print(f"Target: {target}")
 
-        target = {key: torch.tensor(val, dtype=torch.int64) if not isinstance(val, torch.Tensor) else val for key, val in target.items()}
         # Return the last transformed image and the original targets converted to tensors.
         return image, target
+
+################## OLD BinaryMultitransformwrapper ###########
+# class BinaryMultiTransformsWrapper:
+#     """
+#     Applies each input transformation to the called input and returns the transformed image
+#     and a tuple containing the original target for each transformation.
+#     """
+#     def __init__(self, transforms: List[object]) -> None:
+#         self.transforms = transforms
     
-    ###### OLD ######
-    # def __call__(self, image: Union[Image.Image, torch.Tensor], target: Dict[str, torch.Tensor]) -> Tuple[torch.Tensor, Tuple[Dict[str, torch.Tensor]]]:
-    #     outputs = []
-    #     for trans in self.transforms:
-    #         image, _ = trans(image, target)  # Ignore transformed target, apply transformation to image.
-            
-    #         outputs.append(target)
+#     def __call__(self, image: Union[Image.Image, torch.Tensor], target: Dict[str, torch.Tensor]) -> Tuple[torch.Tensor, Tuple[torch.Tensor]]:
+#         for trans in self.transforms:
+#             image, _ = trans(image, target)  # Ignore transformed target, apply transformation to image.
         
-    #     # Return the last transformed image and a tuple of the original targets repeated for each transformation.
-    #     return image, tuple(outputs)
+#         # Convert each key-value pair in the target dict to a tensor and store in a new dict
+#         target = {key: torch.tensor(val, dtype=torch.int64) if not isinstance(val, torch.Tensor) else val for key, val in target.items()}
+        
+#         # Debug print statements to verify the targets
+#         print(f"Transformed Image: {image.shape}")
+#         print(f"Target: {target}")
 
-#################################################################
+#         # Return the last transformed image and the original targets converted to tensors.
+#         return image, target
+
 @TRANSFORMS.register()
-# class SampleToTensor:
-#     ''' Convert PIL image and target to Tensors '''
 
-#     def __call__(
-#         self,
-#         image: PIL.Image.Image, 
-#         target: dict,
-#         anno_type: str = 'bbox'
-#         ) -> Tuple[torch.Tensor,dict]:
-#         '''
-#         Args:
-#             image (PIL.Image.Image or torch.Tensor): image to transform [C,H,W]
-#             target (dict): corresponding target
-#             anno_type (str, optional): choose between 'bbox' for bounding box or 'point'
-#                 for points. Defaults to 'bbox'
-        
-#         Returns:
-#             Tuple[torch.Tensor, dict]:
-#                 the transormed image and target
-#         '''
-
-#         tr_image = torchvision.transforms.ToTensor()(image)
-
-#         tr_target = {}
-#         tr_target.update(dict(**target))
-
-#         if anno_type == 'bbox':
-#             tr_target['boxes'] = torch.as_tensor(tr_target['boxes'], dtype=torch.float32)
-#         elif anno_type == 'point':
-#             tr_target['points'] = torch.as_tensor(tr_target['points'], dtype=torch.float32)
-
-#         tr_target['labels'] = torch.as_tensor(tr_target['labels'], dtype=torch.int64)
-
-#         return tr_image, tr_target
 ########################### New SampleToTensor Function ###############
 class SampleToTensor:
     class SampleToTensor:

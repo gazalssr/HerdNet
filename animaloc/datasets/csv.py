@@ -23,7 +23,7 @@ import albumentations
 import torchvision
 import torchvision.transforms
 from torch.utils.data import Dataset
-
+import albumentations as A
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 from .register import DATASETS
@@ -80,7 +80,8 @@ class CSVDataset(Dataset):
         self, 
         csv_file: str, 
         root_dir: str, 
-        albu_transforms: Optional[list] = None,
+        # albu_transforms: Optional[list] = None,
+        albu_transforms: Optional[Union[list, A.Compose]] = None,
         end_transforms: Optional[list] = None
         ) -> None:
         ''' 
@@ -96,10 +97,11 @@ class CSVDataset(Dataset):
                 version. These will be applied after albu_transforms. Defaults
                 to None.
         '''
-        
-        assert isinstance(albu_transforms, (list, type(None))), \
-            f'albumentations-transformations must be a list, got {type(albu_transforms)}'
-
+        #################### Added A.compose to assert ######
+        assert isinstance(albu_transforms, (list,  A.Compose, type(None))), \
+            f'albumentations-transformations must be a list or an A.Compose, got {type(albu_transforms)}'
+            # f'albumentations-transformations must be a list, got {type(albu_transforms)}'
+            
         assert isinstance(end_transforms, (list, type(None))), \
             f'end-transformations must be a list, got {type(end_transforms)}'
 
@@ -179,6 +181,7 @@ class CSVDataset(Dataset):
                 
                 transformed = transform_pipeline(**albumentations_input)
                 transformed['image'] = numpy.asarray(transformed['image'])
+                print("Applied Transformations")
         else:
             transformed['image'] = torchvision.transforms.ToTensor()(image)
 

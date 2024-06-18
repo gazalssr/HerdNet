@@ -17,7 +17,7 @@ __version__ = "0.2.0"
 
 import os
 import PIL
-import pandas
+import pandas 
 import numpy 
 import torch
 
@@ -131,151 +131,56 @@ class FolderDataset(CSVDataset):
                     
         
         return target
-##########################################
+############################# NEW Binaryfolderdataset that incorporates image_IDs into the targets #############
 import os
-import numpy as np
 import pandas as pd
-import PIL.Image
+import numpy as np
+from PIL import Image
+import torch
 from torch.utils.data import Dataset
+from typing import List, Dict, Any, Union
 
+import os
+import pandas as pd
+import numpy as np
+from PIL import Image
+import torch
+from torch.utils.data import Dataset
+from typing import List, Dict, Any, Union
 @DATASETS.register()
-class BalancedFolderDataset(CSVDataset):
-    def __init__(
-        self, 
-        csv_file: str, 
-        root_dir: str, 
-        albu_transforms: Optional[list] = None,
-        end_transforms: Optional[list] = None
-        ) -> None:
-        super(BalancedFolderDataset, self).__init__(csv_file, root_dir, albu_transforms, end_transforms)
-
-        self.folder_images = [i for i in os.listdir(self.root_dir) if i.endswith(('.JPG', '.jpg', '.JPEG', '.jpeg'))]
-        self.anno_keys = self.data.columns
-        self.data['from_folder'] = 0  # all images in the folder
-
-        folder_only_images = np.setdiff1d(self.folder_images, self.data['images'].unique().tolist())
-        folder_df = pd.DataFrame(data=dict(images=folder_only_images))
-        folder_df['from_folder'] = 1  # images without annotations
-
-        self.data = pd.concat([self.data, folder_df], ignore_index=True).convert_dtypes()
-        # Use group_by_image to organize or group the image data
-        self._ordered_img_names = group_by_image(self.data)['images'].values.tolist()
-        # Separate empty and non-empty patches based on 'from_folder'
-        self.non_empty_patches = self.data[self.data['from_folder'] == 0]['images'].tolist()
-        self.empty_patches = self.data[self.data['from_folder'] == 1]['images'].tolist()
-
-        # Initialize the dataset for the first epoch
-        self.refresh_samples()
-
-    def refresh_samples(self):
-        if len(self.non_empty_patches) <= len(self.empty_patches):
-            sampled_empty = np.random.choice(self.empty_patches, len(self.non_empty_patches), replace=False).tolist()
-        else:
-            sampled_empty = np.random.choice(self.empty_patches, len(self.non_empty_patches), replace=True).tolist()
-
-        # Combine and shuffle
-        self.sampled_patches = self.non_empty_patches + sampled_empty
-        np.random.shuffle(self.sampled_patches)
-
-    def _load_image(self, img_name: str) -> PIL.Image.Image:
-        img_path = os.path.join(self.root_dir, img_name)
-        try:
-            pil_img = PIL.Image.open(img_path).convert('RGB')
-            pil_img.filename = img_name
-            return pil_img
-        except (IOError, FileNotFoundError) as e:
-            print(f"Error opening image {img_name}: {e}")
-            # Handle error as appropriate (e.g., return a default image or skip this sample)
-
-    def _load_target(self, img_name: str) -> Dict[str, List[Any]]:
-        annotations = self.data[self.data['images'] == img_name]
-        anno_keys = list(self.anno_keys)
-        anno_keys.remove('images')   
-        target = {
-            'image_id': [self.sampled_patches.index(img_name)], 
-            'image_name': [img_name]
-        }
-
-        nan_in_annos = annotations[anno_keys].isnull().values.any()
-        if not nan_in_annos:
-            for key in anno_keys:
-                # Check if 'annos' key exists and handle accordingly
-                if key == 'annos' and hasattr(annotations[key], 'get_tuple'): 
-                    target.update({key: [list(a.get_tuple) for a in annotations[key]]})
-                else:
-                    target.update({key: list(annotations[key])})
-        else:
-            for key in anno_keys:
-                if self.anno_type == 'BoundingBox':
-                    if key == 'annos':  
-                        target.update({key: [[0,1,2,3]]})
-                    elif key == 'labels':
-                        target.update({key: [0]})
-                else:        
-                    target.update({key: []})
-
-        return target
-
-    def __getitem__(self, index: int):
-        img_name = self.sampled_patches[index]
-        img = self._load_image(img_name)
-        target = self._load_target(img_name)
-        return img, target
-
-    def __len__(self):
-        return len(self.sampled_patches)
-
-    def on_epoch_end(self):
-        # Refresh samples at the end of each epoch
-        self.refresh_samples()
-
-    
-########################## BinaryFolderDataset (new) #######################
 class BinaryFolderDataset(CSVDataset):
     def __init__(self, csv_file, root_dir, albu_transforms=None, end_transforms=None, preprocess=False):
         super(BinaryFolderDataset, self).__init__(csv_file, root_dir, albu_transforms, end_transforms)
         if preprocess:
             self.create_binary_dataframe()
         else:
-            self.data = pd.read_csv(csv_file)
+            self.data = pandas.read_csv(csv_file)
         self.anno_type = 'binary'
         self._ordered_img_names = self.data['images'].values.tolist()
 
     def create_binary_dataframe(self):
-        # Listing all image files in the directory
         self.folder_images = [i for i in os.listdir(self.root_dir) if i.endswith(('.JPG', '.jpg', '.JPEG', '.jpeg'))]
-        # print(f"Total patches in folder: {len(self.folder_images)}")  
         unmatched_images = [img for img in self.folder_images if img not in self.data['images'].tolist()]
-        # print(f"Empty patches: {len(unmatched_images)}")
         self.data = self.data.drop_duplicates(subset='images')
-        self.data['binary'] = 1  # Mark these as non-empty
+        self.data['binary'] = 1
         if 'base_images' not in self.data.columns:
             self.data['base_images'] = self.data['images'].apply(self.derive_base_image_id)
-        # Identify images that are only in the folder but not in the initial CSV
-        folder_only_images = np.setdiff1d(self.folder_images, self.data['images'].tolist())
-   
-        # Creating a DataFrame for the folder-only images, assumed empty
-        folder_df = pd.DataFrame({
+        folder_only_images = numpy.setdiff1d(self.folder_images, self.data['images'].tolist())
+        folder_df = pandas.DataFrame({
             'images': folder_only_images,
-            'binary': np.zeros(len(folder_only_images), dtype=int),  # Mark these as empty
-            'base_images': [self.derive_base_image_id(img) for img in folder_only_images]  # Derive base image IDs for folder-only images
+            'binary': numpy.zeros(len(folder_only_images), dtype=int),
+            'base_images': [self.derive_base_image_id(img) for img in folder_only_images]
         })
-        # Concatenate the original data with the new folder data
-        self.data = pd.concat([self.data, folder_df], ignore_index=True)
-         # Update base_image column for all entries
-
-        # Clean up the data 
+        self.data = pandas.concat([self.data, folder_df], ignore_index=True)
         columns_to_remove = ['annos', 'subset', 'from_folder', 'labels', 'species']
         self.data.drop(columns=columns_to_remove, errors='ignore', inplace=True)
-        # Print statements for weightening process
         empty_patches_count = len(folder_only_images)
         non_empty_patches_count = len(self.data[self.data['binary'] == 1])
-        
         print(f"Number of empty patches: {empty_patches_count}")
         print(f"Number of non-empty patches: {non_empty_patches_count}")
 
     def _load_image(self, index: int) -> Image.Image:
-        img_name = self.data.at[index, 'images']
+        img_name = self.data.at[index, 'images']  ###### Corrected to access the dataframe properly
         img_path = os.path.join(self.root_dir, img_name)
         return Image.open(img_path).convert('RGB')
   
@@ -283,15 +188,30 @@ class BinaryFolderDataset(CSVDataset):
         img_name = self.data.at[index, 'images']
         binary_label = self.data.at[index, 'binary']
         return {
-            'image_id': index,
             'image_name': img_name,
             'binary': torch.tensor([binary_label], dtype=torch.int64)  
         }
-    
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, index: int) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
+        image = self._load_image(index)
+        target = self._load_target(index)
+        if self.albu_transforms:
+            augmented = self.albu_transforms(image=np.array(image))  ###### Change made here to call the transforms correctly
+            image = augmented['image']
+        if self.end_transforms:
+            for transform in self.end_transforms:
+                image, target = transform(image, target)
+        return image, target
+
+    @staticmethod
     def collate_fn(batch):
-        images = [item[0] for item in batch]  # Assuming item[0] are images
-        binary_targets = torch.stack([item[1]['binary'] for item in batch])  # Collect 'binary' targets and stack them
-        return images, {'binary': binary_targets}
+        images = [item[0] for item in batch]
+        binary_targets = torch.stack([item[1]['binary'] for item in batch])
+        image_names = [item[1]['image_name'] for item in batch]
+        return images, {'binary': binary_targets, 'image_name': image_names}
 
     def derive_base_image_id(self, image_name):
         if "_" in image_name:
@@ -301,5 +221,76 @@ class BinaryFolderDataset(CSVDataset):
 
     def save_binary_csv(self, save_path):
         self.data.to_csv(save_path, index=False)
+########################## BinaryFolderDataset (new) #######################
+# class BinaryFolderDataset(CSVDataset):
+#     def __init__(self, csv_file, root_dir, albu_transforms=None, end_transforms=None, preprocess=False):
+#         super(BinaryFolderDataset, self).__init__(csv_file, root_dir, albu_transforms, end_transforms)
+#         if preprocess:
+#             self.create_binary_dataframe()
+#         else:
+#             self.data = pandas.read_csv(csv_file)
+#         self.anno_type = 'binary'
+#         self._ordered_img_names = self.data['images'].values.tolist()
+
+#     def create_binary_dataframe(self):
+#         # Listing all image files in the directory
+#         self.folder_images = [i for i in os.listdir(self.root_dir) if i.endswith(('.JPG', '.jpg', '.JPEG', '.jpeg'))]
+#         # print(f"Total patches in folder: {len(self.folder_images)}")  
+#         unmatched_images = [img for img in self.folder_images if img not in self.data['images'].tolist()]
+#         # print(f"Empty patches: {len(unmatched_images)}")
+#         self.data = self.data.drop_duplicates(subset='images')
+#         self.data['binary'] = 1  # Mark these as non-empty
+#         if 'base_images' not in self.data.columns:
+#             self.data['base_images'] = self.data['images'].apply(self.derive_base_image_id)
+#         # Identify images that are only in the folder but not in the initial CSV
+#         folder_only_images = numpy.setdiff1d(self.folder_images, self.data['images'].tolist())
+   
+#         # Creating a DataFrame for the folder-only images, assumed empty
+#         folder_df = pandas.DataFrame({
+#             'images': folder_only_images,
+#             'binary': numpy.zeros(len(folder_only_images), dtype=int),  # Mark these as empty
+#             'base_images': [self.derive_base_image_id(img) for img in folder_only_images]  # Derive base image IDs for folder-only images
+#         })
+#         # Concatenate the original data with the new folder data
+#         self.data = pandas.concat([self.data, folder_df], ignore_index=True)
+#          # Update base_image column for all entries
+
+#         # Clean up the data 
+#         columns_to_remove = ['annos', 'subset', 'from_folder', 'labels', 'species']
+#         self.data.drop(columns=columns_to_remove, errors='ignore', inplace=True)
+#         # Print statements for weightening process
+#         empty_patches_count = len(folder_only_images)
+#         non_empty_patches_count = len(self.data[self.data['binary'] == 1])
+        
+#         print(f"Number of empty patches: {empty_patches_count}")
+#         print(f"Number of non-empty patches: {non_empty_patches_count}")
+
+#     def _load_image(self, index: int) -> Image.Image:
+#         img_name = self.data.at[index, 'images']
+#         img_path = os.path.join(self.root_dir, img_name)
+#         return Image.open(img_path).convert('RGB')
+  
+#     def _load_target(self, index: int) -> Dict[str, Any]:
+#         img_name = self.data.at[index, 'images']
+#         binary_label = self.data.at[index, 'binary']
+#         return {
+#             'image_id': index,
+#             'image_name': img_name,
+#             'binary': torch.tensor([binary_label], dtype=torch.int64)  
+#         }
+    
+#     def collate_fn(batch):
+#         images = [item[0] for item in batch]  # Assuming item[0] are images
+#         binary_targets = torch.stack([item[1]['binary'] for item in batch])  # Collect 'binary' targets and stack them
+#         return images, {'binary': binary_targets}
+
+#     def derive_base_image_id(self, image_name):
+#         if "_" in image_name:
+#             parts = image_name.rsplit("_", 1)
+#             return parts[0] + '.jpg'
+#         return image_name
+
+#     def save_binary_csv(self, save_path):
+#         self.data.to_csv(save_path, index=False)
 
     
