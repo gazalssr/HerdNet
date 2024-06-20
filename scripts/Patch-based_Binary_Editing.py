@@ -107,6 +107,11 @@ def load_image(image_path):
 def save_image_as_pdf(image, save_path):
     plt.imsave(save_path, image, format='pdf')
 
+# Function to clip image values to valid range
+def clip_image(image):
+    image = numpy.clip(image, 0, 1)
+    return image
+
 # Save a few samples to verify
 for i, (images, targets) in enumerate(train_dataloader):
     if i >= 1:
@@ -131,7 +136,9 @@ for i, (images, targets) in enumerate(train_dataloader):
         # Ensure the augmented image has the correct shape (height, width, channels)
         if img_augmented.shape[0] == 3:
             img_augmented = numpy.transpose(img_augmented, (1, 2, 0))
-        img_augmented = numpy.clip(img_augmented, 0, 1)
+
+        # Clip the image to the valid range
+        img_augmented = clip_image(img_augmented)
 
         # Save the augmented image as PDF
         augmented_save_path = os.path.join(augmented_save_dir, f'augmented_image_batch{i+1}_image{j+1}_name{image_name}.pdf')
@@ -217,10 +224,15 @@ def calculate_accuracy(probabilities, targets, threshold=0.5):
     accuracy = correct / targets.size(0)
     return accuracy
 
+# Convert list of numpy arrays to list of tensors and stack
+def convert_and_stack(inputs):
+    tensor_list = [torch.tensor(img).to(device).permute(2, 0, 1) for img in inputs]  ##### Convert each numpy array to tensor and permute
+    return torch.stack(tensor_list)  ##### Stack the list of tensors
+
 # Get a batch of data for initial predictions
 inputs, targets = next(iter(train_dataloader))
 targets = targets['binary'].to(device)
-inputs = inputs.to(device)
+inputs = convert_and_stack(inputs)  ##### Convert and stack inputs to tensor
 
 # Forward pass: get logits from the model
 outputs = model(inputs)
@@ -261,7 +273,7 @@ for epoch in range(num_epochs):
 
     for inputs, targets in train_dataloader:
         targets = targets['binary'].to(device)
-        inputs = inputs.to(device)
+        inputs = convert_and_stack(inputs)  ##### Convert and stack inputs to tensor
 
         optimizer.zero_grad()
         outputs = model(inputs)
@@ -287,7 +299,7 @@ for epoch in range(num_epochs):
 # Get a batch of data for final predictions
 inputs, targets = next(iter(train_dataloader))
 targets = targets['binary'].to(device)
-inputs = inputs.to(device)
+inputs = convert_and_stack(inputs)  ##### Convert and stack inputs to tensor
 
 # Forward pass: get logits from the model
 outputs = model(inputs)
@@ -316,7 +328,6 @@ print("Final Loss:", final_loss.item())
 # Calculate and print final accuracy
 final_accuracy = calculate_accuracy(probabilities, targets)
 print("Final Accuracy:", final_accuracy)
-
 ########################    
 # def print_dataloader_info(dataloader):
 #     total_batches = len(dataloader)
