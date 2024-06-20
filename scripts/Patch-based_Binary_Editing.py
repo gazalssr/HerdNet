@@ -49,7 +49,7 @@ train_dataset = BinaryFolderDataset(preprocess=preprocess,
     )
 # train_dataset.data.to_csv('/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/train_CF/Train_binary_gt.csv', index=False)
 import os
-
+from PIL import Image
 val_dataset = BinaryFolderDataset(preprocess=preprocess,
     csv_file = '/herdnet/DATASETS/CAH_no_margins_30/val/Val_binary_gt.csv',
     root_dir = '/herdnet/DATASETS/CAH_no_margins_30/val/',
@@ -99,32 +99,43 @@ os.makedirs(augmented_save_dir, exist_ok=True)  # Ensure the directory exists
 
 # Save a few samples to verify
 # Save a few samples to verify
+def load_image(image_path):
+    image = Image.open(image_path).convert('RGB')
+    return numpy.array(image)
+
+# Function to save images as PDF
+def save_image_as_pdf(image, save_path):
+    plt.imsave(save_path, image, format='pdf')
+
+# Save a few samples to verify
 for i, (images, targets) in enumerate(train_dataloader):
     if i >= 1:
         break
     # Save original and augmented images
     for j in range(len(images)):
         image_name = targets['image_name'][j]
-        img_original = images[j]
-
-        # If img_original is a PyTorch tensor, convert it to a NumPy array
-        if isinstance(img_original, torch.Tensor):
-            img_original = img_original.cpu().numpy()
-
-        # Clip the image to the valid range
-        img_original = numpy.clip(img_original, 0, 1)
+        image_path = os.path.join('/herdnet/DATASETS/CAH_no_margins_30/train/', image_name)
+        
+        # Load the original image
+        img_original = load_image(image_path)
 
         # Save the original image as PDF
         original_save_path = os.path.join(original_save_dir, f'original_image_batch{i+1}_image{j+1}_name{image_name}.pdf')
-        plt.imsave(original_save_path, img_original, format='pdf')
+        save_image_as_pdf(img_original, original_save_path)
+
+        # Process the augmented image if it's a tensor
+        img_augmented = images[j]
+        if isinstance(img_augmented, torch.Tensor):
+            img_augmented = img_augmented.numpy()
+
+        # Ensure the augmented image has the correct shape (height, width, channels)
+        if img_augmented.shape[0] == 3:
+            img_augmented = numpy.transpose(img_augmented, (1, 2, 0))
+        img_augmented = numpy.clip(img_augmented, 0, 1)
 
         # Save the augmented image as PDF
         augmented_save_path = os.path.join(augmented_save_dir, f'augmented_image_batch{i+1}_image{j+1}_name{image_name}.pdf')
-        plt.imsave(augmented_save_path, img_original, format='pdf')
-
-        # Save the augmented image as PDF
-        augmented_save_path = os.path.join(augmented_save_dir, f'augmented_image_batch{i+1}_image{j+1}_name{image_name}.pdf')
-        plt.imsave(augmented_save_path, img_original, format='pdf')
+        save_image_as_pdf(img_augmented, augmented_save_path)
 
     # print(f"Saved original and augmented images for batch {i+1}")
 
