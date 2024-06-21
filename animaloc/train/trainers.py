@@ -21,7 +21,7 @@ import sys
 import os
 import wandb
 import matplotlib
-
+import numpy
 import matplotlib.pyplot as plt
 matplotlib.use('Agg')
 from torchvision.transforms import ToPILImage
@@ -198,10 +198,41 @@ class Trainer:
         self.val_logger = CustomLogger(delimiter=' ', filename='validation', work_dir=self.work_dir, csv=self.csv_logger)
     
     ############# New Preparedata Class #################
+    # def prepare_data(self, images, targets) -> tuple:
+    #     # print(f"Targets type before processing: {type(targets)}")
+    #     ''' Method to prepare the data before feeding to the model. 
+    #     Can be override by subclass to create a custom Trainer.
+
+    #     Args:
+    #         images,
+    #         targets
+        
+    #     Returns:
+    #         tuple
+    #     '''
+
+    #     images = images.to(self.device)
+
+    #     if isinstance(targets, dict):
+    #         # Move each tensor within the target dictionary to the device
+    #         # print("Targets are a dictionary.")
+    #         if len(targets.keys())>1:
+    #             targets = {k: v.to(self.device) for k, v in targets.items()}
+    #         else:
+    #             targets = [v.to(self.device) for k, v in targets.items()]
+    #     elif isinstance(targets, (list, tuple)):
+    #         # If targets is a list or tuple, move each item to the device
+    #         targets = [tar.to(self.device) for tar in targets]
+    #         print("Targets are in a list or tuple.")
+    #     else:
+    #         print("Unexpected targets format.")
+    
+        
+    #     return images, targets
+#############################################
     def prepare_data(self, images, targets) -> tuple:
-        # print(f"Targets type before processing: {type(targets)}")
         ''' Method to prepare the data before feeding to the model. 
-        Can be override by subclass to create a custom Trainer.
+        Can be overridden by subclass to create a custom Trainer.
 
         Args:
             images,
@@ -210,23 +241,51 @@ class Trainer:
         Returns:
             tuple
         '''
-
-        images = images.to(self.device)
+        
+        # If images are in NumPy array format, convert them to tensors
+        if isinstance(images, list) and isinstance(images[0], numpy.ndarray):
+            images = [torch.tensor(img).permute(2, 0, 1).to(self.device) for img in images]
+        else:
+            images = images.to(self.device)
 
         if isinstance(targets, dict):
             # Move each tensor within the target dictionary to the device
-            # print("Targets are a dictionary.")
-            if len(targets.keys())>1:
-                targets = {k: v.to(self.device) for k, v in targets.items()}
-            else:
-                targets = [v.to(self.device) for k, v in targets.items()]
+            processed_targets = {}
+            for k, v in targets.items():
+                print(f"Processing target key: {k}, value: {v}, type: {type(v)}")
+                if isinstance(v, torch.Tensor):
+                    processed_targets[k] = v.to(self.device)
+                elif isinstance(v, (int, float)):
+                    processed_targets[k] = torch.tensor([v]).to(self.device)
+                elif isinstance(v, (list, numpy.ndarray)):
+                    if isinstance(v[0], str):  # Skip lists of strings
+                        processed_targets[k] = v
+                    else:
+                        processed_targets[k] = torch.tensor(v).to(self.device)
+                else:
+                    print(f"Skipping target key: {k} with incompatible type: {type(v)}")
+                    processed_targets[k] = v  # Leave strings and other non-tensor-compatible values as they are
+            targets = processed_targets
         elif isinstance(targets, (list, tuple)):
             # If targets is a list or tuple, move each item to the device
-            targets = [tar.to(self.device) for tar in targets]
-            print("Targets are in a list or tuple.")
+            processed_targets = []
+            for tar in targets:
+                print(f"Processing target: {tar}, type: {type(tar)}")
+                if isinstance(tar, torch.Tensor):
+                    processed_targets.append(tar.to(self.device))
+                elif isinstance(tar, (int, float)):
+                    processed_targets.append(torch.tensor([tar]).to(self.device))
+                elif isinstance(tar, (list, numpy.ndarray)):
+                    if isinstance(tar[0], str):  # Skip lists of strings
+                        processed_targets.append(tar)
+                    else:
+                        processed_targets.append(torch.tensor(tar).to(self.device))
+                else:
+                    print(f"Skipping target with incompatible type: {type(tar)}")
+                    processed_targets.append(tar)  # Leave strings and other non-tensor-compatible values as they are
+            targets = processed_targets
         else:
             print("Unexpected targets format.")
-    
         
         return images, targets
 

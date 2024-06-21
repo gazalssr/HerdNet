@@ -261,6 +261,14 @@ class FocalComboLoss_P(nn.Module):
         if self.weights is None:
             raise ValueError("Weights are not defined.")
         
+        # Print the shapes of outputs and targets for debugging
+        print(f"Outputs shape: {outputs.shape}")
+        print(f"Targets shape: {targets.shape}")
+        
+        # Ensure outputs and targets have the same shape
+        if outputs.shape != targets.shape:
+            targets = targets.view_as(outputs)
+
         outputs = torch.clamp(outputs, min=self.eps, max=1 - self.eps)
         bce_loss = F.binary_cross_entropy_with_logits(outputs, targets, reduction='none')
         

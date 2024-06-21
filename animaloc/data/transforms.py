@@ -89,8 +89,8 @@ class BinaryMultiTransformsWrapper:
         target = {key: torch.tensor(val, dtype=torch.int64) if key != 'image_name' and not isinstance(val, torch.Tensor) else val for key, val in target.items()}
         
         # Debug print statements to verify the targets
-        print(f"Transformed Image: {image.shape}")
-        print(f"Target: {target}")
+        # print(f"Transformed Image: {image.shape}")
+        # print(f"Target: {target}")
 
         # Return the last transformed image and the original targets converted to tensors.
         return image, target

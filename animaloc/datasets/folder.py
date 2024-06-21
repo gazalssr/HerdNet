@@ -132,21 +132,7 @@ class FolderDataset(CSVDataset):
         
         return target
 ############################# NEW Binaryfolderdataset that incorporates image_IDs into the targets #############
-import os
-import pandas as pd
-import numpy as np
-from PIL import Image
-import torch
-from torch.utils.data import Dataset
-from typing import List, Dict, Any, Union
 
-import os
-import pandas as pd
-import numpy as np
-from PIL import Image
-import torch
-from torch.utils.data import Dataset
-from typing import List, Dict, Any, Union
 @DATASETS.register()
 class BinaryFolderDataset(CSVDataset):
     def __init__(self, csv_file, root_dir, albu_transforms=None, end_transforms=None, preprocess=False):
@@ -155,6 +141,9 @@ class BinaryFolderDataset(CSVDataset):
             self.create_binary_dataframe()
         else:
             self.data = pandas.read_csv(csv_file)
+        
+        self.data.reset_index(drop=True, inplace=True)  # Reset the DataFrame index
+        
         self.anno_type = 'binary'
         self._ordered_img_names = self.data['images'].values.tolist()
 
@@ -172,15 +161,15 @@ class BinaryFolderDataset(CSVDataset):
             'base_images': [self.derive_base_image_id(img) for img in folder_only_images]
         })
         self.data = pandas.concat([self.data, folder_df], ignore_index=True)
-        columns_to_remove = ['annos', 'subset', 'from_folder', 'labels', 'species']
-        self.data.drop(columns=columns_to_remove, errors='ignore', inplace=True)
+        self.data.drop(columns=['annos', 'subset', 'from_folder', 'labels', 'species'], errors='ignore', inplace=True)
+        self.data.reset_index(drop=True, inplace=True)  # Reset the DataFrame index after modifications
         empty_patches_count = len(folder_only_images)
         non_empty_patches_count = len(self.data[self.data['binary'] == 1])
         print(f"Number of empty patches: {empty_patches_count}")
         print(f"Number of non-empty patches: {non_empty_patches_count}")
 
     def _load_image(self, index: int) -> Image.Image:
-        img_name = self.data.at[index, 'images']  ###### Corrected to access the dataframe properly
+        img_name = self.data.at[index, 'images']
         img_path = os.path.join(self.root_dir, img_name)
         return Image.open(img_path).convert('RGB')
   
@@ -189,17 +178,37 @@ class BinaryFolderDataset(CSVDataset):
         binary_label = self.data.at[index, 'binary']
         return {
             'image_name': img_name,
-            'binary': torch.tensor([binary_label], dtype=torch.int64)  
+            'binary': torch.tensor([binary_label], dtype=torch.int64)
         }
 
     def __len__(self):
         return len(self.data)
 
-    def __getitem__(self, index: int) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
+    def __getitem__(self, index) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
+        if isinstance(index, list):  ##### Check if the index is a list
+            images = []
+            targets = {'image_name': [], 'binary': []}
+            for idx in index:
+                image, target = self._get_single_item(idx)
+                images.append(image)
+                targets['image_name'].append(target['image_name'])
+                targets['binary'].append(target['binary'])
+            targets['binary'] = torch.stack(targets['binary'])
+            return images, targets
+        else:
+            return self._get_single_item(index)
+
+    def _get_single_item(self, index: int) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
+        if not isinstance(index, int):
+            raise TypeError(f"Index {index} is not an integer")
+
+        if index < 0 or index >= len(self.data):
+            raise IndexError(f"Index {index} is out of bounds for dataset with length {len(self.data)}")
+
         image = self._load_image(index)
         target = self._load_target(index)
         if self.albu_transforms:
-            augmented = self.albu_transforms(image=np.array(image))  ###### Change made here to call the transforms correctly
+            augmented = self.albu_transforms(image=numpy.array(image))
             image = augmented['image']
         if self.end_transforms:
             for transform in self.end_transforms:
@@ -221,76 +230,3 @@ class BinaryFolderDataset(CSVDataset):
 
     def save_binary_csv(self, save_path):
         self.data.to_csv(save_path, index=False)
-########################## BinaryFolderDataset (new) #######################
-# class BinaryFolderDataset(CSVDataset):
-#     def __init__(self, csv_file, root_dir, albu_transforms=None, end_transforms=None, preprocess=False):
-#         super(BinaryFolderDataset, self).__init__(csv_file, root_dir, albu_transforms, end_transforms)
-#         if preprocess:
-#             self.create_binary_dataframe()
-#         else:
-#             self.data = pandas.read_csv(csv_file)
-#         self.anno_type = 'binary'
-#         self._ordered_img_names = self.data['images'].values.tolist()
-
-#     def create_binary_dataframe(self):
-#         # Listing all image files in the directory
-#         self.folder_images = [i for i in os.listdir(self.root_dir) if i.endswith(('.JPG', '.jpg', '.JPEG', '.jpeg'))]
-#         # print(f"Total patches in folder: {len(self.folder_images)}")  
-#         unmatched_images = [img for img in self.folder_images if img not in self.data['images'].tolist()]
-#         # print(f"Empty patches: {len(unmatched_images)}")
-#         self.data = self.data.drop_duplicates(subset='images')
-#         self.data['binary'] = 1  # Mark these as non-empty
-#         if 'base_images' not in self.data.columns:
-#             self.data['base_images'] = self.data['images'].apply(self.derive_base_image_id)
-#         # Identify images that are only in the folder but not in the initial CSV
-#         folder_only_images = numpy.setdiff1d(self.folder_images, self.data['images'].tolist())
-   
-#         # Creating a DataFrame for the folder-only images, assumed empty
-#         folder_df = pandas.DataFrame({
-#             'images': folder_only_images,
-#             'binary': numpy.zeros(len(folder_only_images), dtype=int),  # Mark these as empty
-#             'base_images': [self.derive_base_image_id(img) for img in folder_only_images]  # Derive base image IDs for folder-only images
-#         })
-#         # Concatenate the original data with the new folder data
-#         self.data = pandas.concat([self.data, folder_df], ignore_index=True)
-#          # Update base_image column for all entries
-
-#         # Clean up the data 
-#         columns_to_remove = ['annos', 'subset', 'from_folder', 'labels', 'species']
-#         self.data.drop(columns=columns_to_remove, errors='ignore', inplace=True)
-#         # Print statements for weightening process
-#         empty_patches_count = len(folder_only_images)
-#         non_empty_patches_count = len(self.data[self.data['binary'] == 1])
-        
-#         print(f"Number of empty patches: {empty_patches_count}")
-#         print(f"Number of non-empty patches: {non_empty_patches_count}")
-
-#     def _load_image(self, index: int) -> Image.Image:
-#         img_name = self.data.at[index, 'images']
-#         img_path = os.path.join(self.root_dir, img_name)
-#         return Image.open(img_path).convert('RGB')
-  
-#     def _load_target(self, index: int) -> Dict[str, Any]:
-#         img_name = self.data.at[index, 'images']
-#         binary_label = self.data.at[index, 'binary']
-#         return {
-#             'image_id': index,
-#             'image_name': img_name,
-#             'binary': torch.tensor([binary_label], dtype=torch.int64)  
-#         }
-    
-#     def collate_fn(batch):
-#         images = [item[0] for item in batch]  # Assuming item[0] are images
-#         binary_targets = torch.stack([item[1]['binary'] for item in batch])  # Collect 'binary' targets and stack them
-#         return images, {'binary': binary_targets}
-
-#     def derive_base_image_id(self, image_name):
-#         if "_" in image_name:
-#             parts = image_name.rsplit("_", 1)
-#             return parts[0] + '.jpg'
-#         return image_name
-
-#     def save_binary_csv(self, save_path):
-#         self.data.to_csv(save_path, index=False)
-
-    

@@ -2,6 +2,7 @@ import random
 import animaloc
 import pandas as pd
 import os
+
 # Set the seed
 from animaloc.utils.seed import set_seed
 import numpy
@@ -26,11 +27,14 @@ from animaloc.vizual.plots import PlotTradeOff
 from animaloc.data.samplers import DataAnalyzer
 NUM_WORKERS= 2
 import albumentations as A
+
+torch.cuda.empty_cache()
+
 binary=True
 preprocess=False
 patch_size = 512
 num_classes = 2
-batch_size=32
+batch_size=8
 down_ratio = 2
 train_dataset = BinaryFolderDataset(preprocess=preprocess,
     csv_file = '/herdnet/DATASETS/CAH_no_margins_30/train/Train_binary_gt.csv',
@@ -78,107 +82,22 @@ test_dataset = BinaryFolderDataset(preprocess=preprocess,
 train_sampler = BinaryBatchSampler(
     dataset=train_dataset,
     col='binary',  
-    batch_size=32,  # Even batch_size
+    batch_size=4,  # Even batch_size
     shuffle=True
 )
 # test_dataset.data.to_csv('/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/test_W/Test_binary_gt.csv', index=False)
 # Dataloaders
 from torch.utils.data import DataLoader
-train_dataloader = DataLoader(dataset = train_dataset,batch_size=16, num_workers= 2,shuffle= True, collate_fn=BinaryFolderDataset.collate_fn)
+train_dataloader = DataLoader(dataset = train_dataset,batch_size=4 , sampler=train_sampler, collate_fn=BinaryFolderDataset.collate_fn)
+# num_workers= 2
+val_dataloader = DataLoader(dataset = val_dataset, batch_size=1 , shuffle= False)
 
-val_dataloader = DataLoader(dataset = val_dataset, batch_size=1 , num_workers= 2, shuffle= False)
-
-test_dataloader= DataLoader(dataset = test_dataset, batch_size=1 , num_workers= 2, shuffle= False)
+test_dataloader= DataLoader(dataset = test_dataset, batch_size=1 , shuffle= False)
 num_classes=2
 dla_encoder = DLAEncoder(num_classes=num_classes, pretrained=True).cuda()
-##### TESTING #############
-original_save_dir = './herdnet/original_images'
-augmented_save_dir = './herdnet/augmented_images'
-os.makedirs(original_save_dir, exist_ok=True)  # Ensure the directory exists
-os.makedirs(augmented_save_dir, exist_ok=True)  # Ensure the directory exists
 
-# Save a few samples to verify
-# Save a few samples to verify
-def load_image(image_path):
-    image = Image.open(image_path).convert('RGB')
-    return numpy.array(image)
 
-# Function to save images as PDF
-def save_image_as_pdf(image, save_path):
-    plt.imsave(save_path, image, format='pdf')
-
-# Function to clip image values to valid range
-def clip_image(image):
-    image = numpy.clip(image, 0, 1)
-    return image
-
-# Save a few samples to verify
-for i, (images, targets) in enumerate(train_dataloader):
-    if i >= 1:
-        break
-    # Save original and augmented images
-    for j in range(len(images)):
-        image_name = targets['image_name'][j]
-        image_path = os.path.join('/herdnet/DATASETS/CAH_no_margins_30/train/', image_name)
-        
-        # Load the original image
-        img_original = load_image(image_path)
-
-        # Save the original image as PDF
-        original_save_path = os.path.join(original_save_dir, f'original_image_batch{i+1}_image{j+1}_name{image_name}.pdf')
-        save_image_as_pdf(img_original, original_save_path)
-
-        # Process the augmented image if it's a tensor
-        img_augmented = images[j]
-        if isinstance(img_augmented, torch.Tensor):
-            img_augmented = img_augmented.numpy()
-
-        # Ensure the augmented image has the correct shape (height, width, channels)
-        if img_augmented.shape[0] == 3:
-            img_augmented = numpy.transpose(img_augmented, (1, 2, 0))
-
-        # Clip the image to the valid range
-        img_augmented = clip_image(img_augmented)
-
-        # Save the augmented image as PDF
-        augmented_save_path = os.path.join(augmented_save_dir, f'augmented_image_batch{i+1}_image{j+1}_name{image_name}.pdf')
-        save_image_as_pdf(img_augmented, augmented_save_path)
-
-    # print(f"Saved original and augmented images for batch {i+1}")
-
-################### PRINT DATALOADER INFO ##################
-import matplotlib.pyplot as plt
-import os
-import torch
-import torchvision
-from torchvision import transforms
-
-# Function to visualize and save augmented images
-import torch
-import matplotlib.pyplot as plt
-import os
-# Instantiate the dataset
-train_dataset = BinaryFolderDataset(
-    preprocess=preprocess,
-    csv_file='/herdnet/DATASETS/CAH_no_margins_30/train/Train_binary_gt.csv',
-    root_dir='/herdnet/DATASETS/CAH_no_margins_30/train/',
-    albu_transforms=[
-        A.VerticalFlip(p=0.9),
-        A.HorizontalFlip(p=0.9),
-        A.RandomRotate90(p=0.9),
-        A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.2),
-        A.Blur(blur_limit=15, p=0.9),
-        A.Normalize(p=0.9),
-        ToTensorV2()
-    ],
-    end_transforms=[BinaryMultiTransformsWrapper([BinaryTransform()])]
-)
-
-# Define DLAENCODER for training
-import torch.nn as nn
 image= torch.ones([1,3,512,512]).cuda()
-
-################ Make a test phase for training loop ########################
 # Number of patches per class (train datset)
 total_patches = len(train_dataset)
 empty_patches = 7960
@@ -187,7 +106,64 @@ non_empty_patches = 1502
 weight_for_empty = total_patches / (2 * empty_patches)
 weight_for_non_empty = total_patches / (2 * non_empty_patches)
 weights = [weight_for_empty, weight_for_non_empty]
-###############
+# ##### TESTING #############
+# original_save_dir = './herdnet/original_images'
+# augmented_save_dir = './herdnet/augmented_images'
+# os.makedirs(original_save_dir, exist_ok=True)  # Ensure the directory exists
+# os.makedirs(augmented_save_dir, exist_ok=True)  # Ensure the directory exists
+
+# # Save a few samples to verify
+# # Save a few samples to verify
+# def load_image(image_path):
+#     image = Image.open(image_path).convert('RGB')
+#     return numpy.array(image)
+
+# # Function to save images as PDF
+# def save_image_as_pdf(image, save_path):
+#     plt.imsave(save_path, image, format='pdf')
+
+# # Function to clip image values to valid range
+# def clip_image(image):
+#     image = numpy.clip(image, 0, 1)
+#     return image
+
+# # Save a few samples to verify
+# for i, (images, targets) in enumerate(train_dataloader):
+#     if i >= 1:
+#         break
+#     # Save original and augmented images
+#     for j in range(len(images)):
+#         image_name = targets['image_name'][j]
+#         image_path = os.path.join('/herdnet/DATASETS/CAH_no_margins_30/train/', image_name)
+        
+#         # Load the original image
+#         img_original = load_image(image_path)
+
+#         # Save the original image as PDF
+#         original_save_path = os.path.join(original_save_dir, f'original_image_batch{i+1}_image{j+1}_name{image_name}.pdf')
+#         save_image_as_pdf(img_original, original_save_path)
+
+#         # Process the augmented image if it's a tensor
+#         img_augmented = images[j]
+#         if isinstance(img_augmented, torch.Tensor):
+#             img_augmented = img_augmented.numpy()
+
+#         # Ensure the augmented image has the correct shape (height, width, channels)
+#         if img_augmented.shape[0] == 3:
+#             img_augmented = numpy.transpose(img_augmented, (1, 2, 0))
+
+#         # Clip the image to the valid range
+#         img_augmented = clip_image(img_augmented)
+
+#         # Save the augmented image as PDF
+#         augmented_save_path = os.path.join(augmented_save_dir, f'augmented_image_batch{i+1}_image{j+1}_name{image_name}.pdf')
+#         save_image_as_pdf(img_augmented, augmented_save_path)
+
+#     # print(f"Saved original and augmented images for batch {i+1}")
+
+
+################ Make a test phase for training loop ########################
+
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -201,13 +177,13 @@ learning_rate = 0.0001  # Adjust if necessary
 optimizer = optim.Adam(model.parameters(), lr=learning_rate)
 
 # Define the class weights based on your dataset
-total_patches = len(train_dataset)
-empty_patches = 7960
-non_empty_patches = 1502
+# total_patches = len(train_dataset)
+# empty_patches = 7960
+# non_empty_patches = 1502
 
-# Class weights
-weight_for_empty = total_patches / (2 * empty_patches)
-weight_for_non_empty = total_patches / (2 * non_empty_patches)
+# # Class weights
+# weight_for_empty = total_patches / (2 * empty_patches)
+# weight_for_non_empty = total_patches / (2 * non_empty_patches)
 pos_weight = torch.tensor([weight_for_non_empty], device=device)  ##### Define pos_weight for BCEWithLogitsLoss
 
 # Initialize the BCEWithLogitsLoss with pos_weight
@@ -220,20 +196,61 @@ criterion = FocalComboLoss_P(weights=weights)
 # Define the accuracy calculation function
 def calculate_accuracy(probabilities, targets, threshold=0.5):
     preds = (probabilities > threshold).float()
+    print(f"Predictions shape: {preds.shape}")
+    print(f"Targets shape: {targets.shape}")
+    targets = targets.view_as(preds)  ### Reshape targets to match preds
     correct = (preds == targets).sum().item()
     accuracy = correct / targets.size(0)
     return accuracy
 
 # Convert list of numpy arrays to list of tensors and stack
 def convert_and_stack(inputs):
-    tensor_list = [torch.tensor(img).to(device).permute(2, 0, 1) for img in inputs]  ##### Convert each numpy array to tensor and permute
-    return torch.stack(tensor_list)  ##### Stack the list of tensors
+    tensor_list = []
+
+    def process_image(img):
+        if isinstance(img, numpy.ndarray):
+            if img.ndim == 3:  # Ensure it's an image with 3 dimensions (H, W, C)
+                tensor_img = torch.tensor(img).to(device)
+                if tensor_img.shape[2] == 3:  # Check if the last dimension is the channel dimension
+                    tensor_img = tensor_img.permute(2, 0, 1)  # Convert to (C, H, W)
+                return tensor_img
+            else:
+                raise ValueError(f"Expected 3 dimensions for image, got {img.ndim} dimensions")
+        else:
+            raise TypeError(f"Expected numpy array, got {type(img)}")
+
+    for item in inputs:
+        if isinstance(item, list):
+            for img in item:
+                tensor_list.append(process_image(img))
+        else:
+            tensor_list.append(process_image(item))
+    
+    return torch.stack(tensor_list)
+# Initialize DataLoader with BinaryBatchSampler
+# train_sampler = BinaryBatchSampler(
+#     dataset=train_dataset,
+#     col='binary',
+#     batch_size=4,  # Even batch_size
+#     shuffle=True
+# )
+
+# train_dataloader = DataLoader(
+#     dataset=train_dataset,
+#     batch_size=4,  # This should match the batch_size used in the sampler
+#     num_workers=2,
+#     shuffle=False,  # Set shuffle to False because we are using a sampler
+#     sampler=train_sampler,
+#     collate_fn=BinaryFolderDataset.collate_fn  # Ensure we use the correct collate_fn
+# )
 
 # Get a batch of data for initial predictions
 inputs, targets = next(iter(train_dataloader))
-targets = targets['binary'].to(device)
+print(f"Inputs: {inputs}")
+print(f"Targets: {targets}")
+targets = targets['binary'].to(device).float()
 inputs = convert_and_stack(inputs)  ##### Convert and stack inputs to tensor
-
+targets = targets.view(-1, 1)
 # Forward pass: get logits from the model
 outputs = model(inputs)
 
@@ -264,16 +281,25 @@ initial_accuracy = calculate_accuracy(probabilities, targets)
 print("Initial Accuracy:", initial_accuracy)
 
 # Training loop
-num_epochs = 5
+num_epochs = 2
 
 for epoch in range(num_epochs):
     model.train()
     total_loss = 0
     total_accuracy = 0
 
-    for inputs, targets in train_dataloader:
-        targets = targets['binary'].to(device)
+    for batch_idx, (inputs, targets) in enumerate(train_dataloader):
+        print(f"Batch index: {batch_idx}, Batch size: {len(inputs)}")
+        targets = targets['binary'].to(device).float()
         inputs = convert_and_stack(inputs)  ##### Convert and stack inputs to tensor
+        
+        # Reshape targets to match the shape of outputs
+        targets = targets.view(-1, 1)
+        
+        # Debug prints for batch balance
+        num_empty = (targets == 0).sum().item()
+        num_non_empty = (targets == 1).sum().item()
+        print(f"Epoch {epoch + 1}, Batch {batch_idx + 1}: Empty patches: {num_empty}, Non-empty patches: {num_non_empty}")
 
         optimizer.zero_grad()
         outputs = model(inputs)
@@ -298,7 +324,7 @@ for epoch in range(num_epochs):
 
 # Get a batch of data for final predictions
 inputs, targets = next(iter(train_dataloader))
-targets = targets['binary'].to(device)
+targets = targets['binary'].to(device).float()
 inputs = convert_and_stack(inputs)  ##### Convert and stack inputs to tensor
 
 # Forward pass: get logits from the model
@@ -328,44 +354,44 @@ print("Final Loss:", final_loss.item())
 # Calculate and print final accuracy
 final_accuracy = calculate_accuracy(probabilities, targets)
 print("Final Accuracy:", final_accuracy)
-########################    
-# def print_dataloader_info(dataloader):
-#     total_batches = len(dataloader)
-#     total_images = len(dataloader.dataset)
-#     batch_size = dataloader.batch_size
+#######################    
+def print_dataloader_info(dataloader):
+    total_batches = len(dataloader)
+    total_images = len(dataloader.dataset)
+    batch_size = dataloader.batch_size
 
-#     print(f"Total number of images: {total_images}")
-#     print(f"Batch size: {batch_size}")
-#     print(f"Total number of batches: {total_batches}")
-#     for i, (images, targets) in enumerate(train_dataloader):
-#         print(f"Batch {i+1}, Number of images: {len(images)}")
-#         batch_index = 0
-#         for batch in dataloader:
-#             images, targets = batch
-#         #     print(f"Batch {batch_index}:")
-#             # print(f"Number of images in this batch: {len(images)}")
-#             # print("List of images:")
-#             # for i, image in enumerate(images):
-#             #     print(f"Image {i+1}: {image}")  # Assuming image is a file path or similar
-#             # batch_index += 1
+    print(f"Total number of images: {total_images}")
+    print(f"Batch size: {batch_size}")
+    print(f"Total number of batches: {total_batches}")
+    for i, (images, targets) in enumerate(train_dataloader):
+        print(f"Batch {i+1}, Number of images: {len(images)}")
+        batch_index = 0
+        for batch in dataloader:
+            images, targets = batch
+        #     print(f"Batch {batch_index}:")
+            # print(f"Number of images in this batch: {len(images)}")
+            # print("List of images:")
+            # for i, image in enumerate(images):
+            #     print(f"Image {i+1}: {image}")  # Assuming image is a file path or similar
+            # batch_index += 1
             
-#             if isinstance(targets, dict) and 'binary' in targets:
-#                 print(f"Number of targets in this batch: {len(targets['binary'])}")
-#                 print("Targets tensor:")
-#                 print(targets['binary'])
-#             elif isinstance(targets, torch.Tensor):  
-#                 print(f"Number of targets in this batch: {len(targets)}")
-#                 print("Targets tensor:")
-#                 print(targets)
-#             else:
-#                 print("Targets not found or not in expected format.")
+            if isinstance(targets, dict) and 'binary' in targets:
+                print(f"Number of targets in this batch: {len(targets['binary'])}")
+                print("Targets tensor:")
+                print(targets['binary'])
+            elif isinstance(targets, torch.Tensor):  
+                print(f"Number of targets in this batch: {len(targets)}")
+                print("Targets tensor:")
+                print(targets)
+            else:
+                print("Targets not found or not in expected format.")
 
-# print("Train DataLoader:")
-# print_dataloader_info(train_dataloader)
-# print("Val DataLoader:")
-# print_dataloader_info(val_dataloader)
-# print("Test DataLoader:")
-# print_dataloader_info(test_dataloader)
+print("Train DataLoader:")
+print_dataloader_info(train_dataloader)
+print("Val DataLoader:")
+print_dataloader_info(val_dataloader)
+print("Test DataLoader:")
+print_dataloader_info(test_dataloader)
 #####################
 
 ################## BCEWithLogitsLoss ############################

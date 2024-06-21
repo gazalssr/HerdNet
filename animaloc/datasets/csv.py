@@ -181,7 +181,7 @@ class CSVDataset(Dataset):
                 
                 transformed = transform_pipeline(**albumentations_input)
                 transformed['image'] = numpy.asarray(transformed['image'])
-                print("Applied Transformations")
+                # print("Applied Transformations")
         else:
             transformed['image'] = torchvision.transforms.ToTensor()(image)
 
