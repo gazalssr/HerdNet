@@ -95,31 +95,7 @@ class BinaryMultiTransformsWrapper:
         # Return the last transformed image and the original targets converted to tensors.
         return image, target
 
-################## OLD BinaryMultitransformwrapper ###########
-# class BinaryMultiTransformsWrapper:
-#     """
-#     Applies each input transformation to the called input and returns the transformed image
-#     and a tuple containing the original target for each transformation.
-#     """
-#     def __init__(self, transforms: List[object]) -> None:
-#         self.transforms = transforms
-    
-#     def __call__(self, image: Union[Image.Image, torch.Tensor], target: Dict[str, torch.Tensor]) -> Tuple[torch.Tensor, Tuple[torch.Tensor]]:
-#         for trans in self.transforms:
-#             image, _ = trans(image, target)  # Ignore transformed target, apply transformation to image.
-        
-#         # Convert each key-value pair in the target dict to a tensor and store in a new dict
-#         target = {key: torch.tensor(val, dtype=torch.int64) if not isinstance(val, torch.Tensor) else val for key, val in target.items()}
-        
-#         # Debug print statements to verify the targets
-#         print(f"Transformed Image: {image.shape}")
-#         print(f"Target: {target}")
-
-#         # Return the last transformed image and the original targets converted to tensors.
-#         return image, target
-
 @TRANSFORMS.register()
-
 ########################### New SampleToTensor Function ###############
 class SampleToTensor:
     class SampleToTensor:

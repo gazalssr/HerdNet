@@ -36,65 +36,73 @@ patch_size = 512
 num_classes = 2
 batch_size=8
 down_ratio = 2
-train_dataset = BinaryFolderDataset(preprocess=preprocess,
-    csv_file = '/herdnet/DATASETS/CAH_no_margins_30/train/Train_binary_gt.csv',
-    root_dir = '/herdnet/DATASETS/CAH_no_margins_30/train/',
-    albu_transforms = A.Compose([
+train_dataset = BinaryFolderDataset(
+    preprocess=preprocess,
+    csv_file='/herdnet/DATASETS/CAH_no_margins_30/train/Train_binary_gt.csv',
+    root_dir='/herdnet/DATASETS/CAH_no_margins_30/train/',
+    albu_transforms=A.Compose([
         A.VerticalFlip(p=0.5),
         A.HorizontalFlip(p=0.5),
         A.RandomRotate90(p=0.5),
         A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.2),
         A.Blur(blur_limit=15, p=0.2),
-        A.Normalize(p=1.0)
-        ]),
-    end_transforms = [BinaryMultiTransformsWrapper([
+        A.Normalize(p=1.0),
+        ToTensorV2()
+    ]),
+    end_transforms=[BinaryMultiTransformsWrapper([
         BinaryTransform(),
-        ])]
-    )
+    ])]
+)
+
 # train_dataset.data.to_csv('/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/train_CF/Train_binary_gt.csv', index=False)
 import os
 from PIL import Image
-val_dataset = BinaryFolderDataset(preprocess=preprocess,
-    csv_file = '/herdnet/DATASETS/CAH_no_margins_30/val/Val_binary_gt.csv',
-    root_dir = '/herdnet/DATASETS/CAH_no_margins_30/val/',
-    albu_transforms = [
+val_dataset = BinaryFolderDataset(
+    preprocess=preprocess,
+    csv_file='/herdnet/DATASETS/CAH_no_margins_30/val/Val_binary_gt.csv',
+    root_dir='/herdnet/DATASETS/CAH_no_margins_30/val/',
+    albu_transforms=A.Compose([
         A.Normalize(p=1.0),
         ToTensorV2()
-        ],
-    end_transforms = [BinaryMultiTransformsWrapper([
+    ]),
+    end_transforms=[BinaryMultiTransformsWrapper([
         BinaryTransform(),
-        ])]
-    )
+    ])]
+)
 # val_dataset.data.to_csv('/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/val_CF/Val_binary_gt.csv', index=False)
 
 
-test_dataset = BinaryFolderDataset(preprocess=preprocess,
-    
-    csv_file = '/herdnet/DATASETS/CAH_no_margins_30/test/Test_binary_gt.csv',
-    root_dir = '/herdnet/DATASETS/CAH_no_margins_30/test/',
-    albu_transforms = [A.Normalize(p=1.0)], 
-    end_transforms = [BinaryMultiTransformsWrapper([
+test_dataset = BinaryFolderDataset(
+    preprocess=preprocess,
+    csv_file='/herdnet/DATASETS/CAH_no_margins_30/test/Test_binary_gt.csv',
+    root_dir='/herdnet/DATASETS/CAH_no_margins_30/test/',
+    albu_transforms=A.Compose([
+        A.Normalize(p=1.0),
+        ToTensorV2()
+    ]),
+    end_transforms=[BinaryMultiTransformsWrapper([
         BinaryTransform(),
-        ])]
-    )
+    ])]
+)
 
 # Initialize BinaryBatchSampler for training
 train_sampler = BinaryBatchSampler(
     dataset=train_dataset,
     col='binary',  
-    batch_size=4,  # Even batch_size
+    batch_size=8,  # Even batch_size
     shuffle=True
 )
 # test_dataset.data.to_csv('/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/test_W/Test_binary_gt.csv', index=False)
 # Dataloaders
 from torch.utils.data import DataLoader
-train_dataloader = DataLoader(dataset = train_dataset,batch_size=4 , sampler=train_sampler, collate_fn=BinaryFolderDataset.collate_fn)
-# num_workers= 2
-val_dataloader = DataLoader(dataset = val_dataset, batch_size=1 , shuffle= False)
+train_dataloader = DataLoader(dataset = train_dataset, sampler=train_sampler, collate_fn=BinaryFolderDataset.collate_fn)
 
-test_dataloader= DataLoader(dataset = test_dataset, batch_size=1 , shuffle= False)
+# num_workers= 2
+val_dataloader = DataLoader(dataset = val_dataset, batch_size=4 , shuffle= False, collate_fn=BinaryFolderDataset.collate_fn)
+
+test_dataloader= DataLoader(dataset = test_dataset, batch_size=1 , shuffle= False, collate_fn=BinaryFolderDataset.collate_fn)
 num_classes=2
-dla_encoder = DLAEncoder(num_classes=num_classes, pretrained=True).cuda()
+dla_encoder = DLAEncoder(num_classes=num_classes, pretrained=False).cuda()
 
 
 image= torch.ones([1,3,512,512]).cuda()
@@ -106,7 +114,11 @@ non_empty_patches = 1502
 weight_for_empty = total_patches / (2 * empty_patches)
 weight_for_non_empty = total_patches / (2 * non_empty_patches)
 weights = [weight_for_empty, weight_for_non_empty]
-# ##### TESTING #############
+# Define the model(with saved imagenet weights)
+dla_encoder = DLAEncoder(num_classes=num_classes, pretrained=False).cuda()
+dla_encoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pth')
+
+# ##### TESTING the augmentation phase #############
 # original_save_dir = './herdnet/original_images'
 # augmented_save_dir = './herdnet/augmented_images'
 # os.makedirs(original_save_dir, exist_ok=True)  # Ensure the directory exists
@@ -162,237 +174,229 @@ weights = [weight_for_empty, weight_for_non_empty]
 #     # print(f"Saved original and augmented images for batch {i+1}")
 
 
-################ Make a test phase for training loop ########################
+################ Make a test phase for training loop ###########################################
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
+# import torch
+# import torch.nn as nn
+# import torch.optim as optim
 
 # Define the model
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = DLAEncoder().to(device)
-
-# Define the optimizer
-learning_rate = 0.0001  # Adjust if necessary
-optimizer = optim.Adam(model.parameters(), lr=learning_rate)
-
-# Define the class weights based on your dataset
-# total_patches = len(train_dataset)
-# empty_patches = 7960
-# non_empty_patches = 1502
-
-# # Class weights
-# weight_for_empty = total_patches / (2 * empty_patches)
-# weight_for_non_empty = total_patches / (2 * non_empty_patches)
-pos_weight = torch.tensor([weight_for_non_empty], device=device)  ##### Define pos_weight for BCEWithLogitsLoss
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# model = DLAEncoder().to(device)
+# dla_encoder = DLAEncoder(num_classes=num_classes, pretrained=False).cuda()
+# dla_encoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pth')
+# # Define the optimizer
+# learning_rate = 0.0001  # Adjust if necessary
+# optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+# pos_weight = torch.tensor([weight_for_non_empty], device=device)  ##### Define pos_weight for BCEWithLogitsLoss
 
 # Initialize the BCEWithLogitsLoss with pos_weight
-criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
-weights = [weight_for_empty, weight_for_non_empty]
+# criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+# weights = [weight_for_empty, weight_for_non_empty]
 
 # Initialize the custom loss function with weights
-criterion = FocalComboLoss_P(weights=weights)
+# criterion = FocalComboLoss_P(weights=weights)
 
-# Define the accuracy calculation function
-def calculate_accuracy(probabilities, targets, threshold=0.5):
-    preds = (probabilities > threshold).float()
-    print(f"Predictions shape: {preds.shape}")
-    print(f"Targets shape: {targets.shape}")
-    targets = targets.view_as(preds)  ### Reshape targets to match preds
-    correct = (preds == targets).sum().item()
-    accuracy = correct / targets.size(0)
-    return accuracy
+# # Define the accuracy calculation function
+# def calculate_accuracy(probabilities, targets, threshold=0.5):
+#     preds = (probabilities > threshold).float()
+#     print(f"Predictions shape: {preds.shape}")
+#     print(f"Targets shape: {targets.shape}")
+#     targets = targets.view_as(preds)  ### Reshape targets to match preds
+#     correct = (preds == targets).sum().item()
+#     accuracy = correct / targets.size(0)
+#     return accuracy
 
 # Convert list of numpy arrays to list of tensors and stack
-def convert_and_stack(inputs):
-    tensor_list = []
+# def convert_and_stack(inputs):
+#     tensor_list = []
 
-    def process_image(img):
-        if isinstance(img, numpy.ndarray):
-            if img.ndim == 3:  # Ensure it's an image with 3 dimensions (H, W, C)
-                tensor_img = torch.tensor(img).to(device)
-                if tensor_img.shape[2] == 3:  # Check if the last dimension is the channel dimension
-                    tensor_img = tensor_img.permute(2, 0, 1)  # Convert to (C, H, W)
-                return tensor_img
-            else:
-                raise ValueError(f"Expected 3 dimensions for image, got {img.ndim} dimensions")
-        else:
-            raise TypeError(f"Expected numpy array, got {type(img)}")
+#     def process_image(img):
+#         if isinstance(img, numpy.ndarray):
+#             if img.ndim == 3:  # Ensure it's an image with 3 dimensions (H, W, C)
+#                 tensor_img = torch.tensor(img).to(device)
+#                 if tensor_img.shape[2] == 3:  # Check if the last dimension is the channel dimension
+#                     tensor_img = tensor_img.permute(2, 0, 1)  # Convert to (C, H, W)
+#                 return tensor_img
+#             else:
+#                 raise ValueError(f"Expected 3 dimensions for image, got {img.ndim} dimensions")
+#         else:
+#             raise TypeError(f"Expected numpy array, got {type(img)}")
 
-    for item in inputs:
-        if isinstance(item, list):
-            for img in item:
-                tensor_list.append(process_image(img))
-        else:
-            tensor_list.append(process_image(item))
+#     for item in inputs:
+#         if isinstance(item, list):
+#             for img in item:
+#                 tensor_list.append(process_image(img))
+#         else:
+#             tensor_list.append(process_image(item))
     
-    return torch.stack(tensor_list)
-# Initialize DataLoader with BinaryBatchSampler
-# train_sampler = BinaryBatchSampler(
-#     dataset=train_dataset,
-#     col='binary',
-#     batch_size=4,  # Even batch_size
-#     shuffle=True
-# )
+#     return torch.stack(tensor_list)
+# # Initialize DataLoader with BinaryBatchSampler
+# # train_sampler = BinaryBatchSampler(
+# #     dataset=train_dataset,
+# #     col='binary',
+# #     batch_size=4,  # Even batch_size
+# #     shuffle=True
+# # )
 
-# train_dataloader = DataLoader(
-#     dataset=train_dataset,
-#     batch_size=4,  # This should match the batch_size used in the sampler
-#     num_workers=2,
-#     shuffle=False,  # Set shuffle to False because we are using a sampler
-#     sampler=train_sampler,
-#     collate_fn=BinaryFolderDataset.collate_fn  # Ensure we use the correct collate_fn
-# )
+# # train_dataloader = DataLoader(
+# #     dataset=train_dataset,
+# #     batch_size=4,  # This should match the batch_size used in the sampler
+# #     num_workers=2,
+# #     shuffle=False,  # Set shuffle to False because we are using a sampler
+# #     sampler=train_sampler,
+# #     collate_fn=BinaryFolderDataset.collate_fn  # Ensure we use the correct collate_fn
+# # )
 
-# Get a batch of data for initial predictions
-inputs, targets = next(iter(train_dataloader))
-print(f"Inputs: {inputs}")
-print(f"Targets: {targets}")
-targets = targets['binary'].to(device).float()
-inputs = convert_and_stack(inputs)  ##### Convert and stack inputs to tensor
-targets = targets.view(-1, 1)
-# Forward pass: get logits from the model
-outputs = model(inputs)
+# # Get a batch of data for initial predictions
+# inputs, targets = next(iter(train_dataloader))
+# print(f"Inputs: {inputs}")
+# print(f"Targets: {targets}")
+# targets = targets['binary'].to(device).float()
+# inputs = convert_and_stack(inputs)  ##### Convert and stack inputs to tensor
+# targets = targets.view(-1, 1)
+# # Forward pass: get logits from the model
+# outputs = model(inputs)
 
-# Apply sigmoid to convert logits to probabilities
-probabilities = torch.sigmoid(outputs)
+# # Apply sigmoid to convert logits to probabilities
+# probabilities = torch.sigmoid(outputs)
 
-# Convert probabilities to binary predictions
-threshold = 0.5  # Adjust threshold if needed
-predictions = (probabilities > threshold).float()
+# # Convert probabilities to binary predictions
+# threshold = 0.5  # Adjust threshold if needed
+# predictions = (probabilities > threshold).float()
 
-# Print initial logits, probabilities, binary predictions, and targets
-print("Initial Predictions")
-print("Logits (raw outputs):")
-print(outputs)
-print("Probabilities after sigmoid:")
-print(probabilities)
-print("Binary predictions:")
-print(predictions)
-print("Targets:")
-print(targets)
+# # Print initial logits, probabilities, binary predictions, and targets
+# print("Initial Predictions")
+# print("Logits (raw outputs):")
+# print(outputs)
+# print("Probabilities after sigmoid:")
+# print(probabilities)
+# print("Binary predictions:")
+# print(predictions)
+# print("Targets:")
+# print(targets)
 
-# Calculate and print initial loss
-initial_loss = criterion(outputs, targets)
-print("Initial Loss:", initial_loss.item())
+# # Calculate and print initial loss
+# initial_loss = criterion(outputs, targets)
+# print("Initial Loss:", initial_loss.item())
 
-# Calculate and print initial accuracy
-initial_accuracy = calculate_accuracy(probabilities, targets)
-print("Initial Accuracy:", initial_accuracy)
+# # Calculate and print initial accuracy
+# initial_accuracy = calculate_accuracy(probabilities, targets)
+# print("Initial Accuracy:", initial_accuracy)
 
-# Training loop
-num_epochs = 2
+# # Training loop
+# num_epochs = 2
 
-for epoch in range(num_epochs):
-    model.train()
-    total_loss = 0
-    total_accuracy = 0
+# for epoch in range(num_epochs):
+#     model.train()
+#     total_loss = 0
+#     total_accuracy = 0
 
-    for batch_idx, (inputs, targets) in enumerate(train_dataloader):
-        print(f"Batch index: {batch_idx}, Batch size: {len(inputs)}")
-        targets = targets['binary'].to(device).float()
-        inputs = convert_and_stack(inputs)  ##### Convert and stack inputs to tensor
+#     for batch_idx, (inputs, targets) in enumerate(train_dataloader):
+#         print(f"Batch index: {batch_idx}, Batch size: {len(inputs)}")
+#         targets = targets['binary'].to(device).float()
+#         inputs = convert_and_stack(inputs)  ##### Convert and stack inputs to tensor
         
-        # Reshape targets to match the shape of outputs
-        targets = targets.view(-1, 1)
+#         # Reshape targets to match the shape of outputs
+#         targets = targets.view(-1, 1)
         
-        # Debug prints for batch balance
-        num_empty = (targets == 0).sum().item()
-        num_non_empty = (targets == 1).sum().item()
-        print(f"Epoch {epoch + 1}, Batch {batch_idx + 1}: Empty patches: {num_empty}, Non-empty patches: {num_non_empty}")
+#         # Debug prints for batch balance
+#         num_empty = (targets == 0).sum().item()
+#         num_non_empty = (targets == 1).sum().item()
+#         print(f"Epoch {epoch + 1}, Batch {batch_idx + 1}: Empty patches: {num_empty}, Non-empty patches: {num_non_empty}")
 
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, targets)
-        loss.backward()
-        optimizer.step()
+#         optimizer.zero_grad()
+#         outputs = model(inputs)
+#         loss = criterion(outputs, targets)
+#         loss.backward()
+#         optimizer.step()
 
-        probabilities = torch.sigmoid(outputs)
-        accuracy = calculate_accuracy(probabilities, targets)
-        total_loss += loss.item()
-        total_accuracy += accuracy
+#         probabilities = torch.sigmoid(outputs)
+#         accuracy = calculate_accuracy(probabilities, targets)
+#         total_loss += loss.item()
+#         total_accuracy += accuracy
 
-    avg_loss = total_loss / len(train_dataloader)
-    avg_accuracy = total_accuracy / len(train_dataloader)
+#     avg_loss = total_loss / len(train_dataloader)
+#     avg_accuracy = total_accuracy / len(train_dataloader)
 
-    print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {avg_loss:.4f}, Accuracy: {avg_accuracy:.4f}")
+#     print(f"Epoch {epoch + 1}/{num_epochs}, Loss: {avg_loss:.4f}, Accuracy: {avg_accuracy:.4f}")
 
-    # Add a condition to check for NaN or very high loss values
-    if torch.isnan(loss):
-        print("Loss is NaN, check the model and data.")
-        break
+#     # Add a condition to check for NaN or very high loss values
+#     if torch.isnan(loss):
+#         print("Loss is NaN, check the model and data.")
+#         break
 
-# Get a batch of data for final predictions
-inputs, targets = next(iter(train_dataloader))
-targets = targets['binary'].to(device).float()
-inputs = convert_and_stack(inputs)  ##### Convert and stack inputs to tensor
+# # Get a batch of data for final predictions
+# inputs, targets = next(iter(train_dataloader))
+# targets = targets['binary'].to(device).float()
+# inputs = convert_and_stack(inputs)  ##### Convert and stack inputs to tensor
 
-# Forward pass: get logits from the model
-outputs = model(inputs)
+# # Forward pass: get logits from the model
+# outputs = model(inputs)
 
-# Apply sigmoid to convert logits to probabilities
-probabilities = torch.sigmoid(outputs)
+# # Apply sigmoid to convert logits to probabilities
+# probabilities = torch.sigmoid(outputs)
 
-# Convert probabilities to binary predictions
-predictions = (probabilities > threshold).float()
+# # Convert probabilities to binary predictions
+# predictions = (probabilities > threshold).float()
 
-# Print final logits, probabilities, binary predictions, and targets
-print("Final Predictions")
-print("Logits (raw outputs):")
-print(outputs)
-print("Probabilities after sigmoid:")
-print(probabilities)
-print("Binary predictions:")
-print(predictions)
-print("Targets:")
-print(targets)
+# # Print final logits, probabilities, binary predictions, and targets
+# print("Final Predictions")
+# print("Logits (raw outputs):")
+# print(outputs)
+# print("Probabilities after sigmoid:")
+# print(probabilities)
+# print("Binary predictions:")
+# print(predictions)
+# print("Targets:")
+# print(targets)
 
-# Calculate and print final loss
-final_loss = criterion(outputs, targets)
-print("Final Loss:", final_loss.item())
+# # Calculate and print final loss
+# final_loss = criterion(outputs, targets)
+# print("Final Loss:", final_loss.item())
 
-# Calculate and print final accuracy
-final_accuracy = calculate_accuracy(probabilities, targets)
-print("Final Accuracy:", final_accuracy)
-#######################    
-def print_dataloader_info(dataloader):
-    total_batches = len(dataloader)
-    total_images = len(dataloader.dataset)
-    batch_size = dataloader.batch_size
+# # Calculate and print final accuracy
+# final_accuracy = calculate_accuracy(probabilities, targets)
+# print("Final Accuracy:", final_accuracy)
+# #######################    
+# def print_dataloader_info(dataloader):
+#     total_batches = len(dataloader)
+#     total_images = len(dataloader.dataset)
+#     batch_size = dataloader.batch_size
 
-    print(f"Total number of images: {total_images}")
-    print(f"Batch size: {batch_size}")
-    print(f"Total number of batches: {total_batches}")
-    for i, (images, targets) in enumerate(train_dataloader):
-        print(f"Batch {i+1}, Number of images: {len(images)}")
-        batch_index = 0
-        for batch in dataloader:
-            images, targets = batch
-        #     print(f"Batch {batch_index}:")
-            # print(f"Number of images in this batch: {len(images)}")
-            # print("List of images:")
-            # for i, image in enumerate(images):
-            #     print(f"Image {i+1}: {image}")  # Assuming image is a file path or similar
-            # batch_index += 1
+#     print(f"Total number of images: {total_images}")
+#     print(f"Batch size: {batch_size}")
+#     print(f"Total number of batches: {total_batches}")
+#     for i, (images, targets) in enumerate(train_dataloader):
+#         print(f"Batch {i+1}, Number of images: {len(images)}")
+#         batch_index = 0
+#         for batch in dataloader:
+#             images, targets = batch
+#         #     print(f"Batch {batch_index}:")
+#             # print(f"Number of images in this batch: {len(images)}")
+#             # print("List of images:")
+#             # for i, image in enumerate(images):
+#             #     print(f"Image {i+1}: {image}")  # Assuming image is a file path or similar
+#             # batch_index += 1
             
-            if isinstance(targets, dict) and 'binary' in targets:
-                print(f"Number of targets in this batch: {len(targets['binary'])}")
-                print("Targets tensor:")
-                print(targets['binary'])
-            elif isinstance(targets, torch.Tensor):  
-                print(f"Number of targets in this batch: {len(targets)}")
-                print("Targets tensor:")
-                print(targets)
-            else:
-                print("Targets not found or not in expected format.")
+#             if isinstance(targets, dict) and 'binary' in targets:
+#                 print(f"Number of targets in this batch: {len(targets['binary'])}")
+#                 print("Targets tensor:")
+#                 print(targets['binary'])
+#             elif isinstance(targets, torch.Tensor):  
+#                 print(f"Number of targets in this batch: {len(targets)}")
+#                 print("Targets tensor:")
+#                 print(targets)
+#             else:
+#                 print("Targets not found or not in expected format.")
 
-print("Train DataLoader:")
-print_dataloader_info(train_dataloader)
-print("Val DataLoader:")
-print_dataloader_info(val_dataloader)
-print("Test DataLoader:")
-print_dataloader_info(test_dataloader)
-#####################
+# print("Train DataLoader:")
+# print_dataloader_info(train_dataloader)
+# print("Val DataLoader:")
+# print_dataloader_info(val_dataloader)
+# print("Test DataLoader:")
+# print_dataloader_info(test_dataloader)
+####################################################################################################################################
 
 ################## BCEWithLogitsLoss ############################
 
@@ -439,7 +443,8 @@ losses = [{'loss': focal_combo_loss, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 
 #       ]
     
 dla_encoder = LossWrapper(dla_encoder, losses=losses)
-
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# model = DLAEncoder().to(device)
 ######################################################################################################################
 # DLA Auto_Encoder
 ##### DLA AutoEncoder 
@@ -503,7 +508,7 @@ mkdir(work_dir)
 
 lr = 1e-4
 weight_decay = 1e-3
-epochs =100
+epochs =2
 # optimizer = Adam(params=dla_encoder_decoder.parameters(), lr=lr, weight_decay=weight_decay)
 optimizer = Adam(params=params_to_update, lr=lr, weight_decay=weight_decay)
 lr_milestones = [30, 60, 90]  # Example milestones
@@ -517,6 +522,7 @@ evaluator = TileEvaluator(
     metrics_class=ImageLevelMetrics,
     threshold=0.3,
     model=dla_encoder,
+    # model=model,
     dataloader=val_dataloader,
     num_classes=num_classes,
     stitcher=None,
@@ -538,6 +544,7 @@ trainer = Trainer(
 
 if wandb.run is not None:
   wandb.finish()
+  
 wandb.init(project="herdnet_pretrain")
 
 ####### Trainer ############

@@ -230,6 +230,65 @@ class Trainer:
         
     #     return images, targets
 #############################################
+    # def prepare_data(self, images, targets) -> tuple:
+    #     ''' Method to prepare the data before feeding to the model. 
+    #     Can be overridden by subclass to create a custom Trainer.
+
+    #     Args:
+    #         images,
+    #         targets
+        
+    #     Returns:
+    #         tuple
+    #     '''
+        
+    #     # If images are in NumPy array format, convert them to tensors
+    #     if isinstance(images, list) and isinstance(images[0], numpy.ndarray):
+    #         images = [torch.tensor(img).permute(2, 0, 1).to(self.device) for img in images]
+    #     else:
+    #         images = images.to(self.device)
+
+    #     if isinstance(targets, dict):
+    #         # Move each tensor within the target dictionary to the device
+    #         processed_targets = {}
+    #         for k, v in targets.items():
+    #             print(f"Processing target key: {k}, value: {v}, type: {type(v)}")
+    #             if isinstance(v, torch.Tensor):
+    #                 processed_targets[k] = v.to(self.device)
+    #             elif isinstance(v, (int, float)):
+    #                 processed_targets[k] = torch.tensor([v]).to(self.device)
+    #             elif isinstance(v, (list, numpy.ndarray)):
+    #                 if isinstance(v[0], str):  # Skip lists of strings
+    #                     processed_targets[k] = v
+    #                 else:
+    #                     processed_targets[k] = torch.tensor(v).to(self.device)
+    #             else:
+    #                 print(f"Skipping target key: {k} with incompatible type: {type(v)}")
+    #                 processed_targets[k] = v  # Leave strings and other non-tensor-compatible values as they are
+    #         targets = processed_targets
+    #     elif isinstance(targets, (list, tuple)):
+    #         # If targets is a list or tuple, move each item to the device
+    #         processed_targets = []
+    #         for tar in targets:
+    #             print(f"Processing target: {tar}, type: {type(tar)}")
+    #             if isinstance(tar, torch.Tensor):
+    #                 processed_targets.append(tar.to(self.device))
+    #             elif isinstance(tar, (int, float)):
+    #                 processed_targets.append(torch.tensor([tar]).to(self.device))
+    #             elif isinstance(tar, (list, numpy.ndarray)):
+    #                 if isinstance(tar[0], str):  # Skip lists of strings
+    #                     processed_targets.append(tar)
+    #                 else:
+    #                     processed_targets.append(torch.tensor(tar).to(self.device))
+    #             else:
+    #                 print(f"Skipping target with incompatible type: {type(tar)}")
+    #                 processed_targets.append(tar)  # Leave strings and other non-tensor-compatible values as they are
+    #         targets = processed_targets
+    #     else:
+    #         print("Unexpected targets format.")
+        
+    #     return images, targets
+################################ 3333333 ########
     def prepare_data(self, images, targets) -> tuple:
         ''' Method to prepare the data before feeding to the model. 
         Can be overridden by subclass to create a custom Trainer.
@@ -241,54 +300,54 @@ class Trainer:
         Returns:
             tuple
         '''
-        
-        # If images are in NumPy array format, convert them to tensors
-        if isinstance(images, list) and isinstance(images[0], numpy.ndarray):
-            images = [torch.tensor(img).permute(2, 0, 1).to(self.device) for img in images]
+
+        def process_image(img):
+            if isinstance(img, numpy.ndarray):
+                tensor_img = torch.tensor(img).permute(2, 0, 1).to(self.device)
+            elif isinstance(img, torch.Tensor):
+                tensor_img = img.to(self.device)
+            elif isinstance(img, list):
+                tensor_img = [process_image(i) for i in img]
+            else:
+                raise TypeError(f"Unsupported image type: {type(img)}")
+            return tensor_img
+
+        # Apply processing to each image in the list
+        if isinstance(images, list):
+            images = [process_image(img) for img in images]
         else:
-            images = images.to(self.device)
+            images = process_image(images)
+
+        def process_target(tar):
+            if isinstance(tar, torch.Tensor):
+                return tar.to(self.device)
+            elif isinstance(tar, (int, float)):
+                return torch.tensor([tar]).to(self.device)
+            elif isinstance(tar, (list, numpy.ndarray)):
+                if len(tar) > 0 and isinstance(tar[0], str):  # Skip lists of strings
+                    return tar
+                else:
+                    return torch.tensor(tar).to(self.device)
+            else:
+                return tar  # Leave non-tensor-compatible values as they are
 
         if isinstance(targets, dict):
-            # Move each tensor within the target dictionary to the device
             processed_targets = {}
             for k, v in targets.items():
-                print(f"Processing target key: {k}, value: {v}, type: {type(v)}")
-                if isinstance(v, torch.Tensor):
-                    processed_targets[k] = v.to(self.device)
-                elif isinstance(v, (int, float)):
-                    processed_targets[k] = torch.tensor([v]).to(self.device)
-                elif isinstance(v, (list, numpy.ndarray)):
-                    if isinstance(v[0], str):  # Skip lists of strings
-                        processed_targets[k] = v
-                    else:
-                        processed_targets[k] = torch.tensor(v).to(self.device)
+                # print(f"Processing target key: {k}, value: {v}, type: {type(v)}")
+                if isinstance(v, list) and len(v) > 0 and isinstance(v[0], str):  # Handle list of strings separately
+                    processed_targets[k] = v
+                elif isinstance(v, list) and all(isinstance(i, list) and all(isinstance(sub_i, str) for sub_i in i) for i in v):
+                    processed_targets[k] = v  # Keep nested lists of strings as is
                 else:
-                    print(f"Skipping target key: {k} with incompatible type: {type(v)}")
-                    processed_targets[k] = v  # Leave strings and other non-tensor-compatible values as they are
-            targets = processed_targets
+                    processed_targets[k] = process_target(v)
         elif isinstance(targets, (list, tuple)):
-            # If targets is a list or tuple, move each item to the device
-            processed_targets = []
-            for tar in targets:
-                print(f"Processing target: {tar}, type: {type(tar)}")
-                if isinstance(tar, torch.Tensor):
-                    processed_targets.append(tar.to(self.device))
-                elif isinstance(tar, (int, float)):
-                    processed_targets.append(torch.tensor([tar]).to(self.device))
-                elif isinstance(tar, (list, numpy.ndarray)):
-                    if isinstance(tar[0], str):  # Skip lists of strings
-                        processed_targets.append(tar)
-                    else:
-                        processed_targets.append(torch.tensor(tar).to(self.device))
-                else:
-                    print(f"Skipping target with incompatible type: {type(tar)}")
-                    processed_targets.append(tar)  # Leave strings and other non-tensor-compatible values as they are
-            targets = processed_targets
+            processed_targets = [process_target(tar) for tar in targets]
         else:
             print("Unexpected targets format.")
+            processed_targets = targets
         
-        return images, targets
-
+        return images, processed_targets
 
 
     def start(
@@ -602,7 +661,10 @@ class Trainer:
                 )
 
         batches_losses = []
-
+        # Initialization for printing statements # 
+        first_batch_printed = False
+        batch_count = 0
+        ####
         for images, targets in self.train_logger.log_every(self.train_dataloader, self.print_freq, header):
 
             images, targets = self.prepare_data(images, targets)
@@ -638,7 +700,21 @@ class Trainer:
 
             self.train_logger.update(loss=losses_reduced, **loss_dict_reduced)
             self.train_logger.update(lr=self.optimizer.param_groups[0]["lr"])
-        
+            
+            ### Printing statements to show the targets format and sampler procedure ####
+            # Print targets for the first batch
+            if not first_batch_printed:
+                print(f"Targets for the first batch: {targets}")
+                first_batch_printed = True
+
+            # Print target information for the first three batches
+            if batch_count < 3:
+                non_empty_targets = sum((t != 0).sum().item() for t in targets['binary'])
+                empty_targets = sum((t == 0).sum().item() for t in targets['binary'])
+                print(f"Batch {batch_count+1} - Non-empty targets: {non_empty_targets}, Empty targets: {empty_targets}")
+                batch_count += 1
+                
+                
         batches_losses = torch.stack(batches_losses)
 
         out = torch.mean(batches_losses).item()

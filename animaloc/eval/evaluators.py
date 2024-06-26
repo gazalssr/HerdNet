@@ -504,19 +504,27 @@ class TileEvaluator(Evaluator):
         self.threshold = threshold
     def prepare_data(self, images: Any, targets: Any) -> tuple: 
         if isinstance(targets, dict):
-            # Move each tensor within the target dictionary to the device
-            # print("Targets are a dictionary.")
-            if len(targets.keys())>1:
-                targets = {k: v.to(self.device) for k, v in targets.items()}
-            else:
-                targets = [v.to(self.device) for k, v in targets.items()]
+            # Check if any of the values in the targets dictionary are lists
+            new_targets = {}
+            for k, v in targets.items():
+                if isinstance(v, list):
+                    # Convert each element in the list to the device
+                    new_targets[k] = [item.to(self.device) if isinstance(item, torch.Tensor) else item for item in v]
+                else:
+                    new_targets[k] = v.to(self.device) if isinstance(v, torch.Tensor) else v
+            targets = new_targets
         elif isinstance(targets, (list, tuple)):
             # If targets is a list or tuple, move each item to the device
-            targets = [tar.to(self.device) for tar in targets]
+            targets = [tar.to(self.device) for tar in targets if isinstance(tar, torch.Tensor)]
             print("Targets are in a list or tuple.")
         else:
-            print("Unexpected targets format.")       
-        return images.to(self.device), targets
+            print("Unexpected targets format.")
+            
+        images = images.to(self.device) if isinstance(images, torch.Tensor) else images
+        
+        return images, targets
+
+
     
  
     def prepare_feeding(self, targets: Any, output: torch.Tensor, threshold: float = 0.5) -> dict:
@@ -525,21 +533,21 @@ class TileEvaluator(Evaluator):
         This version assumes targets are provided in a suitable format for binary classification.
         """
 
-        # If targets come as a list of tensors, convert to a single tensor
-        if isinstance(targets, list):
-            targets = torch.stack(targets).to(self.device)
+        # Ensure targets are in the correct format
+        if isinstance(targets, dict):
+            targets = {k: v.float().to(self.device) if isinstance(v, torch.Tensor) else v for k, v in targets.items()}
+        elif isinstance(targets, list):
+            targets = [v.float().to(self.device) if isinstance(v, torch.Tensor) else v for v in targets]
 
-        targets_float = targets.float()
-
-        # Convert model output to probabilities via sigmoid 
+        # Convert model output to probabilities via sigmoid
         scores = torch.sigmoid(output).float()
 
-        # convert probabilities to binary predictions (threshold)
+        # Convert probabilities to binary predictions (threshold)
         pred_binary = (scores > threshold).float()
-        # pred_binary = torch.tensor([1 if s > 0 else 0 for s in scores], dtype=torch.float32).to(output.device)
+
         # Prepare dictionary for feeding into metrics
         feeding_dict = {
-            'gt': {'binary': targets_float},
+            'gt': targets,
             'preds': {'binary': pred_binary}
         }
 

@@ -143,9 +143,10 @@ class BinaryFolderDataset(CSVDataset):
             self.data = pandas.read_csv(csv_file)
         
         self.data.reset_index(drop=True, inplace=True)  # Reset the DataFrame index
-        
         self.anno_type = 'binary'
         self._ordered_img_names = self.data['images'].values.tolist()
+
+        # print(f"DataFrame length after preprocessing: {len(self.data)}")
 
     def create_binary_dataframe(self):
         self.folder_images = [i for i in os.listdir(self.root_dir) if i.endswith(('.JPG', '.jpg', '.JPEG', '.jpeg'))]
@@ -167,6 +168,7 @@ class BinaryFolderDataset(CSVDataset):
         non_empty_patches_count = len(self.data[self.data['binary'] == 1])
         print(f"Number of empty patches: {empty_patches_count}")
         print(f"Number of non-empty patches: {non_empty_patches_count}")
+        # print(f"DataFrame length after create_binary_dataframe: {len(self.data)}")
 
     def _load_image(self, index: int) -> Image.Image:
         img_name = self.data.at[index, 'images']
@@ -185,7 +187,7 @@ class BinaryFolderDataset(CSVDataset):
         return len(self.data)
 
     def __getitem__(self, index) -> Tuple[torch.Tensor, Dict[str, torch.Tensor]]:
-        if isinstance(index, list):  ##### Check if the index is a list
+        if isinstance(index, list):  # Check if the index is a list
             images = []
             targets = {'image_name': [], 'binary': []}
             for idx in index:
@@ -217,7 +219,16 @@ class BinaryFolderDataset(CSVDataset):
 
     @staticmethod
     def collate_fn(batch):
-        images = [item[0] for item in batch]
+        images = []
+        for item in batch:
+            if isinstance(item[0], list):
+                images.extend(item[0])
+            else:
+                images.append(item[0])
+
+        images = [torch.tensor(img).permute(2, 0, 1) if isinstance(img, numpy.ndarray) else img for img in images]
+        images = torch.stack(images)  # Stack images into a single tensor
+        
         binary_targets = torch.stack([item[1]['binary'] for item in batch])
         image_names = [item[1]['image_name'] for item in batch]
         return images, {'binary': binary_targets, 'image_name': image_names}
