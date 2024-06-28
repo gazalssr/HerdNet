@@ -89,7 +89,7 @@ test_dataset = BinaryFolderDataset(
 train_sampler = BinaryBatchSampler(
     dataset=train_dataset,
     col='binary',  
-    batch_size=8,  # Even batch_size
+    batch_size=4,  # Even batch_size
     shuffle=True
 )
 # test_dataset.data.to_csv('/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/test_W/Test_binary_gt.csv', index=False)
@@ -98,11 +98,11 @@ from torch.utils.data import DataLoader
 train_dataloader = DataLoader(dataset = train_dataset, sampler=train_sampler, collate_fn=BinaryFolderDataset.collate_fn)
 
 # num_workers= 2
-val_dataloader = DataLoader(dataset = val_dataset, batch_size=4 , shuffle= False, collate_fn=BinaryFolderDataset.collate_fn)
+val_dataloader = DataLoader(dataset = val_dataset, batch_size=1 , shuffle= False, collate_fn=BinaryFolderDataset.collate_fn)
 
 test_dataloader= DataLoader(dataset = test_dataset, batch_size=1 , shuffle= False, collate_fn=BinaryFolderDataset.collate_fn)
 num_classes=2
-dla_encoder = DLAEncoder(num_classes=num_classes, pretrained=False).cuda()
+dla_encoder = DLAEncoder(num_classes=num_classes, pretrained=True).cuda()
 
 
 image= torch.ones([1,3,512,512]).cuda()
@@ -116,7 +116,7 @@ weight_for_non_empty = total_patches / (2 * non_empty_patches)
 weights = [weight_for_empty, weight_for_non_empty]
 # Define the model(with saved imagenet weights)
 dla_encoder = DLAEncoder(num_classes=num_classes, pretrained=False).cuda()
-dla_encoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pth')
+# dla_encoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pth')
 
 # ##### TESTING the augmentation phase #############
 # original_save_dir = './herdnet/original_images'
@@ -413,9 +413,9 @@ dla_encoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pt
 #     {'loss': bce_loss_with_weights, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'bce_loss'}
 # ]
 ######## Scenario2: using BCELoss without weights
-# losses = [
-#       {'loss': BCEWithLogitsLoss(reduction='mean'), 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'bce_loss'}
-#       ]
+losses = [
+      {'loss': BCEWithLogitsLoss(reduction='mean'), 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'bce_loss'}
+      ]
 ###### Scenario 3: using FCLoss and BCELoss with weights 
 # Initialize FocalLoss with appropriate alpha and weights
 # focal_loss = BinaryFocalLoss(alpha_pos=0.85, alpha_neg=0.15, beta=3, reduction='mean')
@@ -434,9 +434,9 @@ dla_encoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pt
 # )
 # losses = [{'loss': focal_combo_loss, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'focal_combo_loss'}]
 ################## Scenario 6: Focal combo loss with weights with 1/beta as denominator (FCLoss in the paper) 
-focal_combo_loss = FocalComboLoss_P(alpha=0.35,beta=3, gamma=2, reduction='mean', weights=[weight_for_empty, weight_for_non_empty] # Adjust the balance between focal and dice loss components
-)
-losses = [{'loss': focal_combo_loss, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'focal_combo_loss'}]
+# focal_combo_loss = FocalComboLoss_P(alpha=0.35,beta=3, gamma=2, reduction='mean', weights=[weight_for_empty, weight_for_non_empty] # Adjust the balance between focal and dice loss components
+# )
+# losses = [{'loss': focal_combo_loss, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'focal_combo_loss'}]
 # else:
 #   losses = [
 #       {'loss': L1Loss(reduction='mean'), 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'bce_loss'},
@@ -508,7 +508,7 @@ mkdir(work_dir)
 
 lr = 1e-4
 weight_decay = 1e-3
-epochs =2
+epochs =50
 # optimizer = Adam(params=dla_encoder_decoder.parameters(), lr=lr, weight_decay=weight_decay)
 optimizer = Adam(params=params_to_update, lr=lr, weight_decay=weight_decay)
 lr_milestones = [30, 60, 90]  # Example milestones
@@ -538,7 +538,7 @@ trainer = Trainer(
     evaluator=evaluator, 
     lr_milestones=lr_milestones,  # Pass the milestones
     auto_lr=auto_lr,# metric evaluation
-    # val_dataloader= val_dataloader, # loss evaluation
+    val_dataloader= val_dataloader, # loss evaluation
     work_dir=work_dir
     )
 
@@ -551,11 +551,11 @@ wandb.init(project="herdnet_pretrain")
 trainer.start(warmup_iters=100, checkpoints='best', select='max', validate_on='f1_score', wandb_flag =True)
 
 ##### Evaluator on validation ############
-if wandb.run is not None:
-  wandb.finish()
-wandb.init(project="herdnet_pretrain")
+# if wandb.run is not None:
+#   wandb.finish()
+# wandb.init(project="herdnet_pretrain")
 
-val_f1_score=evaluator.evaluate(returns='f1_score', viz=True, wandb_flag =True )
+val_f1_score=evaluator.evaluate(returns='f1_score', viz=True, wandb_flag =False )
 
 #Detections and Results
 df_val_r=evaluator.results

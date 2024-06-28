@@ -232,7 +232,7 @@ class LossWrapper(torch.nn.Module):
                 
                 if isinstance(target, dict):
                     try:
-                        target_tensor = target['binary'].view(-1, 1)  # Flatten the target tensor to match the output shape
+                        target_tensor = target['binary'].float().view(-1, 1)  # Flatten the target tensor to match the output shape
                         # print(f"Outputs shape: {output_used[i].shape}")
                         # print(f"Targets shape: {target_tensor.shape}")
                         loss = loss_module(output_used[i], target_tensor)
@@ -244,7 +244,7 @@ class LossWrapper(torch.nn.Module):
                         raise
                 else:
                     try:
-                        loss = loss_module(output_used[i], target[j])
+                        loss = loss_module(output_used[i], target[j].float())
                     except KeyError as e:
                         print(f"KeyError: {e}")
                         raise

@@ -58,7 +58,7 @@ class Trainer:
         vizual_fn: Optional[Callable] = None,
         work_dir: Optional[str] = None, 
         device_name: str = 'cuda', 
-        print_freq: int = 50,
+        print_freq: int = 100,
         valid_freq: int = 1,
         csv_logger: bool = False
         ) -> None:
@@ -406,7 +406,7 @@ class Trainer:
             # training
             train_output = self._train(epoch, warmup_iters, wandb_flag)
             if wandb_flag:
-                wandb.log({'train_FComboloss': train_output, 'epoch': epoch})
+                wandb.log({'train_loss': train_output, 'epoch': epoch})
                 wandb.log({'lr': self.optimizer.param_groups[0]["lr"]})
 
             # validation
@@ -418,12 +418,13 @@ class Trainer:
                     if wandb_flag: viz = True
                     self._prepare_evaluator('validation', epoch)
                     val_output = self.evaluator.evaluate(returns=validate_on, viz=viz)
+                    val_loss = self.evaluate(epoch, wandb_flag=False)
                     print(f'{self.evaluator.header} {validate_on}: {val_output:.4f}')
                     ## NEW
                     precision = self.evaluator.metrics.precision()
                     self.precision_values.append(precision)
                     if wandb_flag:
-                        # wandb.log({validate_on: val_output, 'epoch': epoch})
+                        wandb.log({'val_loss': val_loss, 'epoch': epoch})
                         wandb.log({
                     'epoch': epoch,
                     'recall': self.evaluator.metrics.recall(),
@@ -628,13 +629,13 @@ class Trainer:
                     wandb.log({'validation_vizuals': fig})
         
         batches_losses = torch.stack(batches_losses)
-        
+        # out= val_loss
         if reduction == 'mean':
             out = torch.mean(batches_losses).item()
             print(f'{header} mean loss: {out:.4f}')
 
             return out
-        
+        #out= val_loss
         elif reduction == 'sum':
             out = torch.sum(batches_losses).item()
             print(f'{header} sum loss: {out:.4f}')
