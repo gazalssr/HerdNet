@@ -60,7 +60,8 @@ class Trainer:
         device_name: str = 'cuda', 
         print_freq: int = 100,
         valid_freq: int = 1,
-        csv_logger: bool = False
+        csv_logger: bool = False,
+        patience: Optional[int] = None 
         ) -> None:
         '''
         Args:
@@ -158,7 +159,10 @@ class Trainer:
         self.val_dataloader = val_dataloader
         self.optimizer = optimizer
         self.epochs = num_epochs
-        
+        self.patience = patience  #####
+        self.epochs_no_improve = 0  #####
+        self.best_epoch = 0  #####
+        self.early_stop = False  #####
         self.print_freq = print_freq
         self.valid_freq = valid_freq
         self.lr_milestones = lr_milestones
@@ -197,98 +201,7 @@ class Trainer:
         self.train_logger = CustomLogger(delimiter=' ', filename='training', work_dir=self.work_dir, csv=self.csv_logger)
         self.val_logger = CustomLogger(delimiter=' ', filename='validation', work_dir=self.work_dir, csv=self.csv_logger)
     
-    ############# New Preparedata Class #################
-    # def prepare_data(self, images, targets) -> tuple:
-    #     # print(f"Targets type before processing: {type(targets)}")
-    #     ''' Method to prepare the data before feeding to the model. 
-    #     Can be override by subclass to create a custom Trainer.
-
-    #     Args:
-    #         images,
-    #         targets
-        
-    #     Returns:
-    #         tuple
-    #     '''
-
-    #     images = images.to(self.device)
-
-    #     if isinstance(targets, dict):
-    #         # Move each tensor within the target dictionary to the device
-    #         # print("Targets are a dictionary.")
-    #         if len(targets.keys())>1:
-    #             targets = {k: v.to(self.device) for k, v in targets.items()}
-    #         else:
-    #             targets = [v.to(self.device) for k, v in targets.items()]
-    #     elif isinstance(targets, (list, tuple)):
-    #         # If targets is a list or tuple, move each item to the device
-    #         targets = [tar.to(self.device) for tar in targets]
-    #         print("Targets are in a list or tuple.")
-    #     else:
-    #         print("Unexpected targets format.")
     
-        
-    #     return images, targets
-#############################################
-    # def prepare_data(self, images, targets) -> tuple:
-    #     ''' Method to prepare the data before feeding to the model. 
-    #     Can be overridden by subclass to create a custom Trainer.
-
-    #     Args:
-    #         images,
-    #         targets
-        
-    #     Returns:
-    #         tuple
-    #     '''
-        
-    #     # If images are in NumPy array format, convert them to tensors
-    #     if isinstance(images, list) and isinstance(images[0], numpy.ndarray):
-    #         images = [torch.tensor(img).permute(2, 0, 1).to(self.device) for img in images]
-    #     else:
-    #         images = images.to(self.device)
-
-    #     if isinstance(targets, dict):
-    #         # Move each tensor within the target dictionary to the device
-    #         processed_targets = {}
-    #         for k, v in targets.items():
-    #             print(f"Processing target key: {k}, value: {v}, type: {type(v)}")
-    #             if isinstance(v, torch.Tensor):
-    #                 processed_targets[k] = v.to(self.device)
-    #             elif isinstance(v, (int, float)):
-    #                 processed_targets[k] = torch.tensor([v]).to(self.device)
-    #             elif isinstance(v, (list, numpy.ndarray)):
-    #                 if isinstance(v[0], str):  # Skip lists of strings
-    #                     processed_targets[k] = v
-    #                 else:
-    #                     processed_targets[k] = torch.tensor(v).to(self.device)
-    #             else:
-    #                 print(f"Skipping target key: {k} with incompatible type: {type(v)}")
-    #                 processed_targets[k] = v  # Leave strings and other non-tensor-compatible values as they are
-    #         targets = processed_targets
-    #     elif isinstance(targets, (list, tuple)):
-    #         # If targets is a list or tuple, move each item to the device
-    #         processed_targets = []
-    #         for tar in targets:
-    #             print(f"Processing target: {tar}, type: {type(tar)}")
-    #             if isinstance(tar, torch.Tensor):
-    #                 processed_targets.append(tar.to(self.device))
-    #             elif isinstance(tar, (int, float)):
-    #                 processed_targets.append(torch.tensor([tar]).to(self.device))
-    #             elif isinstance(tar, (list, numpy.ndarray)):
-    #                 if isinstance(tar[0], str):  # Skip lists of strings
-    #                     processed_targets.append(tar)
-    #                 else:
-    #                     processed_targets.append(torch.tensor(tar).to(self.device))
-    #             else:
-    #                 print(f"Skipping target with incompatible type: {type(tar)}")
-    #                 processed_targets.append(tar)  # Leave strings and other non-tensor-compatible values as they are
-    #         targets = processed_targets
-    #     else:
-    #         print("Unexpected targets format.")
-        
-    #     return images, targets
-################################ 3333333 ########
     def prepare_data(self, images, targets) -> tuple:
         ''' Method to prepare the data before feeding to the model. 
         Can be overridden by subclass to create a custom Trainer.
@@ -423,6 +336,19 @@ class Trainer:
                     ## NEW
                     precision = self.evaluator.metrics.precision()
                     self.precision_values.append(precision)
+                    #########
+                    if self._is_best(val_output, mode=select):
+                        print('Best model saved - Epoch {} - Validation value: {:.6f}'.format(epoch, val_output))
+                        self._save_checkpoint(epoch, checkpoints)
+                        self.best_epoch = epoch  #####
+                        self.epochs_no_improve = 0  #####
+                    else:
+                        self.epochs_no_improve += 1  #####
+                        if self.patience and self.epochs_no_improve >= self.patience:  #####
+                            print(f'Early stopping triggered after {self.epochs_no_improve} epochs with no improvement.')  #####
+                            self.early_stop = True  #####
+                            break  #####
+                    ###############
                     if wandb_flag:
                         wandb.log({'val_loss': val_loss, 'epoch': epoch})
                         wandb.log({
