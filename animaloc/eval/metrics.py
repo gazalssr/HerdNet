@@ -88,7 +88,7 @@ class Metrics:
         
         self.confusion_matrix = numpy.zeros((self.num_classes-1,self.num_classes-1))
         self._confusion_matrix = self.confusion_matrix
-
+   
     def feed(self, gt: dict, preds: dict, est_count: Optional[list] = None) -> None:
         ''' Feed the object with ground truth and predictions and returns
         specified metrics optionally.

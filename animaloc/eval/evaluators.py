@@ -525,14 +525,14 @@ class TileEvaluator(Evaluator):
         return images, targets
 
 
-    
- 
     def prepare_feeding(self, targets: Any, output: torch.Tensor, threshold: float = 0.5) -> dict:
         """
         Adjust targets and output for feeding into metrics.
         This version assumes targets are provided in a suitable format for binary classification.
         """
-
+         ###### Check if output is a tuple and extract tensor
+        if isinstance(output, tuple):
+            output = output[0]
         # Ensure targets are in the correct format
         if isinstance(targets, dict):
             targets = {k: v.float().to(self.device) if isinstance(v, torch.Tensor) else v for k, v in targets.items()}
@@ -552,7 +552,7 @@ class TileEvaluator(Evaluator):
         }
 
         return feeding_dict
-
+    
     def evaluate(self, returns: str = 'recall', wandb_flag: bool = False, viz: bool = False,
         log_meters: bool = True) -> float:
         ''' Evaluate the model
@@ -588,7 +588,7 @@ class TileEvaluator(Evaluator):
             else:
                 output, _ = self.model(images, targets)  
                 # output, _ = self.model(images)
-
+                # print(f"Model output type: {type(output)}, value: {output}")
             if viz and self.vizual_fn is not None:
                 if i % self.print_freq == 0 or i == len(self.dataloader) - 1:
                     fig = self._vizual(image = images, target = targets, output = output)

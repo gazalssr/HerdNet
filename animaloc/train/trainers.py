@@ -61,7 +61,8 @@ class Trainer:
         print_freq: int = 100,
         valid_freq: int = 1,
         csv_logger: bool = False,
-        patience: Optional[int] = None 
+        patience: Optional[int] = None,
+        best_model_path: Optional[str] = None
         ) -> None:
         '''
         Args:
@@ -167,6 +168,7 @@ class Trainer:
         self.valid_freq = valid_freq
         self.lr_milestones = lr_milestones
         self.evaluator = evaluator
+        self.best_model_path = best_model_path
 
         self.vizual_fn = vizual_fn
 
@@ -200,7 +202,30 @@ class Trainer:
         self.csv_logger = csv_logger
         self.train_logger = CustomLogger(delimiter=' ', filename='training', work_dir=self.work_dir, csv=self.csv_logger)
         self.val_logger = CustomLogger(delimiter=' ', filename='validation', work_dir=self.work_dir, csv=self.csv_logger)
-    
+    def _save_checkpoint(self, epoch: int, mode: str) -> None:
+        ''' Method to save checkpoints '''
+        check_dir = self.work_dir
+        if mode == 'all':
+            outpath = os.path.join(check_dir, f'epoch_{epoch}.pth')
+        elif mode == 'best':
+            outpath = self.best_model_path
+        elif mode == 'latest':
+            outpath = os.path.join(check_dir, 'latest_model.pth')
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': self.model.state_dict(),
+            'optimizer_state_dict': self.optimizer.state_dict(),
+            'loss': self.losses,
+            'best_val': self.best_val
+        }, outpath)
+
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': self.model.state_dict(),
+            'optimizer_state_dict': self.optimizer.state_dict(),
+            'loss': self.losses,
+            'best_val': self.best_val
+        }, outpath)
     
     def prepare_data(self, images, targets) -> tuple:
         ''' Method to prepare the data before feeding to the model. 
