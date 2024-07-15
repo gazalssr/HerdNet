@@ -261,7 +261,7 @@ dla_encoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pt
 #       {'loss': L1Loss(reduction='mean'), 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'bce_loss'},
 #       ]
 ################## Scenario 6: Focal loss without weights #############################
-focal_loss = BinaryFocalLoss(alpha_pos=1, alpha_neg=1, beta=4, reduction='mean')
+focal_loss = BinaryFocalLoss(alpha_pos=1, alpha_neg=1, beta=2.5, reduction='mean')
 
 # Losses list
 losses = [
@@ -333,7 +333,7 @@ mkdir(work_dir)
 
 lr = 1e-4
 weight_decay = 1e-3
-epochs =200
+epochs =300
 # optimizer = Adam(params=dla_encoder_decoder.parameters(), lr=lr, weight_decay=weight_decay)
 optimizer = Adam(params=params_to_update, lr=lr, weight_decay=weight_decay)
 # lr_milestones = [30, 60, 90]  # Example milestones
@@ -364,7 +364,7 @@ trainer = Trainer(
     # lr_milestones=lr_milestones,  # Pass the milestones
     # auto_lr=auto_lr,# metric evaluation
     val_dataloader= val_dataloader, # loss evaluation
-    patience=20,
+    patience=15,
     best_model_path='/herdnet/pth_files/binary.pth',
     work_dir=work_dir
     )
@@ -428,7 +428,7 @@ patch_size = 512
 num_classes = 2
 batch_size = 8
 down_ratio = 2
-eval_epochs=50
+eval_epochs=35
 train_dataset = BinaryFolderDataset(
     preprocess=preprocess,
     csv_file='/herdnet/DATASETS/CAH_no_margins_30/train/Train_binary_gt.csv',
@@ -477,7 +477,72 @@ train_dataloader = DataLoader(dataset=train_dataset, sampler=train_sampler, coll
 val_dataloader = DataLoader(dataset=val_dataset, sampler=val_sampler, collate_fn=BinaryFolderDataset.collate_fn)
 
 # Define the evaluation function
-def evaluate_precision_recall(beta, train_dataloader, val_dataloader, model, epochs, work_dir):
+# def evaluate_precision_recall(beta, train_dataloader, val_dataloader, model, epochs, work_dir):
+#     # Check if val_dataloader is not None and contains data
+#     if val_dataloader is None:
+#         raise ValueError("val_dataloader is None")
+#     if len(val_dataloader) == 0:
+#         raise ValueError("val_dataloader is empty")
+
+#     focal_loss = BinaryFocalLoss(alpha_pos=1, alpha_neg=1, beta=beta, reduction='mean')
+#     losses = [{'loss': focal_loss, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'focal_loss'}]
+
+#     wrapped_model = LossWrapper(model, losses=losses)  # Create a new instance each time
+#     optimizer = Adam(params=wrapped_model.parameters(), lr=1e-4, weight_decay=1e-3)
+
+#     evaluator = TileEvaluator(
+#         metrics_class=ImageLevelMetrics,
+#         threshold=0.3,
+#         model=wrapped_model,
+#         dataloader=val_dataloader,
+#         num_classes=2,
+#         stitcher=None,
+#         work_dir=work_dir,
+#         header='validation',
+#     )
+
+#     trainer = Trainer(
+#         model=wrapped_model,
+#         train_dataloader=train_dataloader,
+#         optimizer=optimizer,
+#         num_epochs=epochs,
+#         evaluator=evaluator,
+#         val_dataloader=val_dataloader,  # Ensure val_dataloader is passed here
+#         work_dir=work_dir
+#     )
+
+#     trainer.start(warmup_iters=100, checkpoints='best', select='max', validate_on='f1_score', wandb_flag=False)
+
+#     precision = evaluator.evaluate(returns='precision')
+#     recall = evaluator.evaluate(returns='recall')
+
+#     return precision, recall
+# # Beta values to test
+# beta_values = [4, 4.25, 4.5, 4.75, 5]
+# precisions = []
+# recalls = []
+
+# for beta in beta_values:
+#     print(f"Evaluating for beta: {beta}")
+#     precision, recall = evaluate_precision_recall(beta, train_dataloader, val_dataloader, dla_encoder, eval_epochs, work_dir)
+#     precisions.append(precision)
+#     recalls.append(recall)
+#     print(f"Results for beta={beta}: Precision: {precision}, Recall: {recall}")
+
+# plt.figure(figsize=(12, 6))
+
+# plt.plot(beta_values, precisions, marker='o', label='Precision', color='blue')
+# plt.plot(beta_values, recalls, marker='o', label='Recall', color='orange')
+# plt.title('Precision and Recall vs Beta')
+# plt.xlabel('Beta')
+# plt.ylabel('Score')
+# plt.legend()
+# plt.grid(True)
+
+# plt.tight_layout()
+# plt.savefig('/herdnet/precision_recall_vs_beta.pdf')
+# plt.show()
+def evaluate_precision_recall(beta, train_dataloader, val_dataloader, model, eval_epochs, work_dir):
     # Check if val_dataloader is not None and contains data
     if val_dataloader is None:
         raise ValueError("val_dataloader is None")
@@ -505,7 +570,7 @@ def evaluate_precision_recall(beta, train_dataloader, val_dataloader, model, epo
         model=wrapped_model,
         train_dataloader=train_dataloader,
         optimizer=optimizer,
-        num_epochs=epochs,
+        num_epochs=eval_epochs,
         evaluator=evaluator,
         val_dataloader=val_dataloader,  # Ensure val_dataloader is passed here
         work_dir=work_dir
@@ -513,12 +578,22 @@ def evaluate_precision_recall(beta, train_dataloader, val_dataloader, model, epo
 
     trainer.start(warmup_iters=100, checkpoints='best', select='max', validate_on='f1_score', wandb_flag=False)
 
-    precision = evaluator.evaluate(returns='precision')
-    recall = evaluator.evaluate(returns='recall')
+    precision_list = []
+    recall_list = []
 
-    return precision, recall
+    for _ in range(eval_epochs):
+        precision = evaluator.evaluate(returns='precision')
+        recall = evaluator.evaluate(returns='recall')
+        precision_list.append(precision)
+        recall_list.append(recall)
+
+    avg_precision = sum(precision_list[-5:]) / min(len(precision_list), 5)  # Average of last 10 epochs
+    avg_recall = sum(recall_list[-10:]) / min(len(recall_list), 10)
+
+    return avg_precision, avg_recall
+
 # Beta values to test
-beta_values = [2, 2.5, 3, 3.5, 4]
+beta_values = [2, 2.5, 3, 3.5, 4, 4.5]
 precisions = []
 recalls = []
 
@@ -529,6 +604,7 @@ for beta in beta_values:
     recalls.append(recall)
     print(f"Results for beta={beta}: Precision: {precision}, Recall: {recall}")
 
+# Plot precision and recall vs beta values
 plt.figure(figsize=(12, 6))
 
 plt.plot(beta_values, precisions, marker='o', label='Precision', color='blue')
