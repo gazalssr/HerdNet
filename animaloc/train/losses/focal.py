@@ -164,12 +164,13 @@ class BinaryFocalLoss(nn.Module):
         outputs = torch.clamp(outputs, min=self.eps, max=1 - self.eps)
 
         # Calculate the basic binary cross entropy loss
-        bce_loss = F.binary_cross_entropy_with_logits(outputs, targets, reduction='none')
+   
+        bce_loss = F.binary_cross_entropy_with_logits(outputs, targets.float(), reduction='none') #####
         probas = torch.sigmoid(outputs)
         p_t = torch.where(targets == 1, probas, 1 - probas)
         focal_factor = (1 - p_t) ** self.beta
         focal_loss = focal_factor * bce_loss
-        alpha_factor = torch.where(targets == 1, self.alpha_pos, self.alpha_neg)
+        alpha_factor = torch.where(targets == 1,torch.tensor(self.alpha_pos, dtype=outputs.dtype, device=outputs.device),torch.tensor(self.alpha_neg, dtype=outputs.dtype, device=outputs.device))
         focal_loss = alpha_factor * focal_loss
 
         # Apply class-specific weights if provided
