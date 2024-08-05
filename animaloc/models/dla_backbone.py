@@ -29,6 +29,7 @@ from . import dla as dla_modules
 
 
 @MODELS.register()
+#DLA encoder with abtch normalization
 class DLAEncoder(nn.Module):
     ''' DLA encoder architecture '''
 
@@ -37,7 +38,7 @@ class DLAEncoder(nn.Module):
         num_layers: int = 34,
         num_classes: int = 2,
         pretrained: bool = True, 
-        ):
+    ):
         '''
         Args:
             num_layers (int, optional): number of layers of DLA. Defaults to 34.
@@ -46,11 +47,9 @@ class DLAEncoder(nn.Module):
             pretrained (bool, optional): set False to disable pretrained DLA encoder parameters
                 from ImageNet. Defaults to True.
         '''
-
         super(DLAEncoder, self).__init__()
         
         base_name = 'dla{}'.format(num_layers)
-
         self.num_classes = num_classes
 
         # backbone
@@ -60,6 +59,10 @@ class DLAEncoder(nn.Module):
 
         channels = self.channels_0
 
+        # Add batch normalization to each convolutional layer
+        self.base_0_bn_layers = nn.ModuleList([
+            nn.BatchNorm2d(num_features) for num_features in channels
+        ])
 
         # bottleneck conv
         self.bottleneck_conv = nn.Conv2d(
@@ -67,9 +70,13 @@ class DLAEncoder(nn.Module):
             kernel_size=1, stride=1, 
             padding=0, bias=True
         )
-        self.pooling= nn.AvgPool2d(kernel_size= 16, stride=1, padding=0) # we take the average of each filter
-        self.cls_head = nn.Linear(512, 1) # binary head
-        ####### Loading pretrain weights localy ######
+
+        # Add batch normalization after the bottleneck convolution
+        self.bottleneck_bn = nn.BatchNorm2d(channels[-1])
+        
+        self.pooling = nn.AvgPool2d(kernel_size=16, stride=1, padding=0)  # we take the average of each filter
+        self.cls_head = nn.Linear(512, 1)  # binary head
+
     def load_custom_pretrained_weights(self, weight_path):
         ''' Load custom pretrained weights into the model. '''
         pretrained_dict = torch.load(weight_path)
@@ -77,19 +84,28 @@ class DLAEncoder(nn.Module):
         pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
         model_dict.update(pretrained_dict)
         self.load_state_dict(model_dict)
-        print("Custom pretrained weights loaded successfully.")    
-    def forward(self, input: torch.Tensor):
+        print("Custom pretrained weights loaded successfully.")
 
-        encode = self.base_0(input) # Nx512x16x16
+    def forward(self, input: torch.Tensor):
+        encode = self.base_0(input)  # Nx512x16x16
+        
+        # Apply batch normalization to each encoded layer
+        for i in range(len(encode)):
+            encode[i] = self.base_0_bn_layers[i](encode[i])
+        
         bottleneck = self.bottleneck_conv(encode[-1])
+        
+        # Apply batch normalization
+        bottleneck = self.bottleneck_bn(bottleneck)
+        
         bottleneck = self.pooling(bottleneck)
-        bottleneck= torch.reshape(bottleneck, (bottleneck.size()[0],-1)) # keeping the first dimension (samples)
-        encode[-1] = bottleneck # Nx512
+        bottleneck = torch.reshape(bottleneck, (bottleneck.size()[0], -1))  # keeping the first dimension (samples)
+        encode[-1] = bottleneck  # Nx512
         cls = self.cls_head(encode[-1])
         
-        #cls = nn.functional.sigmoid(cls)
+        # cls = nn.functional.sigmoid(cls)
         return cls
-    
+
     def freeze(self, layers: list) -> None:
         ''' Freeze all layers mentioned in the input list '''
         for layer in layers:
@@ -98,6 +114,77 @@ class DLAEncoder(nn.Module):
     def _freeze_layer(self, layer_name: str) -> None:
         for param in getattr(self, layer_name).parameters():
             param.requires_grad = False
+            
+            
+# class DLAEncoder(nn.Module):
+#     ''' DLA encoder architecture '''
+
+#     def __init__(
+#         self,
+#         num_layers: int = 34,
+#         num_classes: int = 2,
+#         pretrained: bool = True, 
+#         ):
+#         '''
+#         Args:
+#             num_layers (int, optional): number of layers of DLA. Defaults to 34.
+#             num_classes (int, optional): number of output classes, background included. 
+#                 Defaults to 2.
+#             pretrained (bool, optional): set False to disable pretrained DLA encoder parameters
+#                 from ImageNet. Defaults to True.
+#         '''
+
+#         super(DLAEncoder, self).__init__()
+        
+#         base_name = 'dla{}'.format(num_layers)
+
+#         self.num_classes = num_classes
+
+#         # backbone
+#         base = dla_modules.__dict__[base_name](pretrained=pretrained, return_levels=True)
+#         setattr(self, 'base_0', base)
+#         setattr(self, 'channels_0', base.channels)
+
+#         channels = self.channels_0
+
+
+#         # bottleneck conv
+#         self.bottleneck_conv = nn.Conv2d(
+#             channels[-1], channels[-1], 
+#             kernel_size=1, stride=1, 
+#             padding=0, bias=True
+#         )
+#         self.pooling= nn.AvgPool2d(kernel_size= 16, stride=1, padding=0) # we take the average of each filter
+#         self.cls_head = nn.Linear(512, 1) # binary head
+#         ####### Loading pretrain weights localy ######
+#     def load_custom_pretrained_weights(self, weight_path):
+#         ''' Load custom pretrained weights into the model. '''
+#         pretrained_dict = torch.load(weight_path)
+#         model_dict = self.state_dict()
+#         pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
+#         model_dict.update(pretrained_dict)
+#         self.load_state_dict(model_dict)
+#         print("Custom pretrained weights loaded successfully.")    
+#     def forward(self, input: torch.Tensor):
+
+#         encode = self.base_0(input) # Nx512x16x16
+#         bottleneck = self.bottleneck_conv(encode[-1])
+#         bottleneck = self.pooling(bottleneck)
+#         bottleneck= torch.reshape(bottleneck, (bottleneck.size()[0],-1)) # keeping the first dimension (samples)
+#         encode[-1] = bottleneck # Nx512
+#         cls = self.cls_head(encode[-1])
+        
+#         #cls = nn.functional.sigmoid(cls)
+#         return cls
+    
+#     def freeze(self, layers: list) -> None:
+#         ''' Freeze all layers mentioned in the input list '''
+#         for layer in layers:
+#             self._freeze_layer(layer)
+    
+#     def _freeze_layer(self, layer_name: str) -> None:
+#         for param in getattr(self, layer_name).parameters():
+#             param.requires_grad = False
 ###################################### DLA Autoencoder ############################
 
 @MODELS.register()
