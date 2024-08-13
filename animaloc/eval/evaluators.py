@@ -515,7 +515,7 @@ class TileEvaluator(Evaluator):
         return images, targets
 
 
-    def prepare_feeding(self, targets: Any, output: torch.Tensor, threshold: float = 0.5) -> dict:
+    def prepare_feeding(self, targets: Any, output: torch.Tensor) -> dict:
         """
         Adjust targets and output for feeding into metrics.
         This version assumes targets are provided in a suitable format for binary classification.
@@ -537,7 +537,7 @@ class TileEvaluator(Evaluator):
         print(f"Scores after sigmoid: {scores.detach().cpu().numpy()}")
 
         # Convert probabilities to binary predictions (threshold)
-        pred_binary = (scores > threshold).float()
+        pred_binary = (scores > self.threshold).float()
 
         # Print thresholded predictions
         print(f"Thresholded predictions: {pred_binary.detach().cpu().numpy()}")
@@ -547,7 +547,7 @@ class TileEvaluator(Evaluator):
             'gt': targets,
             'preds': {'binary': pred_binary}
         }
-
+         
         return feeding_dict
     
     def evaluate(self, returns: str = 'recall', wandb_flag: bool = False, viz: bool = False,
@@ -573,17 +573,16 @@ class TileEvaluator(Evaluator):
             # Print raw model output before applying sigmoid
             print(f"Raw model output (before sigmoid): {output.detach().cpu().numpy()}")
 
-            # Convert to probabilities using sigmoid
-            scores = torch.sigmoid(output).float()
+            # # Convert to probabilities using sigmoid
+            # scores = torch.sigmoid(output).float()
             
-            # Print the scores after sigmoid
-            print(f"Model output after sigmoid: {scores.detach().cpu().numpy()}")
+            # # Print the scores after sigmoid
+            # print(f"Model output after sigmoid: {scores.detach().cpu().numpy()}")
 
-            # Apply threshold to get binary predictions
-            pred_binary = (scores > self.threshold).float()
+            # # Apply threshold to get binary predictions
+            # pred_binary = (scores > self.threshold).float()
             
-            # Print the thresholded predictions
-            print(f"Thresholded predictions: {pred_binary.detach().cpu().numpy()}")
+        
 
             # Print the corresponding ground truth labels
             print(f"Ground truth labels: {targets}")

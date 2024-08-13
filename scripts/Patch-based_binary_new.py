@@ -192,7 +192,7 @@ metrics.binary_annotations = True
 #AutotileEvaluator for autoencoder and tileEvaluator for DLA encoder
 evaluator = TileEvaluator(
     metrics_class=ImageLevelMetrics,
-    threshold=0.9,
+    threshold=0.7,
     model=dla_encoder_decoder,
     # model=model,
     dataloader=val_dataloader,
