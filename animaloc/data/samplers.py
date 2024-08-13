@@ -29,7 +29,6 @@ SAMPLERS = Registry('samplers', module_key='animaloc.data.samplers')
 __all__ = ['SAMPLERS', *SAMPLERS.registry_names]
 
 @SAMPLERS.register()
-# class BinaryBatchSampler(Sampler):
 class BinaryBatchSampler(Sampler):
     def __init__(self, dataset, col, batch_size=16, shuffle=False):
         super().__init__(dataset)

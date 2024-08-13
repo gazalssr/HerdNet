@@ -132,7 +132,7 @@ class Evaluator:
         '''
         if isinstance(targets, dict):
             # Move each tensor within the target dictionary to the device
-            # print("Targets are a dictionary.")
+            
             if len(targets.keys())>1:
                 targets = {k: v.to(self.device) for k, v in targets.items()}
             else:
@@ -304,47 +304,37 @@ class Evaluator:
                 'ap': metrics_cpy.ap(c),
             }
             res.append(metrics)
-        
-        # metrics_cpy.aggregate()
-        # res.append({
-        #     'class': 'binary',
-        #     'n': metrics_cpy.tp[0] + metrics_cpy.fn[0],
-        #     'recall': metrics_cpy.recall(),
-        #     'precision': metrics_cpy.precision(),
-        #     'f1_score': metrics_cpy.fbeta_score(),
-        #     'confusion': metrics_cpy.confusion(),
-        #     'mae': metrics_cpy.mae(),
-        #     'mse': metrics_cpy.mse(),
-        #     'rmse': metrics_cpy.rmse(),
-        #     'ap': metrics_cpy.ap()
-        # })
-
         return pandas.DataFrame(data = res)
     
     @property
    
     def detections(self) -> pandas.DataFrame:
-        ''' Returns detections (image id, location, label, and score) in a pandas dataframe '''
-
         assert self._stored_metrics is not None, \
             'No detections have been stored, please use the evaluate method first.'
 
         img_names = self.dataloader.dataset._img_names
         dets = self._stored_metrics.detections
 
-        # Update to check if 'images' contains a valid index or is already the name
+        print("Number of detections:", len(dets))
+        # print("Image names from dataloader:", img_names)
+
         for det in dets:
             index = det['images']
             # Check if 'index' is actually an integer index; if not, assume it's a valid image name
-            if isinstance(index, int) and index < len(img_names):
-                det['images'] = img_names[index]
+            if isinstance(index, int):
+                if index < len(img_names):
+                    det['images'] = img_names[index]
+                else:
+                    print(f"IndexError: {index} is out of bounds for image names with length {len(img_names)}")
+                    det['images'] = 'InvalidIndex'
             elif isinstance(index, str):
                 # 'index' is already the image name, so no need to change it
                 continue
             else:
-                print(f"IndexError or TypeError: {index} is not a valid index or image name")
-                det['images'] = 'InvalidIndexOrName'  # Placeholder for error cases
+                print(f"TypeError: {index} is not a valid index or image name")
+                det['images'] = 'InvalidIndexOrName'
 
+        # print("Updated detections with image names:", dets)
         return pandas.DataFrame(data=dets)
 
 @EVALUATORS.register()
@@ -530,9 +520,10 @@ class TileEvaluator(Evaluator):
         Adjust targets and output for feeding into metrics.
         This version assumes targets are provided in a suitable format for binary classification.
         """
-         ###### Check if output is a tuple and extract tensor
+        # Check if output is a tuple and extract tensor
         if isinstance(output, tuple):
             output = output[0]
+
         # Ensure targets are in the correct format
         if isinstance(targets, dict):
             targets = {k: v.float().to(self.device) if isinstance(v, torch.Tensor) else v for k, v in targets.items()}
@@ -542,8 +533,14 @@ class TileEvaluator(Evaluator):
         # Convert model output to probabilities via sigmoid
         scores = torch.sigmoid(output).float()
 
+        # Print scores after sigmoid
+        print(f"Scores after sigmoid: {scores.detach().cpu().numpy()}")
+
         # Convert probabilities to binary predictions (threshold)
         pred_binary = (scores > threshold).float()
+
+        # Print thresholded predictions
+        print(f"Thresholded predictions: {pred_binary.detach().cpu().numpy()}")
 
         # Prepare dictionary for feeding into metrics
         feeding_dict = {
@@ -555,22 +552,7 @@ class TileEvaluator(Evaluator):
     
     def evaluate(self, returns: str = 'recall', wandb_flag: bool = False, viz: bool = False,
         log_meters: bool = True) -> float:
-        ''' Evaluate the model
-        
-        Args:
-            returns (str, optional): metric to be returned. Possible values are:
-                'recall', 'precision', 'f1_score', 'mse', 'mae', 'rmse', 'accuracy'
-                and 'mAP'. Defauts to 'recall'
-            wandb_flag (bool, optional): set to True to log on Weight & Biases. 
-                Defaults to False.
-            viz (bool, optional): set to True to save vizual predictions on original
-                images. Defaults to False.
-            log_meters (bool, optional): set to False to disable meters logging. 
-                Defaults to True.
-        
-        Returns:
-            float
-        '''
+        ''' Evaluate the model '''
         
         self.model.eval()
 
@@ -587,19 +569,34 @@ class TileEvaluator(Evaluator):
                 output = self.post_stitcher(output)
             else:
                 output, _ = self.model(images, targets)  
-                # output, _ = self.model(images)
-                # print(f"Model output type: {type(output)}, value: {output}")
-            if viz and self.vizual_fn is not None:
-                if i % self.print_freq == 0 or i == len(self.dataloader) - 1:
-                    fig = self._vizual(image = images, target = targets, output = output)
-                    wandb.log({'validation_vizuals': fig})
-            #UPDATE######################
+
+            # Print raw model output before applying sigmoid
+            print(f"Raw model output (before sigmoid): {output.detach().cpu().numpy()}")
+
+            # Convert to probabilities using sigmoid
+            scores = torch.sigmoid(output).float()
+            
+            # Print the scores after sigmoid
+            print(f"Model output after sigmoid: {scores.detach().cpu().numpy()}")
+
+            # Apply threshold to get binary predictions
+            pred_binary = (scores > self.threshold).float()
+            
+            # Print the thresholded predictions
+            print(f"Thresholded predictions: {pred_binary.detach().cpu().numpy()}")
+
+            # Print the corresponding ground truth labels
+            print(f"Ground truth labels: {targets}")
+
+            # Prepare the output for metrics
             output = self.prepare_feeding(targets, output)
 
+            # Feed the output to metrics
             iter_metrics.feed(**output)
 
+            # Log metrics if enabled
             if log_meters:
-                logger.add_meter('threshold', self.threshold)  # Log the current threshold
+                logger.add_meter('threshold', self.threshold)
                 logger.add_meter('n', sum(iter_metrics.tp) + sum(iter_metrics.fn))
                 logger.add_meter('recall', round(iter_metrics.recall(),2))
                 logger.add_meter('precision', round(iter_metrics.precision(),2))
@@ -623,13 +620,15 @@ class TileEvaluator(Evaluator):
             iter_metrics.flush()
 
             self.metrics.feed(**output)
-   
+
+        # Print final stored metrics
         self._stored_metrics = self.metrics.copy()
-            
-        print("Recall:", self._stored_metrics.recall())
-        print("Precision:", self._stored_metrics.precision())
+        print("Stored metrics:", self._stored_metrics)    
+        print("Final Recall:", self._stored_metrics.recall())
+        print("Final Precision:", self._stored_metrics.precision())
         mAP = numpy.mean([self.metrics.ap(c) for c in range(1, self.metrics.num_classes)]).item()
-    
+
+        # Log final metrics if using wandb
         if wandb_flag:
             wandb.run.summary['threshold']= self.threshold
             wandb.run.summary['recall'] =  self.metrics.recall()

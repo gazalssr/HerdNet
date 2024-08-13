@@ -20,7 +20,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 import torchvision.transforms as T
-
+from torch.nn import BCEWithLogitsLoss
 from typing import Optional
 
 from .register import MODELS
@@ -29,7 +29,7 @@ from . import dla as dla_modules
 
 
 @MODELS.register()
-#DLA encoder with abtch normalization
+#DLA encoder with batch normalization
 class DLAEncoder(nn.Module):
     ''' DLA encoder architecture '''
 
@@ -79,13 +79,37 @@ class DLAEncoder(nn.Module):
 
     def load_custom_pretrained_weights(self, weight_path):
         ''' Load custom pretrained weights into the model. '''
-        pretrained_dict = torch.load(weight_path)
-        model_dict = self.state_dict()
-        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
-        model_dict.update(pretrained_dict)
-        self.load_state_dict(model_dict)
-        print("Custom pretrained weights loaded successfully.")
+        checkpoint = torch.load(weight_path)
+        
+        if 'model_state_dict' in checkpoint:
+            model_state_dict = checkpoint['model_state_dict']
+        else:
+            raise KeyError("Checkpoint file does not contain 'model_state_dict'")
 
+        # Get the model's current state dictionary
+        model_dict = self.state_dict()
+        
+        # Remove "model." prefix from keys in pretrained_dict
+        pretrained_dict = {k.replace('model.', ''): v for k, v in model_state_dict.items()}
+        
+        # Filter out unnecessary keys and mismatched keys
+        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
+        
+        # Update the model's state dictionary
+        model_dict.update(pretrained_dict)
+        
+        # Load the updated state dictionary into the model
+        self.load_state_dict(model_dict)
+        
+        print("Custom pretrained weights loaded successfully.")
+        
+        # Return other training state information
+        optimizer_state_dict = checkpoint.get('optimizer_state_dict', None)
+        epoch = checkpoint.get('epoch', None)
+        
+        return optimizer_state_dict, epoch
+    
+    
     def forward(self, input: torch.Tensor):
         encode = self.base_0(input)  # Nx512x16x16
         
@@ -114,136 +138,66 @@ class DLAEncoder(nn.Module):
     def _freeze_layer(self, layer_name: str) -> None:
         for param in getattr(self, layer_name).parameters():
             param.requires_grad = False
-            
-            
-# class DLAEncoder(nn.Module):
-#     ''' DLA encoder architecture '''
 
-#     def __init__(
-#         self,
-#         num_layers: int = 34,
-#         num_classes: int = 2,
-#         pretrained: bool = True, 
-#         ):
-#         '''
-#         Args:
-#             num_layers (int, optional): number of layers of DLA. Defaults to 34.
-#             num_classes (int, optional): number of output classes, background included. 
-#                 Defaults to 2.
-#             pretrained (bool, optional): set False to disable pretrained DLA encoder parameters
-#                 from ImageNet. Defaults to True.
-#         '''
-
-#         super(DLAEncoder, self).__init__()
-        
-#         base_name = 'dla{}'.format(num_layers)
-
-#         self.num_classes = num_classes
-
-#         # backbone
-#         base = dla_modules.__dict__[base_name](pretrained=pretrained, return_levels=True)
-#         setattr(self, 'base_0', base)
-#         setattr(self, 'channels_0', base.channels)
-
-#         channels = self.channels_0
-
-
-#         # bottleneck conv
-#         self.bottleneck_conv = nn.Conv2d(
-#             channels[-1], channels[-1], 
-#             kernel_size=1, stride=1, 
-#             padding=0, bias=True
-#         )
-#         self.pooling= nn.AvgPool2d(kernel_size= 16, stride=1, padding=0) # we take the average of each filter
-#         self.cls_head = nn.Linear(512, 1) # binary head
-#         ####### Loading pretrain weights localy ######
-#     def load_custom_pretrained_weights(self, weight_path):
-#         ''' Load custom pretrained weights into the model. '''
-#         pretrained_dict = torch.load(weight_path)
-#         model_dict = self.state_dict()
-#         pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
-#         model_dict.update(pretrained_dict)
-#         self.load_state_dict(model_dict)
-#         print("Custom pretrained weights loaded successfully.")    
-#     def forward(self, input: torch.Tensor):
-
-#         encode = self.base_0(input) # Nx512x16x16
-#         bottleneck = self.bottleneck_conv(encode[-1])
-#         bottleneck = self.pooling(bottleneck)
-#         bottleneck= torch.reshape(bottleneck, (bottleneck.size()[0],-1)) # keeping the first dimension (samples)
-#         encode[-1] = bottleneck # Nx512
-#         cls = self.cls_head(encode[-1])
-        
-#         #cls = nn.functional.sigmoid(cls)
-#         return cls
-    
-#     def freeze(self, layers: list) -> None:
-#         ''' Freeze all layers mentioned in the input list '''
-#         for layer in layers:
-#             self._freeze_layer(layer)
-    
-#     def _freeze_layer(self, layer_name: str) -> None:
-#         for param in getattr(self, layer_name).parameters():
-#             param.requires_grad = False
 ###################################### DLA Autoencoder ############################
 
 @MODELS.register()
 class DLAEncoderDecoder(nn.Module):
-    ''' DLA Encoder-Decoder architecture tailored for binary classification '''
+    ''' DLA Encoder-Decoder architecture for binary patch detection '''
 
     def __init__(
         self,
         num_layers: int = 34,
-        pretrained: bool = True,
-        down_ratio: int = 2,
         num_classes: int = 2,
-        ):
+        pretrained: bool = True, 
+        down_ratio: Optional[int] = 2, 
+        head_conv: int = 64,
+    ):
         super(DLAEncoderDecoder, self).__init__()
+
+        # Initialize the model
+        assert down_ratio in [1, 2, 4, 8, 16], \
+            f'Downsample ratio possible values are 1, 2, 4, 8 or 16, got {down_ratio}'
         
         base_name = 'dla{}'.format(num_layers)
-        
-        # Encoder (backbone)
-        self.base_0 = dla_modules.__dict__[base_name](pretrained=pretrained, return_levels=True)
-        self.channels_0 = self.base_0.channels
+        self.down_ratio = down_ratio
+        self.num_classes = num_classes
+        self.head_conv = head_conv
 
-        # Bottleneck convolutional layer
+        # Calculate first level
+        self.first_level = int(np.log2(down_ratio))
+
+        # Backbone
+        base = dla_modules.__dict__[base_name](pretrained=pretrained, return_levels=True)
+        setattr(self, 'base_0', base)
+        setattr(self, 'channels_0', base.channels)
+
+        channels = self.channels_0
+
+        scales = [2 ** i for i in range(len(channels[self.first_level:]))]
+        self.dla_up = dla_modules.DLAUp(channels[self.first_level:], scales=scales)
+
+        # Bottleneck conv
         self.bottleneck_conv = nn.Conv2d(
-            self.channels_0[-1], self.channels_0[-1], 
-            kernel_size=1, stride=1, padding=0, bias=True
+            channels[-1], channels[-1], 
+            kernel_size=1, stride=1, 
+            padding=0, bias=True
         )
-        self.pooling = nn.AvgPool2d(kernel_size=16, stride=1, padding=0)
 
-        # Decoder
-        scales = [2 ** i for i in range(len(self.channels_0))]
-        self.dla_up = dla_modules.DLAUp(self.channels_0, scales=scales)
+        # Localization head (similar to HerdNet)
+        self.loc_head = nn.Sequential(
+            nn.Conv2d(channels[self.first_level], head_conv,
+            kernel_size=3, padding=1, bias=True),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(
+                head_conv, 1, 
+                kernel_size=1, stride=1, 
+                padding=0, bias=True
+                ),
+            nn.Sigmoid()
+        )
 
-        # Binary classification head
-        self.cls_head = nn.Linear(512, 1)  # Maintained as a binary head
-
-    def forward(self, input: torch.Tensor):
-        encode = self.base_0(input) # Getting feature maps from the encoder
-        bottleneck = self.bottleneck_conv(encode[-1])
-        bottleneck = self.pooling(bottleneck)
-        bottleneck = torch.reshape(bottleneck, (bottleneck.size()[0], -1))
-
-        # Decoder
-        decode = self.dla_up(encode)  # Pass all encoder outputs for upsampling and integration
-
-        # Classification
-        cls = self.cls_head(bottleneck)  # Classification from bottleneck features
-
-        return cls, decode
-
-    ########################################################
-    def adapt_keys(self, pretrained_dict):
-        ''' Adapt keys from the pretrained model to fit the current model structure. '''
-        new_keys = {}
-        for k in pretrained_dict:
-            # Adapt the keys based on the structure of model_dict
-            new_key = 'base_0.' + k 
-            new_keys[new_key] = pretrained_dict[k]
-        return new_keys
-
+        self.loc_head[-2].bias.data.fill_(0.00)
     def load_custom_pretrained_weights(self, weight_path):
         ''' Load custom pretrained weights into the model. '''
         print(f"Loading weights from: {weight_path}")
@@ -262,6 +216,75 @@ class DLAEncoderDecoder(nn.Module):
             model_dict.update(pretrained_dict)
             self.load_state_dict(model_dict, strict=False)
             print("Custom pretrained weights loaded successfully.")
+
+
+    def forward(self, input: torch.Tensor):
+        # Encoder
+        encode = self.base_0(input)    
+        bottleneck = self.bottleneck_conv(encode[-1])
+        encode[-1] = bottleneck
+
+        # Decoder
+        decode_hm = self.dla_up(encode[self.first_level:])
+        heatmap = self.loc_head(decode_hm)
+
+        # Compute the mean of the heatmap
+        density_mean = heatmap.mean(dim=[2, 3])  # Average over height and width
+
+        return density_mean
+###### to vizualize the heatmaps
+    # def forward(self, input: torch.Tensor):
+    #     # Encoder
+    #     encode = self.base_0(input)    
+    #     bottleneck = self.bottleneck_conv(encode[-1])
+    #     encode[-1] = bottleneck
+
+    #     # Decoder
+    #     decode_hm = self.dla_up(encode[self.first_level:])
+    #     heatmap = self.loc_head(decode_hm)  # This should be the heatmap you want to visualize
+
+    #     # Compute the mean of the heatmap
+    #     density_mean = heatmap.mean(dim=[2, 3])  # Average over height and width
+
+    #     return heatmap, density_mean  # Return both the heatmap and the final output
+    def freeze(self, layers: list) -> None:
+        ''' Freeze all layers mentioned in the input list '''
+        for layer in layers:
+            self._freeze_layer(layer)
+    
+    def _freeze_layer(self, layer_name: str) -> None:
+        for param in getattr(self, layer_name).parameters():
+            param.requires_grad = False
+   
+
+    ########################################################
+    def adapt_keys(self, pretrained_dict):
+        ''' Adapt keys from the pretrained model to fit the current model structure. '''
+        new_keys = {}
+        for k in pretrained_dict:
+            # Adapt the keys based on the structure of model_dict
+            new_key = 'base_0.' + k 
+            new_keys[new_key] = pretrained_dict[k]
+        return new_keys
+
+    # def load_custom_pretrained_weights(self, weight_path):
+    #     ''' Load custom pretrained weights into the model. '''
+    #     print(f"Loading weights from: {weight_path}")
+    #     pretrained_dict = torch.load(weight_path, map_location='cuda')
+    #     adapted_pretrained_dict = self.adapt_keys(pretrained_dict)
+
+    #     model_dict = self.state_dict()
+    #     print("Model keys:", model_dict.keys())  #print model keys
+    #     print("Adapted pretrained keys:", adapted_pretrained_dict.keys())  #print adapted keys
+
+    #     # Filter out unmatched keys and size mismatches
+    #     pretrained_dict = {k: v for k, v in adapted_pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
+    #     if not pretrained_dict:
+    #         print("No matching keys found or size mismatch.")
+    #     else:
+    #         model_dict.update(pretrained_dict)
+    #         self.load_state_dict(model_dict, strict=False)
+    #         print("Custom pretrained weights loaded successfully.")
 
 ########################################################################
 

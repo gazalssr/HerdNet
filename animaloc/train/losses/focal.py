@@ -292,40 +292,97 @@ class FocalComboLoss_P(nn.Module):
             return combined_loss.sum()
         else:
             return combined_loss
-    ############ weighted dice loss ##################
-    # def forward(self, outputs, targets):
-    #     outputs = torch.clamp(outputs, min=self.eps, max=1 - self.eps)
-    #     bce_loss = F.binary_cross_entropy_with_logits(outputs, targets, reduction='none')
+    ########### Density loss for the decoder #########
+from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss, L1Loss
+    
+import torch
+
+class DensityLoss(torch.nn.Module):
+    def __init__(
+        self,
+        reduction: str = 'mean',
+        eps: float = 1e-6
+        ) -> None:
+
+        super().__init__()
+
+        assert reduction in ['mean', 'max'], \
+            f'Reduction must be either \'mean\' or \'max\', got {reduction}'
+
+        self.reduction = reduction
+        self.eps = eps
+        self.th= 1e-6
+        # take a single input feature and produces a single output feature
+        self.binary_head= torch.nn.Linear(1,1)
+        self.loss = BCEWithLogitsLoss()
+    def forward(self, output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+        '''
+        Args:
+            output (torch.Tensor): [B,C,H,W]
+            target (torch.Tensor): [B,C,H,W]
+
+        Returns:
+            torch.Tensor
+        '''
+
+        return self._neg_loss(output, target)
+ ################# neg_loss based on Max values in heatmap #####
+    # def _neg_loss(self, output: torch.Tensor, target: torch.Tensor):
+    #     output = torch.clamp(output, min=self.eps, max=1-self.eps)
         
-    #     probas = torch.sigmoid(outputs)
-    #     p_t = torch.where(targets == 1, probas, 1 - probas)
-    #     focal_factor = (1 - p_t) ** self.gamma
-    #     weight_factor = torch.where(targets == 1, self.weights[1], self.weights[0])
-    #     focal_loss = weight_factor * focal_factor * bce_loss
-
-    #     # Calculate the modified Dice Loss with weights
-    #     inputs = torch.sigmoid(outputs)
-
-    #     # Ensure that the tensors are 4-dimensional
-    #     if inputs.dim() == 4 and targets.dim() == 4:
-    #         intersection = (inputs * targets).sum(dim=(1, 2, 3))  #####
-    #         total = (inputs + targets).sum(dim=(1, 2, 3))  #####
+    #     # Use max over spatial dimensions to determine if there's a significant activation
+    #     if output.dim() == 4:  # [batch_size, channels, height, width]
+    #         m = output.max(dim=[1, 2, 3])[0]  # max over spatial dimensions
+    #     elif output.dim() == 3:  # [batch_size, channels, spatial_dim]
+    #         m = output.max(dim=[1, 2])[0]  # max over channels and spatial dimensions
+    #     elif output.dim() == 2:  # [batch_size, channels]
+    #         m = output.max(dim=1)[0]  # max over channels
     #     else:
-    #         intersection = (inputs * targets).sum()  # For non-4D tensors, sum all elements
-    #         total = (inputs + targets).sum()  # For non-4D tensors, sum all elements
+    #         raise ValueError(f"Unexpected output tensor with shape: {output.shape}")
         
-    #     dice_score = (2. * intersection + self.eps) / (total + self.eps)
-    #     modified_dice_score = dice_score ** (1 / self.beta) # The change compared to standard dice loss
-    #     dice_loss = 1 - modified_dice_score
+    #     # Apply threshold to filter out low activations
+    #     m = torch.where(m > self.eps, m, torch.zeros_like(m))
+        
+    #     # Ensure m has shape [batch_size, 1]
+    #     m = m.unsqueeze(1)
 
-    #     # Apply weights to dice loss
-    #     weighted_dice_loss = weight_factor.mean() * dice_loss  #####
+    #     # Move m and target to the same device as binary_head
+    #     device = self.binary_head.weight.device
+    #     m = m.to(device)
+    #     target = target.to(device)
 
-    #     # Combine the losses using alpha as the balancing factor
-    #     combined_loss = self.alpha * focal_loss + (1 - self.alpha) * weighted_dice_loss  #####
-    #     if self.reduction == 'mean':
-    #         combined_loss = combined_loss.mean()
-    #     elif self.reduction == 'sum':
-    #         combined_loss = combined_loss.sum()
+    #     logits = self.binary_head(m)
+    #     return self.loss(logits, target)
 
-    #     return combined_loss
+    
+ ###############################################################
+    def _neg_loss(self, output: torch.Tensor, target: torch.Tensor):
+        output = torch.clamp(output, min=self.eps, max=1-self.eps)
+        
+        # Check the number of dimensions and compute the mean accordingly
+        if output.dim() == 4:  # [batch_size, channels, height, width]
+            m = output.mean(dim=[1, 2, 3])  # density mean over the spatial dimensions
+        elif output.dim() == 3:  # [batch_size, channels, spatial_dim]
+            m = output.mean(dim=[1, 2])  # density mean over channels and spatial dimensions
+        elif output.dim() == 2:  # [batch_size, channels]
+            m = output.mean(dim=1)  # density mean over channels
+        else:
+            raise ValueError(f"Unexpected output tensor with shape: {output.shape}")
+
+        # Ensure m has shape [batch_size, 1]
+        m = m.unsqueeze(1)
+
+        # Move m to the same device as binary_head
+        m = m.to(self.binary_head.weight.device)
+
+        # Compute logits using the binary head
+        logits = self.binary_head(m)
+
+        # Move the target to the same device as logits
+        target = target.to(logits.device)
+
+        # Compute the loss
+        return self.loss(logits, target)
+
+
+

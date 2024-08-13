@@ -27,7 +27,7 @@ matplotlib.use('Agg')
 from torchvision.transforms import ToPILImage
 
 from typing import List, Optional, Union, Callable, Any
-
+import datetime
 from ..utils.torchvision_utils import SmoothedValue, reduce_dict
 from ..utils.logger import CustomLogger
 from ..eval.evaluators import Evaluator
@@ -204,13 +204,12 @@ class Trainer:
         self.val_logger = CustomLogger(delimiter=' ', filename='validation', work_dir=self.work_dir, csv=self.csv_logger)
     def _save_checkpoint(self, epoch: int, mode: str) -> None:
         ''' Method to save checkpoints '''
-        check_dir = self.work_dir
-        if mode == 'all':
-            outpath = os.path.join(check_dir, f'epoch_{epoch}.pth')
-        elif mode == 'best':
-            outpath = self.best_model_path
-        elif mode == 'latest':
-            outpath = os.path.join(check_dir, 'latest_model.pth')
+        date_str = datetime.datetime.now().strftime("%Y%m%d") #########
+        base_filename = f'binary_{date_str}' #########
+        custom_name = f'{base_filename}.pth' #########
+
+        outpath = os.path.join(self.best_model_path, custom_name) #########
+
         torch.save({
             'epoch': epoch,
             'model_state_dict': self.model.state_dict(),
@@ -226,7 +225,14 @@ class Trainer:
             'loss': self.losses,
             'best_val': self.best_val
         }, outpath)
-    
+
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': self.model.state_dict(),
+            'optimizer_state_dict': self.optimizer.state_dict(),
+            'loss': self.losses,
+            'best_val': self.best_val
+        }, outpath)
     def prepare_data(self, images, targets) -> tuple:
         ''' Method to prepare the data before feeding to the model. 
         Can be overridden by subclass to create a custom Trainer.
@@ -725,25 +731,25 @@ class Trainer:
             else:
                 return False
     
-    def _save_checkpoint(self, epoch: int, mode: str) -> None:
-        ''' Method to save checkpoints '''
+    # def _save_checkpoint(self, epoch: int, mode: str) -> None:
+    #     ''' Method to save checkpoints '''
 
-        check_dir = self.work_dir
+    #     check_dir = self.work_dir
 
-        if mode == 'all':
-            outpath = os.path.join(check_dir,f'epoch_{epoch}.pth')
-        elif mode == 'best':
-            outpath = os.path.join(check_dir,'best_model.pth')
-        elif mode == 'latest':
-            outpath = os.path.join(check_dir,'latest_model.pth')
+    #     if mode == 'all':
+    #         outpath = os.path.join(check_dir,f'epoch_{epoch}.pth')
+    #     elif mode == 'best':
+    #         outpath = os.path.join(check_dir,'best_model.pth')
+    #     elif mode == 'latest':
+    #         outpath = os.path.join(check_dir,'latest_model.pth')
 
-        torch.save({
-            'epoch': epoch,
-            'model_state_dict': self.model.state_dict(),
-            'optimizer_state_dict': self.optimizer.state_dict(),
-            'loss': self.losses ,
-            'best_val': self.best_val
-            }, outpath)
+    #     torch.save({
+    #         'epoch': epoch,
+    #         'model_state_dict': self.model.state_dict(),
+    #         'optimizer_state_dict': self.optimizer.state_dict(),
+    #         'loss': self.losses ,
+    #         'best_val': self.best_val
+    #         }, outpath)
     
     def _vizual(self, image: Any, target: Any, output: Any):
         fig = self.vizual_fn(image=image, target=target, output=output)

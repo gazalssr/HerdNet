@@ -397,8 +397,8 @@ class Metrics:
 
             return recalls.tolist(), precisions.tolist()
 
-   
-    def confusion(self, c: int = 1) -> float:
+   #changed float to dict
+    def confusion(self, c: int = 1) -> dict:
         ''' Construct the confusion matrix for binary classification tasks
         or return interclass confusion for a specified class in object detection tasks.
 
@@ -744,7 +744,6 @@ class BoxesMetrics(Metrics):
 class ImageLevelMetrics(Metrics):
     '''Metrics class for image-level classification for binary tasks.'''
 ####### updated ##### there was no init in this class before 
-# (for the problem of the repeated detections in batchsize more than 1)
     def __init__(self, img_names, num_classes: int = 2):
         '''Initialize metrics for binary classification tasks.'''
         num_classes = num_classes + 1  # Adjust for binary classification
@@ -769,7 +768,7 @@ class ImageLevelMetrics(Metrics):
         self.fp[0] += ((~gt_binary_bool & pred_binary_bool).sum().item())
         self.fn[0] += ((gt_binary_bool & ~pred_binary_bool).sum().item())
         self.tn[0] += ((~gt_binary_bool & ~pred_binary_bool).sum().item())
-        # print("TP:", self.tp[0], "FP:", self.fp[0], "FN:", self.fn[0], "TN:", self.tn[0])
+        print("TP:", self.tp[0], "FP:", self.fp[0], "FN:", self.fn[0], "TN:", self.tn[0])
     
         
         # Update the confusion matrix
@@ -777,28 +776,43 @@ class ImageLevelMetrics(Metrics):
         self.confusion_matrix[0, 1] = self.fp[0]
         self.confusion_matrix[1, 0] = self.fn[0]
         self.confusion_matrix[1, 1] = self.tn[0]
-        # print(self.confusion_matrix)
-    def _store_detections(self, preds: dict, est_count: Optional[list] = None) -> None:
-        ''' Store detections internally (1 row = 1 detection), convert tensor to int. '''
+        #print(self.confusion_matrix)
+    def _store_detections(self, preds: dict, est_count: Optional[list] = None): ######## Added est_count parameter
+        binary_values = preds['binary'].view(-1).cpu().numpy() ######## Flattened binary values and moved to numpy for storage
+        counts = {'empty_count': est_count[0], 'non_empty_count': est_count[1]} if est_count else {} ######## Added counts if est_count is provided
+        for idx, binary_value in enumerate(binary_values):
+            if idx < len(self.img_names):
+                self.detections.append({
+                    'images': self.img_names[idx],
+                    'binary': int(binary_value),
+                    'empty_count': (binary_value == 0).sum().item(), ######## Stored counts of binary values
+                    'non-empty_count': (binary_value == 1).sum().item(), ######## Stored counts of binary values
+                    **counts ######## Included counts in the stored detections
+                })
+            else:
+                print(f"Index {idx} out of range for img_names with length {len(self.img_names)}")
+        #### oLD
+    # def _store_detections(self, preds: dict, est_count: Optional[list] = None) -> None:
+    #     ''' Store detections internally (1 row = 1 detection), convert tensor to int. '''
 
-        # Convert tensor predictions to integers before storing them
-        preds = {k: [v.item() if torch.is_tensor(v) else v for v in vals] for k, vals in preds.items()}
+    #     # Convert tensor predictions to integers before storing them
+    #     preds = {k: [v.item() if torch.is_tensor(v) else v for v in vals] for k, vals in preds.items()}
 
-        m = map(dict, zip(*[
-            [(k, v) for v in value]
-            for k, value in preds.items()
-        ]))
-        m, m_copy = tee(m)
+    #     m = map(dict, zip(*[
+    #         [(k, v) for v in value]
+    #         for k, value in preds.items()
+    #     ]))
+    #     m, m_copy = tee(m)
 
-        counts = {}
-        if est_count is not None:
-            counts = {f'count_{i+1}': x for i, x in enumerate(est_count)}
+    #     counts = {}
+    #     if est_count is not None:
+    #         counts = {f'count_{i+1}': x for i, x in enumerate(est_count)}
 
-        if len([x for x in m_copy]) > 0:
-            for det in m:
-                self.detections.append({'images': self.idx, **det, **counts})
-        else:
-            self.detections.append({'images': self.idx, **counts})
+    #     if len([x for x in m_copy]) > 0:
+    #         for det in m:
+    #             self.detections.append({'images': self.idx, **det, **counts})
+    #     else:
+    #         self.detections.append({'images': self.idx, **counts})
  
     def _store_detections_binary(self, preds: dict, est_count: Optional[list] = None):
         ''' Store detections for binary classification internally '''
