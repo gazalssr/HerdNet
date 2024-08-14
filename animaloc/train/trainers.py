@@ -25,7 +25,7 @@ import numpy
 import matplotlib.pyplot as plt
 matplotlib.use('Agg')
 from torchvision.transforms import ToPILImage
-
+from animaloc.models import DLAEncoderDecoder
 from typing import List, Optional, Union, Callable, Any
 import datetime
 from ..utils.torchvision_utils import SmoothedValue, reduce_dict
@@ -62,7 +62,8 @@ class Trainer:
         valid_freq: int = 1,
         csv_logger: bool = False,
         patience: Optional[int] = None,
-        best_model_path: Optional[str] = None
+        best_model_path: Optional[str] = None,
+        loss_fn: Optional[Callable] = None #####
         ) -> None:
         '''
         Args:
@@ -169,7 +170,8 @@ class Trainer:
         self.lr_milestones = lr_milestones
         self.evaluator = evaluator
         self.best_model_path = best_model_path
-
+        
+        self.loss_fn = loss_fn   #####
         self.vizual_fn = vizual_fn
 
         # auto-learning rate reduction
@@ -204,19 +206,11 @@ class Trainer:
         self.val_logger = CustomLogger(delimiter=' ', filename='validation', work_dir=self.work_dir, csv=self.csv_logger)
     def _save_checkpoint(self, epoch: int, mode: str) -> None:
         ''' Method to save checkpoints '''
-        date_str = datetime.datetime.now().strftime("%Y%m%d") #########
-        base_filename = f'binary_{date_str}' #########
-        custom_name = f'{base_filename}.pth' #########
+        date_str = datetime.datetime.now().strftime("%Y%m%d") 
+        base_filename = f'binary_{date_str}' 
+        custom_name = f'{base_filename}.pth' 
 
-        outpath = os.path.join(self.best_model_path, custom_name) #########
-
-        torch.save({
-            'epoch': epoch,
-            'model_state_dict': self.model.state_dict(),
-            'optimizer_state_dict': self.optimizer.state_dict(),
-            'loss': self.losses,
-            'best_val': self.best_val
-        }, outpath)
+        outpath = os.path.join(self.best_model_path, custom_name) 
 
         torch.save({
             'epoch': epoch,
@@ -226,13 +220,6 @@ class Trainer:
             'best_val': self.best_val
         }, outpath)
 
-        torch.save({
-            'epoch': epoch,
-            'model_state_dict': self.model.state_dict(),
-            'optimizer_state_dict': self.optimizer.state_dict(),
-            'loss': self.losses,
-            'best_val': self.best_val
-        }, outpath)
     def prepare_data(self, images, targets) -> tuple:
         ''' Method to prepare the data before feeding to the model. 
         Can be overridden by subclass to create a custom Trainer.
@@ -569,34 +556,38 @@ class Trainer:
 
             images, targets = self.prepare_data(images, targets)
 
-            output, loss_dict = self.model(images, targets)
+            ######## Handle different models ########
+            if isinstance(self.model, DLAEncoderDecoder):
+                output, loss_dict = self.model(images, targets)
+            else:
+                output = self.model(images)
+                target_tensor = targets['binary'].float() if isinstance(targets, dict) else targets.float()
+                loss_dict = {'loss': self.loss_fn(output, target_tensor)}
+            ########
 
             losses = sum(loss for loss in loss_dict.values())
 
             loss_dict_reduced = reduce_dict(loss_dict)
             losses_reduced = sum(loss for loss in loss_dict_reduced.values())
 
-            self.val_logger.update(loss=losses_reduced, **loss_dict_reduced)
+            # self.val_logger.update(loss=losses_reduced, **loss_dict_reduced)
+            self.val_logger.update(**loss_dict_reduced)
 
             batches_losses.append(losses)
 
             if wandb_flag and self.vizual_fn is not None:
                 if (i % self.print_freq == 0 or i == len(self.val_dataloader) - 1):
-                    fig = self._vizual(image = images, target = targets, output = output)
+                    fig = self._vizual(image=images, target=targets, output=output)
                     wandb.log({'validation_vizuals': fig})
         
         batches_losses = torch.stack(batches_losses)
-        # out= val_loss
         if reduction == 'mean':
             out = torch.mean(batches_losses).item()
             print(f'{header} mean loss: {out:.4f}')
-
             return out
-        #out= val_loss
         elif reduction == 'sum':
             out = torch.sum(batches_losses).item()
             print(f'{header} sum loss: {out:.4f}')
-
             return out
 
     def _train(
@@ -628,9 +619,13 @@ class Trainer:
             images, targets = self.prepare_data(images, targets)
 
             self.optimizer.zero_grad()
-
-            loss_dict = self.model(images, targets)
-
+            if isinstance(self.model, DLAEncoderDecoder):
+                output, loss_dict = self.model(images, targets)
+            else:
+                output = self.model(images)
+                target_tensor = targets['binary'].float() if isinstance(targets, dict) else targets.float()
+                loss_dict = {'loss': self.loss_fn(output, target_tensor)}
+                
             if wandb_flag:
                 wandb.log(loss_dict)
 
@@ -655,7 +650,7 @@ class Trainer:
 
             if warmup_iters is not None and epoch == 1:
                 self.start_lr_scheduler.step()
-
+            loss_dict_reduced.pop('loss', None)
             self.train_logger.update(loss=losses_reduced, **loss_dict_reduced)
             self.train_logger.update(lr=self.optimizer.param_groups[0]["lr"])
             

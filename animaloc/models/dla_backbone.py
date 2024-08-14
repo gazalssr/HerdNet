@@ -79,35 +79,22 @@ class DLAEncoder(nn.Module):
 
     def load_custom_pretrained_weights(self, weight_path):
         ''' Load custom pretrained weights into the model. '''
-        checkpoint = torch.load(weight_path)
-        
-        if 'model_state_dict' in checkpoint:
-            model_state_dict = checkpoint['model_state_dict']
-        else:
-            raise KeyError("Checkpoint file does not contain 'model_state_dict'")
+        print(f"Loading weights from: {weight_path}")
+        pretrained_dict = torch.load(weight_path, map_location='cuda')
+        adapted_pretrained_dict = self.adapt_keys(pretrained_dict)
 
-        # Get the model's current state dictionary
         model_dict = self.state_dict()
-        
-        # Remove "model." prefix from keys in pretrained_dict
-        pretrained_dict = {k.replace('model.', ''): v for k, v in model_state_dict.items()}
-        
-        # Filter out unnecessary keys and mismatched keys
-        pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
-        
-        # Update the model's state dictionary
-        model_dict.update(pretrained_dict)
-        
-        # Load the updated state dictionary into the model
-        self.load_state_dict(model_dict)
-        
-        print("Custom pretrained weights loaded successfully.")
-        
-        # Return other training state information
-        optimizer_state_dict = checkpoint.get('optimizer_state_dict', None)
-        epoch = checkpoint.get('epoch', None)
-        
-        return optimizer_state_dict, epoch
+        print("Model keys:", model_dict.keys())  #print model keys
+        print("Adapted pretrained keys:", adapted_pretrained_dict.keys())  #print adapted keys
+
+        # Filter out unmatched keys and size mismatches
+        pretrained_dict = {k: v for k, v in adapted_pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
+        if not pretrained_dict:
+            print("No matching keys found or size mismatch.")
+        else:
+            model_dict.update(pretrained_dict)
+            self.load_state_dict(model_dict, strict=False)
+            print("Custom pretrained weights loaded successfully.")
     
     
     def forward(self, input: torch.Tensor):
@@ -138,7 +125,15 @@ class DLAEncoder(nn.Module):
     def _freeze_layer(self, layer_name: str) -> None:
         for param in getattr(self, layer_name).parameters():
             param.requires_grad = False
-
+    def adapt_keys(self, pretrained_dict):
+        ''' Adapt keys from the pretrained model to fit the current model structure. '''
+        new_keys = {}
+        for k in pretrained_dict:
+            # Adapt the keys based on the structure of model_dict
+            new_key = 'base_0.' + k 
+            new_keys[new_key] = pretrained_dict[k]
+        return new_keys
+    
 ###################################### DLA Autoencoder ############################
 
 @MODELS.register()
@@ -267,24 +262,7 @@ class DLAEncoderDecoder(nn.Module):
             new_keys[new_key] = pretrained_dict[k]
         return new_keys
 
-    # def load_custom_pretrained_weights(self, weight_path):
-    #     ''' Load custom pretrained weights into the model. '''
-    #     print(f"Loading weights from: {weight_path}")
-    #     pretrained_dict = torch.load(weight_path, map_location='cuda')
-    #     adapted_pretrained_dict = self.adapt_keys(pretrained_dict)
-
-    #     model_dict = self.state_dict()
-    #     print("Model keys:", model_dict.keys())  #print model keys
-    #     print("Adapted pretrained keys:", adapted_pretrained_dict.keys())  #print adapted keys
-
-    #     # Filter out unmatched keys and size mismatches
-    #     pretrained_dict = {k: v for k, v in adapted_pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
-    #     if not pretrained_dict:
-    #         print("No matching keys found or size mismatch.")
-    #     else:
-    #         model_dict.update(pretrained_dict)
-    #         self.load_state_dict(model_dict, strict=False)
-    #         print("Custom pretrained weights loaded successfully.")
+  
 
 ########################################################################
 
