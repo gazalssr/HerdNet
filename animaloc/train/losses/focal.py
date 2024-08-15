@@ -359,7 +359,13 @@ class DensityLoss(torch.nn.Module):
  ###############################################################
     def _neg_loss(self, output: torch.Tensor, target: torch.Tensor):
         output = torch.clamp(output, min=self.eps, max=1-self.eps)
-        
+
+        # If target is a dictionary, extract the tensor (assuming a 'binary' key)
+        if isinstance(target, dict):
+            target = target.get('binary', None)
+            if target is None:
+                raise ValueError("The target dictionary does not contain a 'binary' key.")
+
         # Check the number of dimensions and compute the mean accordingly
         if output.dim() == 4:  # [batch_size, channels, height, width]
             m = output.mean(dim=[1, 2, 3])  # density mean over the spatial dimensions
@@ -382,8 +388,14 @@ class DensityLoss(torch.nn.Module):
         # Move the target to the same device as logits
         target = target.to(logits.device)
 
+        # Reshape or squeeze target to match logits' shape
+        if target.shape != logits.shape:
+            target = target.view_as(logits)  # Reshape target to match logits
+
+        # Convert target to float (same as logits)
+        target = target.float()
+
         # Compute the loss
         return self.loss(logits, target)
-
 
 

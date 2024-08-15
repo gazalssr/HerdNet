@@ -158,6 +158,7 @@ class LossWrapper(torch.nn.Module):
         model: torch.nn.Module, 
         losses: List[dict], 
         mode: str = 'module'
+        
         ) -> None:
         '''
         Args:
@@ -186,7 +187,7 @@ class LossWrapper(torch.nn.Module):
         self.model = model
         self.losses = losses
         self.output_mode = mode
-  
+        self.is_loss_wrapper = True
     def forward(
         self, 
         x: torch.Tensor, 

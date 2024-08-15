@@ -551,7 +551,7 @@ class TileEvaluator(Evaluator):
         return feeding_dict
     
     def evaluate(self, returns: str = 'recall', wandb_flag: bool = False, viz: bool = False,
-        log_meters: bool = True) -> float:
+                log_meters: bool = True) -> float:
         ''' Evaluate the model '''
         
         self.model.eval()
@@ -569,9 +569,13 @@ class TileEvaluator(Evaluator):
                 output = self.post_stitcher(output)
             else:
                 if isinstance(self.model, DLAEncoderDecoder):
-                    output, _ = self.model(images, targets)  
-                else: 
-                    output = self.model(images)  ######## Use only images for DLAEncoder
+                    output, _ = self.model(images, targets)
+                else:
+                    output = self.model(images)  # Use only images for other models
+
+            # Handle output depending on its type (tuple or tensor)
+            if isinstance(output, tuple):
+                output = output[0]  # Extract the first element from the tuple
 
             # Print raw model output before applying sigmoid
             print(f"Raw model output (before sigmoid): {output.detach().cpu().numpy()}")
@@ -606,7 +610,7 @@ class TileEvaluator(Evaluator):
                     'MAE': iter_metrics.mae(),
                     'MSE': iter_metrics.mse(),
                     'RMSE': iter_metrics.rmse()
-                    })
+                })
 
             iter_metrics.flush()
 
@@ -621,15 +625,15 @@ class TileEvaluator(Evaluator):
 
         # Log final metrics if using wandb
         if wandb_flag:
-            wandb.run.summary['threshold']= self.threshold
-            wandb.run.summary['recall'] =  self.metrics.recall()
-            wandb.run.summary['precision'] =  self.metrics.precision()
-            wandb.run.summary['f1_score'] =  self.metrics.fbeta_score()
-            wandb.run.summary['MAE'] =  self.metrics.mae()
-            wandb.run.summary['MSE'] =  self.metrics.mse()
-            wandb.run.summary['RMSE'] =  self.metrics.rmse()
-            wandb.run.summary['accuracy'] =  self.metrics.accuracy()
-            wandb.run.summary['mAP'] =  mAP
+            wandb.run.summary['threshold'] = self.threshold
+            wandb.run.summary['recall'] = self.metrics.recall()
+            wandb.run.summary['precision'] = self.metrics.precision()
+            wandb.run.summary['f1_score'] = self.metrics.fbeta_score()
+            wandb.run.summary['MAE'] = self.metrics.mae()
+            wandb.run.summary['MSE'] = self.metrics.mse()
+            wandb.run.summary['RMSE'] = self.metrics.rmse()
+            wandb.run.summary['accuracy'] = self.metrics.accuracy()
+            wandb.run.summary['mAP'] = mAP
             wandb.run.finish()
 
         if returns == 'recall':

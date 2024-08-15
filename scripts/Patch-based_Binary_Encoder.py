@@ -339,7 +339,7 @@ from animaloc.utils.useful_funcs import mkdir
 work_dir = '/herdnet/output'
 mkdir(work_dir)
 weight_decay = 1e-4
-epochs = 500
+epochs = 700
 
 # optimizer = Adam(params=dla_encoder_decoder.parameters(), lr=lr, weight_decay=weight_decay)
 optimizer = Adam(params=params_to_update, lr=lr, weight_decay=weight_decay)
@@ -370,7 +370,8 @@ trainer = Trainer(
     evaluator=evaluator, 
     # lr_milestones=lr_milestones,  # Pass the milestones
     # auto_lr=auto_lr,
-    loss_fn=BinaryFocalLoss(alpha_pos=2, alpha_neg=1, beta=3, reduction='mean'),
+    loss_dicts=None, 
+    loss_fn=focal_loss,
     best_model_path='/herdnet/herdnet/Binary_pth',
     val_dataloader= val_dataloader, # loss evaluation
     patience=50,

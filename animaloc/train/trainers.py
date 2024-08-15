@@ -33,7 +33,7 @@ from ..utils.logger import CustomLogger
 from ..eval.evaluators import Evaluator
 from ..data.transforms import UnNormalize
 from .adaloss import Adaloss
-
+from animaloc.models import LossWrapper
 from ..utils.registry import Registry
 
 TRAINERS = Registry('trainers', module_key='animaloc.train.trainers')
@@ -63,7 +63,8 @@ class Trainer:
         csv_logger: bool = False,
         patience: Optional[int] = None,
         best_model_path: Optional[str] = None,
-        loss_fn: Optional[Callable] = None #####
+        loss_fn: Optional[Callable] = None,
+        loss_dicts: Optional[List[dict]] = None
         ) -> None:
         '''
         Args:
@@ -170,7 +171,7 @@ class Trainer:
         self.lr_milestones = lr_milestones
         self.evaluator = evaluator
         self.best_model_path = best_model_path
-        
+        self.loss_dicts = loss_dicts
         self.loss_fn = loss_fn   #####
         self.vizual_fn = vizual_fn
 
@@ -544,8 +545,9 @@ class Trainer:
         return self.model
     
     @torch.no_grad()
+ 
     def evaluate(self, epoch: int, reduction: str = 'mean', wandb_flag: bool = False) -> float:
-        
+    
         self.model.eval()
 
         header = '[VALIDATION] - Epoch: [{}]'.format(epoch)
@@ -557,9 +559,11 @@ class Trainer:
             images, targets = self.prepare_data(images, targets)
 
             ######## Handle different models ########
-            if isinstance(self.model, DLAEncoderDecoder):
+            if hasattr(self.model, 'is_loss_wrapper') and self.model.is_loss_wrapper:
                 output, loss_dict = self.model(images, targets)
             else:
+                if self.loss_fn is None:
+                    raise ValueError("loss_fn cannot be None for models other than DLAEncoderDecoder.")
                 output = self.model(images)
                 target_tensor = targets['binary'].float() if isinstance(targets, dict) else targets.float()
                 loss_dict = {'loss': self.loss_fn(output, target_tensor)}
@@ -570,8 +574,9 @@ class Trainer:
             loss_dict_reduced = reduce_dict(loss_dict)
             losses_reduced = sum(loss for loss in loss_dict_reduced.values())
 
-            # self.val_logger.update(loss=losses_reduced, **loss_dict_reduced)
-            self.val_logger.update(**loss_dict_reduced)
+            # Update the logger
+            loss_dict_reduced.pop('loss', None)
+            self.val_logger.update(loss=losses_reduced, **loss_dict_reduced)
 
             batches_losses.append(losses)
 
@@ -589,6 +594,32 @@ class Trainer:
             out = torch.sum(batches_losses).item()
             print(f'{header} sum loss: {out:.4f}')
             return out
+
+        
+    def calculate_loss(self, output, targets):
+        # Check if the model is wrapped with LossWrapper
+        if isinstance(self.model, LossWrapper) and isinstance(self.model.model, DLAEncoderDecoder):
+            # Handle multiple loss functions for DLAEncoderDecoder wrapped with LossWrapper
+            total_loss = 0
+            for loss_dict in self.loss_dicts:
+                loss_fn = loss_dict['loss']
+                lambda_factor = loss_dict.get('lambda', 1.0)
+                total_loss += lambda_factor * loss_fn(output, targets)
+            return total_loss
+        elif isinstance(self.model, DLAEncoderDecoder):
+            # Directly handling DLAEncoderDecoder without LossWrapper
+            total_loss = 0
+            for loss_dict in self.loss_dicts:
+                loss_fn = loss_dict['loss']
+                lambda_factor = loss_dict.get('lambda', 1.0)
+                total_loss += lambda_factor * loss_fn(output, targets)
+            return total_loss
+        else:
+            if self.loss_fn is None:
+                raise ValueError("loss_fn cannot be None for models other than DLAEncoderDecoder.")
+            
+            target_tensor = targets['binary'].float() if isinstance(targets, dict) else targets.float()
+            return self.loss_fn(output, target_tensor)
 
     def _train(
         self, 
@@ -619,27 +650,24 @@ class Trainer:
             images, targets = self.prepare_data(images, targets)
 
             self.optimizer.zero_grad()
+
+            # Calculate the loss using the appropriate method
             if isinstance(self.model, DLAEncoderDecoder):
                 output, loss_dict = self.model(images, targets)
+                self.losses = sum(loss_dict.values())  ##### Sum all the losses from the dictionary
             else:
                 output = self.model(images)
-                target_tensor = targets['binary'].float() if isinstance(targets, dict) else targets.float()
-                loss_dict = {'loss': self.loss_fn(output, target_tensor)}
-                
-            if wandb_flag:
-                wandb.log(loss_dict)
+                self.losses = self.calculate_loss(output, targets)
 
-            self.losses = sum(loss for loss in loss_dict.values())
+            if wandb_flag:
+                wandb.log({'loss': self.losses})
+
             batches_losses.append(self.losses)
 
-            loss_dict_reduced = reduce_dict(loss_dict)
-            losses_reduced = sum(loss for loss in loss_dict_reduced.values())
-
-            loss_value = losses_reduced.item()
+            loss_value = self.losses.item()
 
             if not math.isfinite(loss_value):
                 print("Loss is {}, stopping training".format(loss_value))
-                print(loss_dict_reduced)
                 sys.exit(1)
 
             self.losses.backward()
@@ -650,11 +678,10 @@ class Trainer:
 
             if warmup_iters is not None and epoch == 1:
                 self.start_lr_scheduler.step()
-            loss_dict_reduced.pop('loss', None)
-            self.train_logger.update(loss=losses_reduced, **loss_dict_reduced)
-            self.train_logger.update(lr=self.optimizer.param_groups[0]["lr"])
-            
-            ### Printing statements to show the targets format and sampler procedure ####
+
+            # Update the logger
+            self.train_logger.update(loss=loss_value, lr=self.optimizer.param_groups[0]["lr"])
+
             # Print targets for the first batch
             if not first_batch_printed:
                 print(f"Targets for the first batch: {targets}")
@@ -667,13 +694,17 @@ class Trainer:
                 print(f"Batch {batch_count+1} - Non-empty targets: {non_empty_targets}, Empty targets: {empty_targets}")
                 batch_count += 1
                 
-                
         batches_losses = torch.stack(batches_losses)
 
         out = torch.mean(batches_losses).item()
         print(f'{header} mean loss: {out:.4f}')
 
-        return out
+        return out    
+                
+                
+
+
+
     
     def _warmup_lr_scheduler(self, warmup_iters: int, warmup_factor: float):
         ''' Method to make a warmup lr scheduler '''
