@@ -358,7 +358,7 @@ class DensityLoss(torch.nn.Module):
     
  ###############################################################
     def _neg_loss(self, output: torch.Tensor, target: torch.Tensor):
-        output = torch.clamp(output, min=self.eps, max=1-self.eps)
+        # output = torch.clamp(output, min=self.eps, max=1-self.eps)
 
         # If target is a dictionary, extract the tensor (assuming a 'binary' key)
         if isinstance(target, dict):

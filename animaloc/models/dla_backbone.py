@@ -79,13 +79,13 @@ class DLAEncoder(nn.Module):
 
     def load_custom_pretrained_weights(self, weight_path):
         ''' Load custom pretrained weights into the model. '''
-        print(f"Loading weights from: {weight_path}")
+        # print(f"Loading weights from: {weight_path}")
         pretrained_dict = torch.load(weight_path, map_location='cuda')
         adapted_pretrained_dict = self.adapt_keys(pretrained_dict)
 
         model_dict = self.state_dict()
-        print("Model keys:", model_dict.keys())  #print model keys
-        print("Adapted pretrained keys:", adapted_pretrained_dict.keys())  #print adapted keys
+        # print("Model keys:", model_dict.keys())  #print model keys
+        # print("Adapted pretrained keys:", adapted_pretrained_dict.keys())  #print adapted keys
 
         # Filter out unmatched keys and size mismatches
         pretrained_dict = {k: v for k, v in adapted_pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
@@ -168,7 +168,7 @@ class DLAEncoderDecoder(nn.Module):
         setattr(self, 'channels_0', base.channels)
 
         channels = self.channels_0
-
+    # Upsampling and rescaling in different scales in decoder
         scales = [2 ** i for i in range(len(channels[self.first_level:]))]
         self.dla_up = dla_modules.DLAUp(channels[self.first_level:], scales=scales)
 
@@ -188,20 +188,20 @@ class DLAEncoderDecoder(nn.Module):
                 head_conv, 1, 
                 kernel_size=1, stride=1, 
                 padding=0, bias=True
-                ),
-            nn.Sigmoid()
+                )
+            # nn.Sigmoid()
         )
 
-        self.loc_head[-2].bias.data.fill_(0.00)
+        self.loc_head[-1].bias.data.fill_(0.00)
     def load_custom_pretrained_weights(self, weight_path):
         ''' Load custom pretrained weights into the model. '''
-        print(f"Loading weights from: {weight_path}")
+        # print(f"Loading weights from: {weight_path}")
         pretrained_dict = torch.load(weight_path, map_location='cuda')
         adapted_pretrained_dict = self.adapt_keys(pretrained_dict)
 
         model_dict = self.state_dict()
-        print("Model keys:", model_dict.keys())  #print model keys
-        print("Adapted pretrained keys:", adapted_pretrained_dict.keys())  #print adapted keys
+        # print("Model keys:", model_dict.keys())  #print model keys
+        # print("Adapted pretrained keys:", adapted_pretrained_dict.keys())  #print adapted keys
 
         # Filter out unmatched keys and size mismatches
         pretrained_dict = {k: v for k, v in adapted_pretrained_dict.items() if k in model_dict and model_dict[k].size() == v.size()}
@@ -222,7 +222,8 @@ class DLAEncoderDecoder(nn.Module):
         # Decoder
         decode_hm = self.dla_up(encode[self.first_level:])
         heatmap = self.loc_head(decode_hm)
-
+        # print("Heatmap values (before activation):", heatmap.detach().cpu().numpy())
+        # print("Heatmap size:", heatmap.size())
         # Compute the mean of the heatmap
         density_mean = heatmap.mean(dim=[2, 3])  # Average over height and width
 
