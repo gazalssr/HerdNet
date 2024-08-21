@@ -123,11 +123,11 @@ weights = [weight_for_empty, weight_for_non_empty]
 # dla_encoder = DLAEncoder(num_classes=num_classes, pretrained=False).cuda()
 # dla_encoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pth')
 ##### DLA AutoEncoder 
-dla_encoder_decoder = DLAEncoderDecoder(num_classes=num_classes, pretrained=False).cuda()
+dla_encoder_decoder = DLAEncoderDecoder(num_classes=num_classes, pretrained=False, down_ratio=down_ratio).cuda()
 dla_encoder_decoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pth')
 ######## Density Loss ############
 losses = [
-    {'loss': DensityLoss(reduction='mean', eps=1e-2), 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'density_loss'},
+    {'loss': DensityLoss(reduction='mean', eps=1e-6), 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'density_loss'},
 ]
 
 # herdnet = LossWrapper(dla_encoder_decoder, losses=losses)
@@ -176,10 +176,11 @@ from animaloc.train import Trainer
 from animaloc.eval import ImageLevelMetrics, HerdNetStitcher, TileEvaluator
 from animaloc.utils.useful_funcs import mkdir
 
-work_dir = '/herdnet/output'
+work_dir = '/herdnet/val_output'
 mkdir(work_dir)
 weight_decay = 1e-4
-epochs = 100
+epochs = 850
+
 
 optimizer = Adam(params=params_to_update, lr=lr, weight_decay=weight_decay)
 # lr_milestones = [30, 60, 90]  # Example milestones
@@ -191,7 +192,7 @@ metrics.binary_annotations = True
 
 evaluator = TileEvaluator(
     metrics_class=ImageLevelMetrics,
-    threshold=0.7,
+    threshold=0.5,
     model=dla_encoder_decoder,
     # model=model,
     dataloader=val_dataloader,
@@ -213,7 +214,7 @@ trainer = Trainer(
     # auto_lr=auto_lr,
     best_model_path='/herdnet/herdnet/Binary_pth',
     val_dataloader= val_dataloader, # loss evaluation
-    patience=50,
+    patience=70,
     work_dir=work_dir
     )
 
@@ -227,7 +228,7 @@ wandb.init(project="herdnet_pretrain")
 # trainer.resume(pth_path='/herdnet/pth_files/Final_binary_celestial-dragon-268.pth', checkpoints='best', select='max', validate_on='f1_score', load_optim=True, wandb_flag=False)
 trainer.start(warmup_iters=100, checkpoints='best', select='max', validate_on='f1_score', wandb_flag =True)
 ###### Evaluator ######
-val_f1_score=evaluator.evaluate(returns='f1_score', viz=True, wandb_flag =False )
+val_f1_score=evaluator.evaluate(returns='f1_score', viz=True, wandb_flag =False)
 
 #Detections and Results
 df_val_r=evaluator.results
@@ -267,7 +268,7 @@ test_evaluator = TileEvaluator(
    num_classes=num_classes,
     stitcher=None,
     work_dir=test_dir,
-    threshold=0.3,
+    threshold=0.5,
     header='test'
     )
 if wandb.run is not None:
@@ -289,7 +290,7 @@ test_detections.to_csv('/herdnet/test_output/new_Binary_test_detections.csv', in
 
 # TEST_DATASETS
 test_detections.rename(columns={'binary': 'Ground truth','count_1': 'empty_count', 'count_2': 'non_empty_count'}, inplace=True)
-detections_df=pd.read_csv('/herdnet/test_output/Binary_test_detections.csv')
+detections_df=pd.read_csv('/herdnet/test_output/new_Binary_test_detections.csv')
 ############### Comparison of the detections and gt #########
 gt_df = pd.read_csv('/herdnet/DATASETS/CAH_no_margins_30/test/Test_binary_gt.csv')
 # Create a new column 'Ground_truth' in df_detection and initialize with NaN

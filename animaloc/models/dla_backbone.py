@@ -263,16 +263,3 @@ class DLAEncoderDecoder(nn.Module):
             new_keys[new_key] = pretrained_dict[k]
         return new_keys
 
-  
-
-########################################################################
-
-    def freeze(self, layers: list) -> None:
-        ''' Freeze all layers mentioned in the input list '''
-        for layer in layers:
-            self._freeze_layer(layer)
-    
-    def _freeze_layer(self, layer_name: str) -> None:
-        for param in getattr(self, layer_name).parameters():
-            param.requires_grad = False
-
