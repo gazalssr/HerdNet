@@ -212,7 +212,6 @@ class DLAEncoderDecoder(nn.Module):
             self.load_state_dict(model_dict, strict=False)
             print("Custom pretrained weights loaded successfully.")
 
-
     def forward(self, input: torch.Tensor):
         # Encoder
         encode = self.base_0(input)    
@@ -222,27 +221,13 @@ class DLAEncoderDecoder(nn.Module):
         # Decoder
         decode_hm = self.dla_up(encode[self.first_level:])
         heatmap = self.loc_head(decode_hm)
-        # print("Heatmap values (before activation):", heatmap.detach().cpu().numpy())
-        # print("Heatmap size:", heatmap.size())
+
         # Compute the mean of the heatmap
         density_mean = heatmap.mean(dim=[2, 3])  # Average over height and width
+        # return heatmap, density_mean  # Return both heatmap and density mean for heatmap visualization
+        return density_mean  
+   
 
-        return density_mean
-###### to vizualize the heatmaps
-    # def forward(self, input: torch.Tensor):
-    #     # Encoder
-    #     encode = self.base_0(input)    
-    #     bottleneck = self.bottleneck_conv(encode[-1])
-    #     encode[-1] = bottleneck
-
-    #     # Decoder
-    #     decode_hm = self.dla_up(encode[self.first_level:])
-    #     heatmap = self.loc_head(decode_hm)  # This should be the heatmap you want to visualize
-
-    #     # Compute the mean of the heatmap
-    #     density_mean = heatmap.mean(dim=[2, 3])  # Average over height and width
-
-    #     return heatmap, density_mean  # Return both the heatmap and the final output
     def freeze(self, layers: list) -> None:
         ''' Freeze all layers mentioned in the input list '''
         for layer in layers:
