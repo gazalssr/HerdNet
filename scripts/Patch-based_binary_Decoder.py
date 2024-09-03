@@ -5,7 +5,7 @@ import os
 
 # Set the seed
 from animaloc.utils.seed import set_seed
-import numpy
+import numpy as np
 set_seed(9292)
 
 import matplotlib.pyplot as plt
@@ -97,7 +97,7 @@ val_sampler = BinaryBatchSampler(
     dataset=val_dataset,
     col='binary',  
     batch_size=8,  # Even batch_size
-    shuffle=False
+    shuffle=True
 )
 # test_dataset.data.to_csv('/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/test_W/Test_binary_gt.csv', index=False)
 # Dataloaders
@@ -179,7 +179,7 @@ from animaloc.utils.useful_funcs import mkdir
 work_dir = '/herdnet/val_output'
 mkdir(work_dir)
 weight_decay = 1e-4
-epochs = 850
+epochs = 100
 
 
 optimizer = Adam(params=params_to_update, lr=lr, weight_decay=weight_decay)
@@ -212,7 +212,7 @@ trainer = Trainer(
     evaluator=evaluator, 
     # lr_milestones=lr_milestones,  # Pass the milestones
     # auto_lr=auto_lr,
-    best_model_path='/herdnet/herdnet/Binary_pth',
+    best_model_path='/herdnet/pth_files',
     val_dataloader= val_dataloader, # loss evaluation
     patience=70,
     work_dir=work_dir
@@ -223,128 +223,123 @@ if wandb.run is not None:
   wandb.finish()
 
 wandb.init(project="herdnet_pretrain")
-####### Trainer ############
-# output_dir = '/herdnet/val_output'
-# os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
+####### Ploting Heatmaps ############
+output_dir = '/herdnet/val_output/before_training'
+os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
 
-# # Get a batch from the validation dataloader
-# images, targets = next(iter(val_dataloader))  
-# images = images.to('cuda')  # Move images to GPU
+# Get a batch from the validation dataloader
+images, targets = next(iter(val_dataloader))  
+images = images.to('cuda')  # Move images to GPU
 
-# # Ensure the model is in evaluation mode
-# dla_encoder_decoder.eval()
+# Ensure the model is in evaluation mode
+dla_encoder_decoder.eval()
 
-# # Get heatmaps
-# with torch.no_grad():  # Disable gradient computation
-#     output = dla_encoder_decoder(images)  # Get the output from the model
+# Get heatmaps
+with torch.no_grad():  # Disable gradient computation
+    output = dla_encoder_decoder(images)  # Get the output from the model
 
-# # Extract heatmaps from the output tuple
-# heatmaps = output[0][0]  # The heatmaps tensor
-# heatmaps = heatmaps.cpu().numpy()  # Move the heatmaps to CPU and convert to numpy
+# Extract heatmaps from the output tuple
+heatmaps = output[0][0]  # The heatmaps tensor
+heatmaps = heatmaps.cpu().numpy()  # Move the heatmaps to CPU and convert to numpy
 
-# # Get image IDs from the targets
-# image_ids = targets['image_name'][0]  # Extract the list of image names
+# Get image IDs from the targets
+image_ids = targets['image_name'][0]  # Extract the list of image names
 
-# # Print the length of image_ids and shape of heatmaps to debug
-# print(f"Number of image IDs: {len(image_ids)}")
-# print(f"Number of heatmaps: {heatmaps.shape[0]}")
+# Print the length of image_ids and shape of heatmaps to debug
+print(f"Number of image IDs: {len(image_ids)}")
+print(f"Number of heatmaps: {heatmaps.shape[0]}")
 
-# # Ensure the lengths match before proceeding
-# assert len(image_ids) == heatmaps.shape[0], "Mismatch between the number of heatmaps and image IDs!"
+# Ensure the lengths match before proceeding
+assert len(image_ids) == heatmaps.shape[0], "Mismatch between the number of heatmaps and image IDs!"
 
-# # Plot and save the heatmaps for each image in the batch
-# for j in range(heatmaps.shape[0]):
-#     plt.figure(figsize=(10, 10))
-#     plt.imshow(heatmaps[j, 0], cmap='hot', interpolation='nearest')
-#     plt.title(f'Heatmap for Image ID {image_ids[j]}')
+# Plot and save the heatmaps for each image in the batch
+for j in range(heatmaps.shape[0]):
+    plt.figure(figsize=(10, 10))
+    plt.imshow(heatmaps[j, 0], cmap='hot', interpolation='nearest')
+    plt.title(f'Heatmap for Image ID {image_ids[j]}')
     
-#     # Save the plot with the image ID in the filename
-#     output_path = os.path.join(output_dir, f'heatmap_image_{image_ids[j]}_before_training.png')
-#     plt.savefig(output_path)
-#     plt.close()
+    # Save the plot with the image ID in the filename
+    output_path = os.path.join(output_dir, f'heatmap_image_{image_ids[j]}_before_training.png')
+    plt.savefig(output_path)
+    plt.close()
 
-# print(f"Heatmaps saved in {output_dir}")
-# ############ After training;
-# output_dir = '/herdnet/val_output'
-# os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
+print(f"Heatmaps saved in {output_dir}")
+############ After training;
+output_dir = '/herdnet/val_output/after_training'
+os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
+# Initialize your custom loss function
+density_loss = DensityLoss()  # Assuming DensityLoss is defined elsewhere in your code
 
-# # Initialize your custom loss function
-# density_loss = DensityLoss()  # Assuming DensityLoss is defined elsewhere in your code
+# Training loop
+num_epochs = 50  # Example: Train for 50 epochs
+checkpoint_epoch = 50  # Plot heatmaps every n epochs
 
-# # Training loop
-# num_epochs = 50  # Example: Train for 50 epochs
-# checkpoint_epoch = 10  # Plot heatmaps every 10 epochs
+# Inside the training loop, only use training data for model updates
+for epoch in range(1, num_epochs + 1):
+    print(f"Epoch {epoch}/{num_epochs}: Training...")
+    
+    # Training loop
+    dla_encoder_decoder.train()  # Set the model to training mode
+    
+    for batch_idx, (images, targets) in enumerate(train_dataloader):
+        images = images.to('cuda')
+        targets = targets['binary'].to('cuda')
+        
+        optimizer.zero_grad()  # Zero the gradients
+        
+        outputs = dla_encoder_decoder(images)
+        
+        density_mean = outputs[1]
+        
+        loss = density_loss(density_mean, targets)
+        
+        loss.backward()
+        optimizer.step()
+        
+        # Log gradients and loss
+        for name, param in dla_encoder_decoder.named_parameters():
+            if param.grad is not None:
+                print(f"{name}: Grad mean = {param.grad.abs().mean()}")
+            else:
+                print(f"{name}: No gradient computed")
+                
+        print(f"Batch {batch_idx+1}/{len(train_dataloader)}, Loss: {loss.item()}")
+    
+    # Evaluate on validation data without affecting gradients
+    if epoch > 0 and epoch % checkpoint_epoch == 0:
+        print(f"Epoch {epoch}: Generating heatmaps...")
 
-# for epoch in range(1, num_epochs + 1):
-#     # Training code here
-#     print(f"Epoch {epoch}/{num_epochs}: Training...")
-
-#     dla_encoder_decoder.train()  # Set the model to training mode
-
-#     # Training loop: Iterate over batches of the training data
-#     for batch_idx, (images, targets) in enumerate(train_dataloader):
-#         images = images.to('cuda')
-#         targets = targets['binary'].to('cuda')
-
-#         # Zero the parameter gradients
-#         optimizer.zero_grad()
-
-#         # Forward pass
-#         outputs = dla_encoder_decoder(images)
-
-#         # Extract the relevant part of the output for loss computation
-#         density_mean = outputs[1]  # Assuming the second element in the tuple is density_mean
-
-#         # Compute loss using your custom loss function
-#         loss = density_loss(density_mean, targets)  # Use density_loss instead of loss_fn
-
-#         # Backward pass and optimize
-#         loss.backward()
-#         optimizer.step()
-
-#         print(f"Batch {batch_idx+1}/{len(train_dataloader)}, Loss: {loss.item()}")
-
-#     # After a certain number of epochs, plot heatmaps
-#     if epoch % checkpoint_epoch == 0:
-#         print(f"Epoch {epoch}: Generating heatmaps...")
-
-#         # Ensure the model is in evaluation mode for heatmap generation
-#         dla_encoder_decoder.eval()
-
-#         # Get a batch from the validation dataloader
-#         images, targets = next(iter(val_dataloader))  
-#         images = images.to('cuda')  # Move images to GPU
-
-#         # Get heatmaps
-#         with torch.no_grad():  # Disable gradient computation
-#             output = dla_encoder_decoder(images)  # Get the output from the model
-
-#         # Extract heatmaps from the output tuple
-#         heatmaps = output[0][0]  # The heatmaps tensor
-#         heatmaps = heatmaps.cpu().numpy()  # Move the heatmaps to CPU and convert to numpy
-
-#         # Get image IDs from the targets
-#         image_ids = targets['image_name'][0]
-
-#         # Plot and save the heatmaps for each image in the batch
-#         for j in range(heatmaps.shape[0]):
-#             plt.figure(figsize=(10, 10))
-#             plt.imshow(heatmaps[j, 0], cmap='hot', interpolation='nearest')
-#             plt.title(f'Heatmap for Image ID {image_ids[j]} (Epoch {epoch})')
+        dla_encoder_decoder.eval()
+        with torch.no_grad():
+            images, targets = next(iter(val_dataloader))
+            images = images.to('cuda')
             
-#             # Save the plot with the image ID and epoch number in the filename
-#             output_path = os.path.join(output_dir, f'heatmap_image_{image_ids[j]}_epoch_{epoch}.png')
-#             plt.savefig(output_path)
-#             plt.close()
+            output = dla_encoder_decoder(images)
+            
+            heatmaps = output[0][0].cpu().numpy()
+            image_ids = targets['image_name'][0]
+            
+            for j in range(heatmaps.shape[0]):
+                plt.figure(figsize=(10, 10))
+                plt.imshow(heatmaps[j, 0], cmap='hot', interpolation='nearest')
+                plt.title(f'Heatmap for Image ID {image_ids[j]} (Epoch {epoch})')
+                output_path = os.path.join(output_dir, f'heatmap_image_{image_ids[j]}_epoch_{epoch}.png')
+                plt.savefig(output_path)
+                plt.close()
+                
+        print(f"Heatmaps saved for epoch {epoch}")
+    
+    # Ensure to switch back to training mode after evaluation
+    dla_encoder_decoder.train()
 
-#         print(f"Heatmaps saved for epoch {epoch}")
 
-#     # Validation step (optional) if you want to validate at the end of each epoch
-#     # val_f1_score = evaluator.evaluate(returns='f1_score', viz=True, wandb_flag=False)
-#     # print(f"Validation F1 Score after Epoch {epoch}: {val_f1_score}")
+    # Ensure to switch back to training mode after heatmap generation
+    dla_encoder_decoder.train()
 
-# print("Training completed.")
-# trainer.resume(pth_path='/herdnet/pth_files/Final_binary_celestial-dragon-268.pth', checkpoints='best', select='max', validate_on='f1_score', load_optim=True, wandb_flag=False)
+print("Training completed.")
+
+
+# trainer.resume(pth_path='/herdnet/herdnet/Binary_pth/binary_20240829.pth', checkpoints='best', select='max', validate_on='f1_score', load_optim=True, wandb_flag=False)
 trainer.start(warmup_iters=100, checkpoints='best', select='max', validate_on='f1_score', wandb_flag =True)
 ###### Evaluator ######
 val_f1_score=evaluator.evaluate(returns='f1_score', viz=True, wandb_flag =False)
@@ -374,6 +369,115 @@ for index, row in detections_df.iterrows():
 
 # Save the updated DataFrame back to a new CSV (optional)
 detections_df.to_csv('/herdnet/new_Val_Final_detection_file.csv', index=False)
+
+################ Plot Beta- Recall - Precision tradeoff in Focal Loss regarding different beta values ###########
+# eval_epochs = 50
+# fine_tune_epochs = 10
+# def fine_tune_and_evaluate(beta, alpha_pos, alpha_neg, train_dataloader, val_dataloader, model, eval_epochs, fine_tune_epochs, work_dir):
+#     # Check if val_dataloader is not None and contains data
+#     if val_dataloader is None:
+#         raise ValueError("val_dataloader is None")
+#     if len(val_dataloader) == 0:
+#         raise ValueError("val_dataloader is empty")
+
+#     # Make sure the model is not already wrapped
+#     if not isinstance(model, LossWrapper):
+#         density_loss = DensityLoss(reduction='mean', eps=1e-6)
+#         # Update BinaryFocalLoss parameters
+#         density_loss.loss = BinaryFocalLoss(alpha_pos=alpha_pos, alpha_neg=alpha_neg, beta=beta, reduction='mean')
+
+#         # Wrap the model with LossWrapper
+#         model = LossWrapper(model, losses=[{'loss': density_loss, 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'density_loss'}])
+#         print(f"Wrapped Model Type: {type(model)}")  ####### Debugging Print
+    
+#     optimizer = Adam(params=model.parameters(), lr=1e-4, weight_decay=1e-3)
+
+#     evaluator = TileEvaluator(
+#         metrics_class=ImageLevelMetrics,
+#         threshold=0.5,
+#         model=model,
+#         dataloader=val_dataloader,
+#         num_classes=2,
+#         stitcher=None,
+#         work_dir=work_dir,
+#         header='validation',
+#     )
+#     best_model_path = os.path.join(work_dir, '/herdnet/herdnet/augmented_images')
+#     fine_tuner = Trainer(
+#         model=model,
+#         train_dataloader=train_dataloader,
+#         optimizer=optimizer,
+#         num_epochs=fine_tune_epochs,
+#         evaluator=evaluator,
+#         val_dataloader=val_dataloader,
+#         work_dir=work_dir,
+#         loss_dicts=model.losses,
+#         best_model_path=best_model_path
+#     )
+
+#     # Start fine-tuning with logging
+#     print(f"Starting fine-tuning for beta={beta}, alpha_pos={alpha_pos}, alpha_neg={alpha_neg}")
+#     fine_tuner.start()  # Use start method of Trainer
+
+#     # Evaluation phase
+#     precision_list = []
+#     recall_list = []
+
+#     for epoch in range(eval_epochs):
+#         precision = evaluator.evaluate(returns='precision')
+#         recall = evaluator.evaluate(returns='recall')
+#         precision_list.append(precision)
+#         recall_list.append(recall)
+#         print(f"Evaluation Epoch [{epoch+1}/{eval_epochs}] completed: Precision={precision}, Recall={recall}")
+
+#     avg_precision = sum(precision_list[-20:]) / min(len(precision_list), 20)  # Average of last 20 epochs
+#     avg_recall = sum(recall_list[-20:]) / min(len(recall_list), 20)
+
+#     return avg_precision, avg_recall
+
+
+
+# ###### plot alpha_pos and beta in one plot
+# # Parameters to test
+# import numpy as np
+# beta_values = [2, 2.5, 3, 3.5, 4]
+# alpha_pos_values = [1, 1.5, 2, 2.5, 3]
+# alpha_neg = 1  # Keep alpha_neg constant, or you can vary it similarly
+# precisions = []
+# recalls = []
+
+# for beta in beta_values:
+#     for alpha_pos in alpha_pos_values:
+#         print(f"Evaluating for beta: {beta}, alpha_pos: {alpha_pos}, alpha_neg: {alpha_neg}")
+#         precision, recall = fine_tune_and_evaluate(beta, alpha_pos, alpha_neg, train_dataloader, val_dataloader, dla_encoder_decoder, eval_epochs, fine_tune_epochs, work_dir)
+#         precisions.append((beta, alpha_pos, precision))
+#         recalls.append((beta, alpha_pos, recall))
+#         print(f"Results for beta={beta}, alpha_pos={alpha_pos}, alpha_neg={alpha_neg}: Precision: {precision}, Recall: {recall}")
+
+# # Convert the list of tuples to a numpy array for easier manipulation
+# precisions = np.array(precisions)
+# recalls = np.array(recalls)
+# plt.figure(figsize=(12, 6))
+
+# # Precision plot
+# for alpha_pos in np.unique(precisions[:, 1]):
+#     mask = precisions[:, 1] == alpha_pos
+#     plt.plot(precisions[mask, 0], precisions[mask, 2], marker='o', label=f'Precision (alpha_pos={alpha_pos})')
+
+# # Recall plot
+# for alpha_pos in np.unique(recalls[:, 1]):
+#     mask = recalls[:, 1] == alpha_pos
+#     plt.plot(recalls[mask, 0], recalls[mask, 2], marker='x', linestyle='--', label=f'Recall (alpha_pos={alpha_pos})')
+
+# plt.title('Precision and Recall vs Beta for different Alpha_pos values')
+# plt.xlabel('Beta')
+# plt.ylabel('Score')
+# plt.legend()
+# plt.grid(True)
+# plt.tight_layout()
+# plt.savefig('/herdnet/Decoder_precision_recall_vs_beta_alpha_pos_line_plot.pdf')
+# plt.show()
+
 #################### Test data and evaluation ###########
 # Create output folder
 test_dir = '/herdnet/test_output'
