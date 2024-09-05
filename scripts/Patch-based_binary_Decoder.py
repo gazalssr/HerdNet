@@ -97,7 +97,7 @@ val_sampler = BinaryBatchSampler(
     dataset=val_dataset,
     col='binary',  
     batch_size=8,  # Even batch_size
-    shuffle=True
+    shuffle=False
 )
 # test_dataset.data.to_csv('/herdnet/DATASETS/CAH_Complete_FCH_101114_STRATIFIED/test_W/Test_binary_gt.csv', index=False)
 # Dataloaders
@@ -227,116 +227,105 @@ wandb.init(project="herdnet_pretrain")
 output_dir = '/herdnet/val_output/before_training'
 os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
 
-# Get a batch from the validation dataloader
-images, targets = next(iter(val_dataloader))  
-images = images.to('cuda')  # Move images to GPU
+def generate_heatmaps(val_dataloader, model, epoch, work_dir):
+    output_dir = os.path.join(work_dir, f'epoch_{epoch}_heatmaps')
+    os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
 
-# Ensure the model is in evaluation mode
-dla_encoder_decoder.eval()
+    # Ensure the model is in evaluation mode
+    model.eval()
 
-# Get heatmaps
-with torch.no_grad():  # Disable gradient computation
-    output = dla_encoder_decoder(images)  # Get the output from the model
+    # Get a batch from the validation dataloader
+    images, targets = next(iter(val_dataloader))  
+    images = images.to('cuda')  # Move images to GPU
 
-# Extract heatmaps from the output tuple
-heatmaps = output[0][0]  # The heatmaps tensor
-heatmaps = heatmaps.cpu().numpy()  # Move the heatmaps to CPU and convert to numpy
+    # Get heatmaps
+    with torch.no_grad():  # Disable gradient computation
+        output = model(images)  # Get the output from the model
 
-# Get image IDs from the targets
-image_ids = targets['image_name'][0]  # Extract the list of image names
+    # Extract heatmaps from the output tuple
+    heatmaps = output[0][0]  # The heatmaps tensor
+    heatmaps = heatmaps.cpu().numpy()  # Move the heatmaps to CPU and convert to numpy
 
-# Print the length of image_ids and shape of heatmaps to debug
-print(f"Number of image IDs: {len(image_ids)}")
-print(f"Number of heatmaps: {heatmaps.shape[0]}")
+    # Get image IDs from the targets
+    image_ids = targets['image_name'][0]  # Extract the list of image names
 
-# Ensure the lengths match before proceeding
-assert len(image_ids) == heatmaps.shape[0], "Mismatch between the number of heatmaps and image IDs!"
+    # Ensure the lengths match before proceeding
+    assert len(image_ids) == heatmaps.shape[0], "Mismatch between the number of heatmaps and image IDs!"
 
-# Plot and save the heatmaps for each image in the batch
-for j in range(heatmaps.shape[0]):
-    plt.figure(figsize=(10, 10))
-    plt.imshow(heatmaps[j, 0], cmap='hot', interpolation='nearest')
-    plt.title(f'Heatmap for Image ID {image_ids[j]}')
-    
-    # Save the plot with the image ID in the filename
-    output_path = os.path.join(output_dir, f'heatmap_image_{image_ids[j]}_before_training.png')
-    plt.savefig(output_path)
-    plt.close()
-
-print(f"Heatmaps saved in {output_dir}")
-############ After training;
-output_dir = '/herdnet/val_output/after_training'
-os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
-# Initialize your custom loss function
-density_loss = DensityLoss()  # Assuming DensityLoss is defined elsewhere in your code
-
-# Training loop
-num_epochs = 50  # Example: Train for 50 epochs
-checkpoint_epoch = 50  # Plot heatmaps every n epochs
-
-# Inside the training loop, only use training data for model updates
-for epoch in range(1, num_epochs + 1):
-    print(f"Epoch {epoch}/{num_epochs}: Training...")
-    
-    # Training loop
-    dla_encoder_decoder.train()  # Set the model to training mode
-    
-    for batch_idx, (images, targets) in enumerate(train_dataloader):
-        images = images.to('cuda')
-        targets = targets['binary'].to('cuda')
+    # Plot and save the heatmaps for each image in the batch
+    for j in range(heatmaps.shape[0]):
+        # Normalize the heatmap values to range [0, 1]
+        heatmap = heatmaps[j, 0]
+        heatmap_min = heatmap.min()
+        heatmap_max = heatmap.max()
+        normalized_heatmap = (heatmap - heatmap_min) / (heatmap_max - heatmap_min + 1e-6)  # Avoid division by zero
         
-        optimizer.zero_grad()  # Zero the gradients
+        plt.figure(figsize=(10, 10))
+        plt.imshow(normalized_heatmap, cmap='hot', interpolation='nearest')  # Plot normalized heatmap
+        plt.title(f'Heatmap for Image ID {image_ids[j]} (Epoch {epoch})')
         
-        outputs = dla_encoder_decoder(images)
-        
-        density_mean = outputs[1]
-        
-        loss = density_loss(density_mean, targets)
-        
-        loss.backward()
-        optimizer.step()
-        
-        # Log gradients and loss
-        for name, param in dla_encoder_decoder.named_parameters():
-            if param.grad is not None:
-                print(f"{name}: Grad mean = {param.grad.abs().mean()}")
-            else:
-                print(f"{name}: No gradient computed")
-                
-        print(f"Batch {batch_idx+1}/{len(train_dataloader)}, Loss: {loss.item()}")
-    
-    # Evaluate on validation data without affecting gradients
-    if epoch > 0 and epoch % checkpoint_epoch == 0:
-        print(f"Epoch {epoch}: Generating heatmaps...")
+        # Save the plot with the image ID and epoch number in the filename
+        output_path = os.path.join(output_dir, f'heatmap_image_{image_ids[j]}_epoch_{epoch}.png')
+        plt.savefig(output_path)
+        plt.close()
 
-        dla_encoder_decoder.eval()
-        with torch.no_grad():
-            images, targets = next(iter(val_dataloader))
+    print(f"Heatmaps saved for epoch {epoch} in {output_dir}")
+
+def train_with_heatmap_generation(train_dataloader, val_dataloader, model, num_epochs, checkpoint_epoch, work_dir, warmup_iters=None):
+    optimizer = Adam(params=model.parameters(), lr=1e-4, weight_decay=1e-3)
+    density_loss = DensityLoss()  # Assuming DensityLoss is defined elsewhere in your code
+
+    for epoch in range(1, num_epochs + 1):
+        print(f"Epoch {epoch}/{num_epochs}: Training...")
+        model.train()  # Set the model to training mode
+        
+        for batch_idx, (images, targets) in enumerate(train_dataloader):
             images = images.to('cuda')
+            targets = targets['binary'].to('cuda')
+
+            optimizer.zero_grad()  # Zero the gradients
+            outputs = model(images)
+
+            density_mean = outputs[1]
+            loss = density_loss(density_mean, targets)
+
+            loss.backward()
+
+            # Apply warmup iterations if specified
+            if warmup_iters and epoch == 1 and batch_idx < warmup_iters:
+                warmup_factor = float(batch_idx + 1) / warmup_iters
+                for param_group in optimizer.param_groups:
+                    for param in param_group['params']:
+                        if param.grad is not None:
+                            param.grad *= warmup_factor  # Scale the gradients during warmup
             
-            output = dla_encoder_decoder(images)
-            
-            heatmaps = output[0][0].cpu().numpy()
-            image_ids = targets['image_name'][0]
-            
-            for j in range(heatmaps.shape[0]):
-                plt.figure(figsize=(10, 10))
-                plt.imshow(heatmaps[j, 0], cmap='hot', interpolation='nearest')
-                plt.title(f'Heatmap for Image ID {image_ids[j]} (Epoch {epoch})')
-                output_path = os.path.join(output_dir, f'heatmap_image_{image_ids[j]}_epoch_{epoch}.png')
-                plt.savefig(output_path)
-                plt.close()
-                
-        print(f"Heatmaps saved for epoch {epoch}")
+            optimizer.step()
+
+            # Log gradients and loss
+            for name, param in model.named_parameters():
+                if param.grad is not None:
+                    print(f"{name}: Grad mean = {param.grad.abs().mean()}")
+                else:
+                    print(f"{name}: No gradient computed")
+                    
+            print(f"Batch {batch_idx+1}/{len(train_dataloader)}, Loss: {loss.item()}")
+
+        # Generate heatmaps at specified intervals
+        if epoch > 0 and epoch % checkpoint_epoch == 0:
+            generate_heatmaps(val_dataloader, model, epoch, work_dir)
+
+        # Ensure to switch back to training mode after evaluation
+        model.train()
+
+    print("Training completed.")
     
-    # Ensure to switch back to training mode after evaluation
-    dla_encoder_decoder.train()
 
+num_epochs = 100
+checkpoint_epoch = 100  # Generate heatmaps every 10 epochs
+work_dir = '/herdnet/val_output/after_training'
+warmup_iters=100
+train_with_heatmap_generation(train_dataloader, val_dataloader, dla_encoder_decoder, num_epochs, checkpoint_epoch, work_dir,warmup_iters=warmup_iters)
 
-    # Ensure to switch back to training mode after heatmap generation
-    dla_encoder_decoder.train()
-
-print("Training completed.")
 
 
 # trainer.resume(pth_path='/herdnet/herdnet/Binary_pth/binary_20240829.pth', checkpoints='best', select='max', validate_on='f1_score', load_optim=True, wandb_flag=False)
