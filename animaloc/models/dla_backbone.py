@@ -22,7 +22,7 @@ import numpy as np
 import torchvision.transforms as T
 from torch.nn import BCEWithLogitsLoss
 from typing import Optional
-
+import torch.nn.functional as F
 from .register import MODELS
 
 from . import dla as dla_modules
@@ -149,7 +149,10 @@ class DLAEncoderDecoder(nn.Module):
         head_conv: int = 64,
     ):
         super(DLAEncoderDecoder, self).__init__()
-
+        #NEW
+        self.gradients = None
+        self.activations = None
+    
         # Initialize the model
         assert down_ratio in [1, 2, 4, 8, 16], \
             f'Downsample ratio possible values are 1, 2, 4, 8 or 16, got {down_ratio}'
@@ -211,11 +214,18 @@ class DLAEncoderDecoder(nn.Module):
             model_dict.update(pretrained_dict)
             self.load_state_dict(model_dict, strict=False)
             print("Custom pretrained weights loaded successfully.")
-
+    #NEW
+    def save_gradients(self, grad):
+        self.gradients = grad
     def forward(self, input: torch.Tensor):
         # Encoder
         encode = self.base_0(input)    
         bottleneck = self.bottleneck_conv(encode[-1])
+        #NEW
+        bottleneck.requires_grad_(True)
+        # Set up a hook on the bottleneck to capture gradients
+        bottleneck.register_hook(self.save_gradients)
+        self.activations = bottleneck  # Store the activations for Grad-CAM
         encode[-1] = bottleneck
 
         # Decoder
@@ -224,8 +234,8 @@ class DLAEncoderDecoder(nn.Module):
 
         # Compute the mean of the heatmap
         density_mean = heatmap.mean(dim=[2, 3])  # Average over height and width
-        # return heatmap, density_mean  # Return both heatmap and density mean for heatmap visualization
-        return density_mean  
+        return heatmap, density_mean  # Return both heatmap and density mean for heatmap visualization (uncomment this when u want to mkae heatmaps)
+        # return density_mean  
    
 
     def freeze(self, layers: list) -> None:
@@ -247,4 +257,64 @@ class DLAEncoderDecoder(nn.Module):
             new_key = 'base_0.' + k 
             new_keys[new_key] = pretrained_dict[k]
         return new_keys
+
+class GradCAM:
+    def __init__(self, model, target_layer_name):
+        # Check if the model is wrapped inside a LossWrapper or other wrapper
+        if hasattr(model, 'model'):  # Assuming the actual model is stored as an attribute 'model'
+            self.model = model.model  # Unwrap the actual model
+        else:
+            self.model = model
+        self.target_layer_name = target_layer_name
+
+    def __call__(self, input_tensor, target_class):
+        # Forward pass to get the heatmap and other outputs from the model
+        output = self.model(input_tensor)
+
+        # Handle the case where the model returns a tuple (output, loss_dict)
+        if isinstance(output, tuple):
+            output = output[0]  # Get the model output, ignore the loss dict
+
+        # Extract the heatmap from the nested tuple structure
+        heatmap_tuple = output[0]  # First element of output is a tuple
+        heatmap = heatmap_tuple[0]  # First tensor in the tuple is the actual heatmap
+
+        # Print the shape of the heatmap for debugging
+        print(f"Heatmap shape: {heatmap.shape}")
+
+        # Backward pass: we calculate the gradients for the target class
+        try:
+            # Create a gradient tensor matching the shape of the heatmap (2D case)
+            one_hot_output = torch.zeros_like(heatmap).to(input_tensor.device)  # Shape [256, 256]
+            one_hot_output[:, :] = 1  # Set gradient for the entire heatmap (since it's 2D)
+
+            # Backpropagate the gradients
+            heatmap.backward(gradient=one_hot_output)
+        except AttributeError as e:
+            print(f"Error during backward pass: {e}")
+            return None
+
+        # Get the gradients and activations from the actual model (after unwrapping)
+        gradients = self.model.gradients  # Gradients saved by the hook
+        activations = self.model.activations  # Activations saved by the hook
+        
+        if gradients is None or activations is None:
+            print("Error: Gradients or activations are None. Check model hooks.")
+            return None
+
+        # Perform Grad-CAM computation: weight the activations by the gradients
+        pooled_gradients = torch.mean(gradients, dim=[0, 2, 3])
+        for i in range(activations.size(1)):
+            activations[:, i, :, :] *= pooled_gradients[i]
+
+        # Generate heatmap by averaging over channels
+        grad_cam_heatmap = torch.mean(activations, dim=1).squeeze()
+        grad_cam_heatmap = F.relu(grad_cam_heatmap)
+
+        # Normalize the heatmap
+        grad_cam_heatmap -= grad_cam_heatmap.min()
+        grad_cam_heatmap /= grad_cam_heatmap.max()
+
+        return grad_cam_heatmap.cpu().detach().numpy()
+
 

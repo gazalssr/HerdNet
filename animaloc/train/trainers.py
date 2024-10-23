@@ -464,19 +464,21 @@ class Trainer:
 
         if load_optim is True:
             self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-
-        resume_epoch = checkpoint['epoch']
+        self.resume_epoch = checkpoint['epoch']
+        # resume_epoch = checkpoint['epoch']
         self.losses = checkpoint['loss']
 
         self.best_val = checkpoint['best_val']
-
+        print(f"Resuming training from epoch {self.resume_epoch + 1}")
         lr_scheduler = self._lr_scheduler()
         val_flag = False
 
         if wandb_flag:
             wandb.log({'lr': self.optimizer.param_groups[0]["lr"]})
 
-        for epoch in range(resume_epoch + 1, self.epochs + 1):
+        for epoch in range(self.resume_epoch + 1, self.epochs + 1):
+            print(f"Current epoch: {epoch}")
+
 
             # training
             train_output = self._train(epoch, wandb_flag=wandb_flag) 
@@ -595,31 +597,50 @@ class Trainer:
             print(f'{header} sum loss: {out:.4f}')
             return out
 
-        
     def calculate_loss(self, output, targets):
         # Check if the model is wrapped with LossWrapper
-        if isinstance(self.model, LossWrapper) and isinstance(self.model.model, DLAEncoderDecoder):
-            # Handle multiple loss functions for DLAEncoderDecoder wrapped with LossWrapper
-            total_loss = 0
-            for loss_dict in self.loss_dicts:
-                loss_fn = loss_dict['loss']
-                lambda_factor = loss_dict.get('lambda', 1.0)
-                total_loss += lambda_factor * loss_fn(output, targets)
-            return total_loss
-        elif isinstance(self.model, DLAEncoderDecoder):
-            # Directly handling DLAEncoderDecoder without LossWrapper
-            total_loss = 0
-            for loss_dict in self.loss_dicts:
-                loss_fn = loss_dict['loss']
-                lambda_factor = loss_dict.get('lambda', 1.0)
-                total_loss += lambda_factor * loss_fn(output, targets)
-            return total_loss
+ 
+        if isinstance(self.model, LossWrapper):
+            if isinstance(self.model.model, DLAEncoderDecoder):
+                # Handle multiple loss functions for DLAEncoderDecoder wrapped with LossWrapper
+                total_loss = 0
+                for loss_dict in self.loss_dicts:
+                    loss_fn = loss_dict['loss']
+                    lambda_factor = loss_dict.get('lambda', 1.0)
+                    total_loss += lambda_factor * loss_fn(output, targets)
+                return total_loss
+            else:
+                
+                raise ValueError("LossWrapper is not being used with a DLAEncoderDecoder model.")
         else:
-            if self.loss_fn is None:
-                raise ValueError("loss_fn cannot be None for models other than DLAEncoderDecoder.")
             
-            target_tensor = targets['binary'].float() if isinstance(targets, dict) else targets.float()
-            return self.loss_fn(output, target_tensor)
+            raise ValueError("Model is not wrapped with LossWrapper.")
+
+
+    # def calculate_loss(self, output, targets):
+    #     # Check if the model is wrapped with LossWrapper
+    #     if isinstance(self.model, LossWrapper) and isinstance(self.model.model, DLAEncoderDecoder):
+    #         # Handle multiple loss functions for DLAEncoderDecoder wrapped with LossWrapper
+    #         total_loss = 0
+    #         for loss_dict in self.loss_dicts:
+    #             loss_fn = loss_dict['loss']
+    #             lambda_factor = loss_dict.get('lambda', 1.0)
+    #             total_loss += lambda_factor * loss_fn(output, targets)
+    #         return total_loss
+    #     elif isinstance(self.model, DLAEncoderDecoder):
+    #         # Directly handling DLAEncoderDecoder without LossWrapper
+    #         total_loss = 0
+    #         for loss_dict in self.loss_dicts:
+    #             loss_fn = loss_dict['loss']
+    #             lambda_factor = loss_dict.get('lambda', 1.0)
+    #             total_loss += lambda_factor * loss_fn(output, targets)
+    #         return total_loss
+    #     else:
+    #         if self.loss_fn is None:
+    #             raise ValueError("loss_fn cannot be None for models other than DLAEncoderDecoder.")
+            
+            # target_tensor = targets['binary'].float() if isinstance(targets, dict) else targets.float()
+            # return self.loss_fn(output, target_tensor)
 
     def _train(
         self, 
@@ -627,14 +648,16 @@ class Trainer:
         warmup_iters: Optional[int] = None, 
         wandb_flag: bool = False
         ) -> torch.Tensor:
+                
         ''' Training method '''
+        
 
         self.model.train()
 
         self.train_logger.add_meter('lr', SmoothedValue(window_size=1, fmt='{value:.6f}'))
         header = '[TRAINING] - Epoch: [{}]'.format(epoch)
-
-        if warmup_iters is not None and epoch == 1:
+        
+        if warmup_iters is not None and hasattr(self, 'resume_epoch') and epoch == self.resume_epoch + 1:
             self.start_lr_scheduler = self._warmup_lr_scheduler(
                 min(warmup_iters, len(self.train_dataloader)-1), 
                 1. / warmup_iters
@@ -646,7 +669,7 @@ class Trainer:
         batch_count = 0
         ####
         for images, targets in self.train_logger.log_every(self.train_dataloader, self.print_freq, header):
-
+            
             images, targets = self.prepare_data(images, targets)
 
             self.optimizer.zero_grad()
@@ -676,7 +699,7 @@ class Trainer:
             if self.adaloss is not None:
                 self.adaloss.feed(self.losses)
 
-            if warmup_iters is not None and epoch == 1:
+            if warmup_iters is not None and hasattr(self, 'resume_epoch') and epoch == self.resume_epoch + 1:
                 self.start_lr_scheduler.step()
 
             # Update the logger

@@ -56,9 +56,6 @@ class BinaryBatchSampler(Sampler):
         # print(f"Initialized BinaryBatchSampler with batch_size: {self.batch_size}")
         # print(f"After undersampling, c0_idx length: {len(self.c0_idx)}, c1_idx length: {len(self.c1_idx)}")
 
-    def _undersample(self, indices, target_size):
-        return indices[:target_size] if len(indices) > target_size else indices
-
     def __iter__(self):
         if self.shuffle:
             numpy.random.shuffle(self.c0_idx)
@@ -90,42 +87,104 @@ class BinaryBatchSampler(Sampler):
             generator.manual_seed(int(torch.empty((), dtype=torch.int64).random_().item()))
             undersampled_indices = [indices[i] for i in torch.randperm(len(indices), generator=generator)[:target_length]]
             return undersampled_indices
-class DataAnalyzer:
-    def __init__(self):
-        pass
+####################################################
+class BalancedMarginSampler(Sampler):
+    def __init__(self, dataset, col, batch_size=16, shuffle=False, ignore_margins=True, black_threshold=0.02, white_threshold=0.02):
+        super().__init__(dataset)
+        if not isinstance(dataset, BinaryFolderDataset):
+            raise TypeError(f"dataset should be an instance of 'BinaryFolderDataset', but got '{type(dataset)}'")
+        if batch_size % 2 != 0:
+            raise ValueError(f"batch size should be even, but got {batch_size}")
 
-    def analyze_batch_composition(self, dataloader, num_batches=10):
-        empty_counts = []
-        non_empty_counts = []
-        for i, (images, targets) in enumerate(dataloader):
-            if i >= num_batches:
-                break
-            if isinstance(targets, dict):
-                targets = targets['binary'] 
-            elif isinstance(targets, torch.Tensor):
-                targets = targets
-            else:
-                raise ValueError("Unexpected target format")
-            
-            # Detailed debug prints
-            print(f"Batch {i+1} targets: {targets.numpy()}")  # Debug print
-            batch_empty_count = (targets == 0).sum().item()
-            batch_non_empty_count = (targets == 1).sum().item()
-            
-            print(f"Batch {i+1}: Empty count = {batch_empty_count}, Non-empty count = {batch_non_empty_count}")  # Debug print
-            
-            empty_counts.append(batch_empty_count)
-            non_empty_counts.append(batch_non_empty_count)
-        return empty_counts, non_empty_counts
+        self.dataset = dataset
+        self.batch_size = batch_size
+        self.shuffle = shuffle
+        self.ignore_margins = ignore_margins  # Whether to ignore patches with black/white margins
+        self.black_threshold = black_threshold
+        self.white_threshold = white_threshold
 
-    def analyze_precision_trend(self, precision_values, save_path):
-        import matplotlib.pyplot as plt
+        self.data = self.dataset.data
+        if col not in self.data.columns:
+            raise ValueError(f"'{col}' column is missing from the data")
 
-        plt.figure(figsize=(10, 5))
-        plt.plot(precision_values, label='Precision')
-        plt.xlabel('Epochs')
-        plt.ylabel('Precision')
-        plt.title('Precision Trend Over Epochs')
-        plt.legend()
-        plt.savefig(save_path)
-        plt.show()
+        self.n = self.batch_size // 2
+
+        # Filter out margin patches if ignore_margins=True
+        if self.ignore_margins:
+            self.c0_idx, self.c1_idx = self._filter_margin_and_balance_patches()
+        else:
+            self.c0_idx = self.data.loc[self.data[col] == 0].index.values.tolist()
+            self.c1_idx = self.data.loc[self.data[col] == 1].index.values.tolist()
+
+        # Ensure equal samples in both categories (undersampling)
+        self.c0_idx = self._undersample(self.c0_idx, len(self.c1_idx))
+        self.c1_idx = self._undersample(self.c1_idx, len(self.c0_idx))
+
+    def _filter_margin_and_balance_patches(self):
+        """Filter out patches with large black/white areas and return balanced indices."""
+        c0_idx_filtered = []
+        c1_idx_filtered = []
+
+        for idx in range(len(self.dataset)):
+            image, target = self.dataset._get_single_item(idx)  # Load image and target
+            binary_label = target['binary'].item()  # Get binary label (0 or 1)
+            black_area_ratio = self._calculate_black_area(image)
+            white_area_ratio = self._calculate_white_area(image)
+
+            # Only include patches below black/white area thresholds
+            if black_area_ratio <= self.black_threshold and white_area_ratio <= self.white_threshold:
+                if binary_label == 0:
+                    c0_idx_filtered.append(idx)
+                elif binary_label == 1:
+                    c1_idx_filtered.append(idx)
+
+        return c0_idx_filtered, c1_idx_filtered
+
+    def _calculate_black_area(self, image):
+        """Calculate the percentage of black pixels in the image."""
+        if isinstance(image, torch.Tensor):
+            image = image.numpy()
+
+        if len(image.shape) == 3 and image.shape[0] == 3:
+            image = numpy.transpose(image, (1, 2, 0))
+
+        black_pixels = numpy.all(image == [0, 0, 0], axis=-1)
+        black_area_ratio = numpy.mean(black_pixels)
+        return black_area_ratio
+
+    def _calculate_white_area(self, image):
+        """Calculate the percentage of white pixels in the image."""
+        if isinstance(image, torch.Tensor):
+            image = image.numpy()
+
+        if len(image.shape) == 3 and image.shape[0] == 3:
+            image = numpy.transpose(image, (1, 2, 0))
+
+        white_pixels = numpy.all(image == [255, 255, 255], axis=-1)
+        white_area_ratio = numpy.mean(white_pixels)
+        return white_area_ratio
+
+    def _undersample(self, indices, target_size):
+        return indices[:target_size] if len(indices) > target_size else indices
+
+    def __iter__(self):
+        if self.shuffle:
+            numpy.random.shuffle(self.c0_idx)
+            numpy.random.shuffle(self.c1_idx)
+
+        c0_batches = [self.c0_idx[i:i + self.n] for i in range(0, len(self.c0_idx), self.n)]
+        c1_batches = [self.c1_idx[i:i + self.n] for i in range(0, len(self.c1_idx), self.n)]
+
+        batches = []
+        for c0_batch, c1_batch in zip(c0_batches, c1_batches):
+            batch = c0_batch + c1_batch
+            if len(batch) < self.batch_size:
+                continue
+            if self.shuffle:
+                numpy.random.shuffle(batch)
+            batches.append(batch)
+
+        return iter(batches)
+
+    def __len__(self):
+        return len(self.c0_idx) // self.n  # Number of batches
