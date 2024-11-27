@@ -220,7 +220,9 @@ class Trainer:
             'loss': self.losses,
             'best_val': self.best_val
         }, outpath)
-
+        # Save path to the best model file when 'best' mode is used
+        if mode == 'best':
+            self.best_model_file = outpath
     def prepare_data(self, images, targets) -> tuple:
         ''' Method to prepare the data before feeding to the model. 
         Can be overridden by subclass to create a custom Trainer.

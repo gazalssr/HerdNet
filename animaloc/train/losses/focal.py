@@ -137,41 +137,53 @@ class FocalLoss(torch.nn.Module):
         elif self.reduction == 'sum':
             return loss.sum()
 ###########################BinaryFocal loss####################
-
-import torch.nn as nn
-import torch.nn.functional as F
-
-class BinaryFocalLoss(nn.Module):
+class BinaryFocalLoss(torch.nn.Module):
     def __init__(
         self, 
-         alpha_pos=2, 
-         alpha_neg=1, 
-         beta=4, 
-         reduction='mean', 
-         weights=None, 
-         eps=1e-6):
+        alpha_pos=2, 
+        alpha_neg=1, 
+        beta=4, 
+        reduction='mean', 
+        weights=None, 
+        eps=1e-6
+    ):
         super(BinaryFocalLoss, self).__init__()
-        self.alpha_pos = alpha_pos  # Alpha for controlling emphasis on positive samples
-        self.alpha_neg = alpha_neg  # Alpha for controlling emphasis on negative samples
-        self.beta = beta    # beta focuses more on hard examples
+        self.alpha_pos = alpha_pos  # Emphasis on positive samples
+        self.alpha_neg = alpha_neg  # Emphasis on negative samples
+        self.beta = beta  # Focusing parameter for hard examples
         self.reduction = reduction
-        self.weights = weights  # Weights for each class
+        self.weights = weights  # Class weights
         self.eps = eps
-    
 
-    def forward(self, outputs, targets):
-        # Ensuring outputs are clamped to avoid log(0)
-        outputs = torch.clamp(outputs, min=self.eps, max=1 - self.eps)
+    def forward(self, logits, targets):
+        """
+        Args:
+            logits (torch.Tensor): Raw logits output from the model (not probabilities).
+            targets (torch.Tensor): Ground truth labels (0 or 1).
+        """
+        # Ensure logits and targets are of the same size
+        if targets.size() != logits.size():
+            targets = targets.view_as(logits)
 
-        # Calculate the basic binary cross entropy loss
-        if targets.size() != outputs.size():  ##### Added this line
-            targets = targets.view_as(outputs)
-        bce_loss = F.binary_cross_entropy_with_logits(outputs, targets.float(), reduction='none') #####
-        probas = torch.sigmoid(outputs)
+        # Binary cross-entropy loss with logits (no sigmoid applied yet)
+        bce_loss = F.binary_cross_entropy_with_logits(logits, targets.float(), reduction='none')
+
+        # Compute probabilities using logits
+        probas = torch.sigmoid(logits)
+
+        # Compute p_t based on targets
         p_t = torch.where(targets == 1, probas, 1 - probas)
+
+        # Apply focal factor
         focal_factor = (1 - p_t) ** self.beta
         focal_loss = focal_factor * bce_loss
-        alpha_factor = torch.where(targets == 1,torch.tensor(self.alpha_pos, dtype=outputs.dtype, device=outputs.device),torch.tensor(self.alpha_neg, dtype=outputs.dtype, device=outputs.device))
+
+        # Apply alpha scaling
+        alpha_factor = torch.where(
+            targets == 1,
+            torch.tensor(self.alpha_pos, dtype=logits.dtype, device=logits.device),
+            torch.tensor(self.alpha_neg, dtype=logits.dtype, device=logits.device)
+        )
         focal_loss = alpha_factor * focal_loss
 
         # Apply class-specific weights if provided
@@ -179,13 +191,16 @@ class BinaryFocalLoss(nn.Module):
             weight_factor = torch.where(targets == 1, self.weights[1], self.weights[0])
             focal_loss = weight_factor * focal_loss
 
+        # Apply reduction
         if self.reduction == 'mean':
             return focal_loss.mean()
         elif self.reduction == 'sum':
             return focal_loss.sum()
         return focal_loss
+
+
 ####################################### My Modified Focal Combo Loss with regular dice loss ###########################################
-class FocalComboLoss_M(nn.Module):
+class FocalComboLoss_M(torch.nn.Module):
     def __init__(
         self, 
         alpha_pos=0.75, 
@@ -239,7 +254,7 @@ class FocalComboLoss_M(nn.Module):
 ########################### Focal Combo loss with modified dice loss( paper) ################
 
 import torch.nn.functional as F
-class FocalComboLoss_P(nn.Module):
+class FocalComboLoss_P(torch.nn.Module):
     def __init__(
         self,
         alpha=0.25,
@@ -315,7 +330,8 @@ class DensityLoss(torch.nn.Module):
         self.th= 1e-6
         # take a single input feature and produces a single output feature
         self.binary_head= torch.nn.Linear(1,1)
-        self.loss = BCEWithLogitsLoss()
+        self.loss = BinaryFocalLoss(alpha_pos=2, alpha_neg=1, beta=4, reduction=reduction)
+        # self.loss = BCEWithLogitsLoss()
     def forward(self, output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
         '''
         Args:

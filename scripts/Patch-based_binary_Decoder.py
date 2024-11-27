@@ -38,8 +38,8 @@ batch_size=8
 down_ratio = 2
 train_dataset = BinaryFolderDataset(
     preprocess=preprocess,
-    csv_file='/herdnet/DATASETS/CAH_no_margins_30/train/Train_binary_gt.csv',
-    root_dir='/herdnet/DATASETS/CAH_no_margins_30/train/',
+    csv_file='/herdnet/DATASETS/TRAIN_patches_no_margin_5/TRAIN_gt_no_margin.csv',
+    root_dir='/herdnet/DATASETS/TRAIN_patches_no_margin_5',
     albu_transforms=A.Compose([
         A.VerticalFlip(p=0.5),
         A.HorizontalFlip(p=0.5),
@@ -60,8 +60,8 @@ import os
 from PIL import Image
 val_dataset = BinaryFolderDataset(
     preprocess=preprocess,
-    csv_file='/herdnet/DATASETS/CAH_no_margins_30/val/Val_binary_gt.csv',
-    root_dir='/herdnet/DATASETS/CAH_no_margins_30/val/',
+    csv_file='/herdnet/DATASETS/VAL_patches_no_margin_5/VAL_gt_no_margin.csv',
+    root_dir='/herdnet/DATASETS/VAL_patches_no_margin_5/',
     albu_transforms=A.Compose([
         A.Normalize(p=1.0),
         ToTensorV2()
@@ -75,8 +75,8 @@ val_dataset = BinaryFolderDataset(
 
 test_dataset = BinaryFolderDataset(
     preprocess=preprocess,
-    csv_file='/herdnet/DATASETS/CAH_no_margins_30/test/Test_binary_gt.csv',
-    root_dir='/herdnet/DATASETS/CAH_no_margins_30/test/',
+    csv_file='/herdnet/DATASETS/TEST_patches_no_margin_5/TEST_gt_no_margin.csv',
+    root_dir='/herdnet/DATASETS/TEST_patches_no_margin_5/',
     albu_transforms=A.Compose([
         A.Normalize(p=1.0),
         ToTensorV2()
@@ -110,25 +110,36 @@ val_dataloader = DataLoader(dataset = val_dataset, sampler=val_sampler, collate_
 test_dataloader= DataLoader(dataset = test_dataset, batch_size=1 , shuffle= False, collate_fn=BinaryFolderDataset.collate_fn)
 num_classes=2
 image= torch.ones([1,3,512,512]).cuda()
-# Number of patches per class (train datset)
-total_patches = len(train_dataset)
-# empty_patches = 7960
-empty_patches=1502
-non_empty_patches = 1502
-# Class weights
-weight_for_empty = total_patches / (2 * empty_patches)
-weight_for_non_empty = total_patches / (2 * non_empty_patches)
-weights = [weight_for_empty, weight_for_non_empty]
-# Define the model(with saved imagenet weights)
-# dla_encoder = DLAEncoder(num_classes=num_classes, pretrained=False).cuda()
-# dla_encoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pth')
+
 ##### DLA AutoEncoder 
 dla_encoder_decoder = DLAEncoderDecoder(num_classes=num_classes, pretrained=False, down_ratio=down_ratio).cuda()
 dla_encoder_decoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pth')
+
+
+# Define a function for weight initialization (random weights) ###########
+import torch.nn as nn
+def initialize_weights(module):
+    if isinstance(module, (nn.Conv2d, nn.Linear)):
+        nn.init.kaiming_normal_(module.weight, mode='fan_out', nonlinearity='relu')
+        if module.bias is not None:
+            nn.init.constant_(module.bias, 0)
+    elif isinstance(module, nn.BatchNorm2d):
+        nn.init.constant_(module.weight, 1)
+        nn.init.constant_(module.bias, 0)
+# # Initialize model without pretrained weights
+# dla_encoder_decoder = DLAEncoderDecoder(num_classes=num_classes, pretrained=False, down_ratio=down_ratio).cuda()
+# # Apply the weight initialization function to the model
+# dla_encoder_decoder.apply(initialize_weights)
+#################################################
+##### ImageNet weights ###########################
+# dla_encoder_decoder = DLAEncoderDecoder(num_classes=num_classes, pretrained=False, down_ratio=down_ratio).cuda()
+# dla_encoder_decoder.load_custom_pretrained_weights('/herdnet/pth_files/dla34-ba72cf86.pth')
 ######## Density Loss ############
 losses = [
     {'loss': DensityLoss(reduction='mean', eps=1e-6), 'idx': 0, 'idy': 0, 'lambda': 1.0, 'name': 'density_loss'},
 ]
+######## Density Loss ############
+
 
 # herdnet = LossWrapper(dla_encoder_decoder, losses=losses)
 dla_encoder_decoder = LossWrapper(dla_encoder_decoder, losses=losses)
@@ -177,7 +188,7 @@ from animaloc.eval import ImageLevelMetrics, HerdNetStitcher, TileEvaluator
 from animaloc.utils.useful_funcs import mkdir
 
 work_dir = '/herdnet/val_output'
-mkdir(work_dir)
+# mkdir(work_dir)
 weight_decay = 1e-4
 epochs = 100
 
@@ -223,113 +234,116 @@ if wandb.run is not None:
   wandb.finish()
 
 wandb.init(project="herdnet_pretrain")
-####### Ploting Heatmaps ############
-output_dir = '/herdnet/val_output/before_training'
-os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
+# ####### Ploting Heatmaps ############
+# output_dir = '/herdnet/val_output/before_training'
+# os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
 
-def generate_heatmaps(val_dataloader, model, epoch, work_dir):
-    output_dir = os.path.join(work_dir, f'epoch_{epoch}_heatmaps')
-    os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
+# def generate_heatmaps(val_dataloader, model, epoch, work_dir):
+#     output_dir = os.path.join(work_dir, f'epoch_{epoch}_heatmaps')
+#     os.makedirs(output_dir, exist_ok=True)  # Create directory if it doesn't exist
 
-    # Ensure the model is in evaluation mode
-    model.eval()
+#     # Ensure the model is in evaluation mode
+#     model.eval()
 
-    # Get a batch from the validation dataloader
-    images, targets = next(iter(val_dataloader))  
-    images = images.to('cuda')  # Move images to GPU
+#     # Get a batch from the validation dataloader
+#     images, targets = next(iter(val_dataloader))  
+#     images = images.to('cuda')  # Move images to GPU
 
-    # Get heatmaps
-    with torch.no_grad():  # Disable gradient computation
-        output = model(images)  # Get the output from the model
+#     # Get heatmaps
+#     with torch.no_grad():  # Disable gradient computation
+#         output = model(images)  # Get the output from the model
 
-    # Extract heatmaps from the output tuple
-    heatmaps = output[0][0]  # The heatmaps tensor
-    heatmaps = heatmaps.cpu().numpy()  # Move the heatmaps to CPU and convert to numpy
+#     # Extract heatmaps from the output tuple
+#     heatmaps = output[0][0]  # The heatmaps tensor
+#     heatmaps = heatmaps.cpu().numpy()  # Move the heatmaps to CPU and convert to numpy
 
-    # Get image IDs from the targets
-    image_ids = targets['image_name'][0]  # Extract the list of image names
+#     # Get image IDs from the targets
+#     image_ids = targets['image_name'][0]  # Extract the list of image names
 
-    # Ensure the lengths match before proceeding
-    assert len(image_ids) == heatmaps.shape[0], "Mismatch between the number of heatmaps and image IDs!"
+#     # Ensure the lengths match before proceeding
+#     assert len(image_ids) == heatmaps.shape[0], "Mismatch between the number of heatmaps and image IDs!"
 
-    # Plot and save the heatmaps for each image in the batch
-    for j in range(heatmaps.shape[0]):
-        # Normalize the heatmap values to range [0, 1]
-        heatmap = heatmaps[j, 0]
-        heatmap_min = heatmap.min()
-        heatmap_max = heatmap.max()
-        normalized_heatmap = (heatmap - heatmap_min) / (heatmap_max - heatmap_min + 1e-6)  # Avoid division by zero
+#     # Plot and save the heatmaps for each image in the batch
+#     for j in range(heatmaps.shape[0]):
+#         # Normalize the heatmap values to range [0, 1]
+#         heatmap = heatmaps[j, 0]
+#         heatmap_min = heatmap.min()
+#         heatmap_max = heatmap.max()
+#         normalized_heatmap = (heatmap - heatmap_min) / (heatmap_max - heatmap_min + 1e-6)  # Avoid division by zero
         
-        plt.figure(figsize=(10, 10))
-        plt.imshow(normalized_heatmap, cmap='hot', interpolation='nearest')  # Plot normalized heatmap
-        plt.title(f'Heatmap for Image ID {image_ids[j]} (Epoch {epoch})')
+#         plt.figure(figsize=(10, 10))
+#         plt.imshow(normalized_heatmap, cmap='hot', interpolation='nearest')  # Plot normalized heatmap
+#         plt.title(f'Heatmap for Image ID {image_ids[j]} (Epoch {epoch})')
         
-        # Save the plot with the image ID and epoch number in the filename
-        output_path = os.path.join(output_dir, f'heatmap_image_{image_ids[j]}_epoch_{epoch}.png')
-        plt.savefig(output_path)
-        plt.close()
+#         # Save the plot with the image ID and epoch number in the filename
+#         output_path = os.path.join(output_dir, f'heatmap_image_{image_ids[j]}_epoch_{epoch}.png')
+#         plt.savefig(output_path)
+#         plt.close()
 
-    print(f"Heatmaps saved for epoch {epoch} in {output_dir}")
+#     print(f"Heatmaps saved for epoch {epoch} in {output_dir}")
 
-def train_with_heatmap_generation(train_dataloader, val_dataloader, model, num_epochs, checkpoint_epoch, work_dir, warmup_iters=None):
-    optimizer = Adam(params=model.parameters(), lr=1e-4, weight_decay=1e-3)
-    density_loss = DensityLoss()  # Assuming DensityLoss is defined elsewhere in your code
+# def train_with_heatmap_generation(train_dataloader, val_dataloader, model, num_epochs, checkpoint_epoch, work_dir, warmup_iters=None):
+#     optimizer = Adam(params=model.parameters(), lr=1e-4, weight_decay=1e-3)
+#     density_loss = DensityLoss()  # Assuming DensityLoss is defined elsewhere in your code
 
-    for epoch in range(1, num_epochs + 1):
-        print(f"Epoch {epoch}/{num_epochs}: Training...")
-        model.train()  # Set the model to training mode
+#     for epoch in range(1, num_epochs + 1):
+#         print(f"Epoch {epoch}/{num_epochs}: Training...")
+#         model.train()  # Set the model to training mode
         
-        for batch_idx, (images, targets) in enumerate(train_dataloader):
-            images = images.to('cuda')
-            targets = targets['binary'].to('cuda')
+#         for batch_idx, (images, targets) in enumerate(train_dataloader):
+#             images = images.to('cuda')
+#             targets = targets['binary'].to('cuda')
 
-            optimizer.zero_grad()  # Zero the gradients
-            outputs = model(images)
+#             optimizer.zero_grad()  # Zero the gradients
+#             outputs = model(images)
 
-            density_mean = outputs[1]
-            loss = density_loss(density_mean, targets)
+#             density_mean = outputs[1]
+#             loss = density_loss(density_mean, targets)
 
-            loss.backward()
+#             loss.backward()
 
-            # Apply warmup iterations if specified
-            if warmup_iters and epoch == 1 and batch_idx < warmup_iters:
-                warmup_factor = float(batch_idx + 1) / warmup_iters
-                for param_group in optimizer.param_groups:
-                    for param in param_group['params']:
-                        if param.grad is not None:
-                            param.grad *= warmup_factor  # Scale the gradients during warmup
+#             # Apply warmup iterations if specified
+#             if warmup_iters and epoch == 1 and batch_idx < warmup_iters:
+#                 warmup_factor = float(batch_idx + 1) / warmup_iters
+#                 for param_group in optimizer.param_groups:
+#                     for param in param_group['params']:
+#                         if param.grad is not None:
+#                             param.grad *= warmup_factor  # Scale the gradients during warmup
             
-            optimizer.step()
+#             optimizer.step()
 
-            # Log gradients and loss
-            for name, param in model.named_parameters():
-                if param.grad is not None:
-                    print(f"{name}: Grad mean = {param.grad.abs().mean()}")
-                else:
-                    print(f"{name}: No gradient computed")
+#             # Log gradients and loss
+#             for name, param in model.named_parameters():
+#                 if param.grad is not None:
+#                     print(f"{name}: Grad mean = {param.grad.abs().mean()}")
+#                 else:
+#                     print(f"{name}: No gradient computed")
                     
-            print(f"Batch {batch_idx+1}/{len(train_dataloader)}, Loss: {loss.item()}")
+#             print(f"Batch {batch_idx+1}/{len(train_dataloader)}, Loss: {loss.item()}")
 
-        # Generate heatmaps at specified intervals
-        if epoch > 0 and epoch % checkpoint_epoch == 0:
-            generate_heatmaps(val_dataloader, model, epoch, work_dir)
+#         # Generate heatmaps at specified intervals
+#         if epoch > 0 and epoch % checkpoint_epoch == 0:
+#             generate_heatmaps(val_dataloader, model, epoch, work_dir)
 
-        # Ensure to switch back to training mode after evaluation
-        model.train()
+#         # Ensure to switch back to training mode after evaluation
+#         model.train()
 
-    print("Training completed.")
+#     print("Training completed.")
     
 
-num_epochs = 100
-checkpoint_epoch = 100  # Generate heatmaps every 10 epochs
-work_dir = '/herdnet/val_output/after_training'
-warmup_iters=100
-train_with_heatmap_generation(train_dataloader, val_dataloader, dla_encoder_decoder, num_epochs, checkpoint_epoch, work_dir,warmup_iters=warmup_iters)
-
+# num_epochs = 100
+# checkpoint_epoch = 100  # Generate heatmaps every 10 epochs
+# work_dir = '/herdnet/val_output/after_training'
+# warmup_iters=100
+# train_with_heatmap_generation(train_dataloader, val_dataloader, dla_encoder_decoder, num_epochs, checkpoint_epoch, work_dir,warmup_iters=warmup_iters)
+########################################################################
 
 
 # trainer.resume(pth_path='/herdnet/herdnet/Binary_pth/binary_20240829.pth', checkpoints='best', select='max', validate_on='f1_score', load_optim=True, wandb_flag=False)
 trainer.start(warmup_iters=100, checkpoints='best', select='max', validate_on='f1_score', wandb_flag =True)
+from animaloc.models import load_model
+pth_path = trainer.best_model_file 
+herdnet = load_model(dla_encoder_decoder, pth_path=pth_path)
 ###### Evaluator ######
 val_f1_score=evaluator.evaluate(returns='f1_score', viz=True, wandb_flag =False)
 
@@ -496,27 +510,10 @@ print(f"F1 score = {test_f1_score * 100:0.0f}%")
 test_results = test_evaluator.results
 test_results.to_csv('/herdnet/test_output/new_Binary_test_results.csv', index=False)
 
-#Get the test detections
-test_detections=test_evaluator.detections
+# Get the test detections and save to CSV with renamed columns
+test_detections = test_evaluator.detection_test()
+# Rename columns directly in the DataFrame
+test_detections.rename(columns={'true_binary': 'Ground truth', 'predicted_binary': 'Prediction'}, inplace=True)
+# Save to CSV
 test_detections.to_csv('/herdnet/test_output/new_Binary_test_detections.csv', index=False)
 
-# TEST_DATASETS
-test_detections.rename(columns={'binary': 'Ground truth','count_1': 'empty_count', 'count_2': 'non_empty_count'}, inplace=True)
-detections_df=pd.read_csv('/herdnet/test_output/new_Binary_test_detections.csv')
-############### Comparison of the detections and gt #########
-gt_df = pd.read_csv('/herdnet/DATASETS/CAH_no_margins_30/test/Test_binary_gt.csv')
-# Create a new column 'Ground_truth' in df_detection and initialize with NaN
-detections_df['Ground_truth'] = pd.NA
-
-# Create a dictionary from the gt DataFrame for quick lookup
-gt_dict = pd.Series(gt_df['binary'].values, index=gt_df['images']).to_dict()
-
-# Iterate over each row in the detection DataFrame
-for index, row in detections_df.iterrows():
-    image_id = row['images']
-    # Check if the current image_id is in the gt_dict and assign the corresponding binary value
-    if image_id in gt_dict:
-        detections_df.at[index, 'Ground_truth'] = gt_dict[image_id]
-
-# Save the updated DataFrame back to a new CSV 
-detections_df.to_csv('/herdnet/test_output/new_Test_Final_detection_file.csv', index=False)

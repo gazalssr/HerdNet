@@ -652,3 +652,46 @@ class TileEvaluator(Evaluator):
             return self.metrics.accuracy()
         elif returns == 'mAP':
             return mAP
+def detection_test(self) -> pandas.DataFrame:
+        """
+        Specific test-time detection function to output predictions and ground truth.
+        Saves results for each image in a DataFrame.
+
+        Returns:
+            pd.DataFrame containing 'image_name', 'true_binary', and 'predicted_binary' columns.
+        """
+        self.model.eval()
+        results = []
+
+        with torch.no_grad():
+            for images, targets in self.dataloader:
+                images = images.to(self.device)
+                targets['binary'] = targets['binary'].to(self.device)
+
+                # Inference
+                outputs = self.model(images)
+
+                # If outputs is a tuple, assume the first element is the prediction tensor
+                if isinstance(outputs, tuple):
+                    outputs = outputs[0]
+
+                # Apply sigmoid to the output to obtain probabilities
+                outputs = torch.sigmoid(outputs)
+
+                # Collect predictions and ground truth
+                for i in range(images.size(0)):
+                    image_name = targets['image_name'][i]
+                    predicted_binary = 1 if outputs[i].item() >= self.threshold else 0
+                    true_binary = targets['binary'][i].item()
+
+                    results.append({
+                        'image_name': image_name,
+                        'true_binary': true_binary,
+                        'predicted_binary': predicted_binary
+                    })
+
+                    # print(f"Image: {image_name}, True Binary: {true_binary}, Predicted Binary: {predicted_binary}")
+
+        # Convert results to DataFrame and return
+        results_df = pandas.DataFrame(results)
+        return results_df
