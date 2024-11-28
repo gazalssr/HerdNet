@@ -26,7 +26,7 @@ from typing import Optional
 from .register import MODELS
 
 from . import dla as dla_modules
-
+########## This DLAEcoderDecoder works well (in terms of sigmoid appliance etc) ##################
 
 @MODELS.register()
 #DLA encoder with batch normalization

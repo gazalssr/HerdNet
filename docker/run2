@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -e
+
+if [[ -n "${HERDNET_DEBUG}" ]]; then
+    set -x
+fi
+
+source $(dirname "$0")/env
+
+function usage() {
+    echo -n \
+        "Usage: $(basename "$0")
+Run a console in a docker container with all prerequisites installed.
+"
+}
+
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+    docker run --rm -it --gpus all\
+        -v /home/serg3401/DEV/HerdNet/DATASETS:/herdnet/DATASETS \
+        --ipc=host \
+        -v /home/serg3401/DEV/HerdNet:/herdnet \
+        -p 8000:8000 $1 \
+        --entrypoint /bin/bash \
+        sfoucherq/herdnet:local
+fi

@@ -13,7 +13,7 @@ __copyright__ = \
 __author__ = "Alexandre Delplanque"
 __license__ = "CC BY-NC-SA 4.0"
 __version__ = "0.2.0"
-
+################# This version of Tile Evaluator works well (i found this after ttrying a lot ##########################)
 
 import torch
 import pandas

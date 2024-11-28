@@ -144,34 +144,50 @@ import torch.nn.functional as F
 class BinaryFocalLoss(nn.Module):
     def __init__(
         self, 
-         alpha_pos=2, 
-         alpha_neg=1, 
-         beta=4, 
-         reduction='mean', 
-         weights=None, 
-         eps=1e-6):
+        alpha_pos=2, 
+        alpha_neg=1, 
+        beta=4, 
+        reduction='mean', 
+        weights=None, 
+        eps=1e-6
+    ):
         super(BinaryFocalLoss, self).__init__()
-        self.alpha_pos = alpha_pos  # Alpha for controlling emphasis on positive samples
-        self.alpha_neg = alpha_neg  # Alpha for controlling emphasis on negative samples
-        self.beta = beta    # beta focuses more on hard examples
+        self.alpha_pos = alpha_pos  # Emphasis on positive samples
+        self.alpha_neg = alpha_neg  # Emphasis on negative samples
+        self.beta = beta  # Focusing parameter for hard examples
         self.reduction = reduction
-        self.weights = weights  # Weights for each class
+        self.weights = weights  # Class weights
         self.eps = eps
-    
 
-    def forward(self, outputs, targets):
-        # Ensuring outputs are clamped to avoid log(0)
-        outputs = torch.clamp(outputs, min=self.eps, max=1 - self.eps)
+    def forward(self, logits, targets):
+        """
+        Args:
+            logits (torch.Tensor): Raw logits output from the model (not probabilities).
+            targets (torch.Tensor): Ground truth labels (0 or 1).
+        """
+        # Ensure logits and targets are of the same size
+        if targets.size() != logits.size():
+            targets = targets.view_as(logits)
 
-        # Calculate the basic binary cross entropy loss
-        if targets.size() != outputs.size():  ##### Added this line
-            targets = targets.view_as(outputs)
-        bce_loss = F.binary_cross_entropy_with_logits(outputs, targets.float(), reduction='none') #####
-        probas = torch.sigmoid(outputs)
+        # Binary cross-entropy loss with logits (no sigmoid applied yet)
+        bce_loss = F.binary_cross_entropy_with_logits(logits, targets.float(), reduction='none')
+
+        # Compute probabilities using logits
+        probas = torch.sigmoid(logits)
+
+        # Compute p_t based on targets
         p_t = torch.where(targets == 1, probas, 1 - probas)
+
+        # Apply focal factor
         focal_factor = (1 - p_t) ** self.beta
         focal_loss = focal_factor * bce_loss
-        alpha_factor = torch.where(targets == 1,torch.tensor(self.alpha_pos, dtype=outputs.dtype, device=outputs.device),torch.tensor(self.alpha_neg, dtype=outputs.dtype, device=outputs.device))
+
+        # Apply alpha scaling
+        alpha_factor = torch.where(
+            targets == 1,
+            torch.tensor(self.alpha_pos, dtype=logits.dtype, device=logits.device),
+            torch.tensor(self.alpha_neg, dtype=logits.dtype, device=logits.device)
+        )
         focal_loss = alpha_factor * focal_loss
 
         # Apply class-specific weights if provided
@@ -179,11 +195,13 @@ class BinaryFocalLoss(nn.Module):
             weight_factor = torch.where(targets == 1, self.weights[1], self.weights[0])
             focal_loss = weight_factor * focal_loss
 
+        # Apply reduction
         if self.reduction == 'mean':
             return focal_loss.mean()
         elif self.reduction == 'sum':
             return focal_loss.sum()
         return focal_loss
+
 ####################################### My Modified Focal Combo Loss with regular dice loss ###########################################
 class FocalComboLoss_M(nn.Module):
     def __init__(
@@ -298,104 +316,153 @@ from torch.nn import CrossEntropyLoss, BCEWithLogitsLoss, L1Loss
     
 import torch
 
+# class DensityLoss(torch.nn.Module):
+#     def __init__(
+#         self,
+#         reduction: str = 'mean',
+#         eps: float = 1e-6
+#         ) -> None:
+
+#         super().__init__()
+
+#         assert reduction in ['mean', 'max'], \
+#             f'Reduction must be either \'mean\' or \'max\', got {reduction}'
+
+#         self.reduction = reduction
+#         self.eps = eps
+#         self.th= 1e-6
+#         # take a single input feature and produces a single output feature
+#         self.binary_head= torch.nn.Linear(1,1)
+#         self.loss = BCEWithLogitsLoss()
+#     def forward(self, output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+#         '''
+#         Args:
+#             output (torch.Tensor): [B,C,H,W]
+#             target (torch.Tensor): [B,C,H,W]
+
+#         Returns:
+#             torch.Tensor
+#         '''
+
+#         return self._neg_loss(output, target)
+#  ################# neg_loss based on Max values in heatmap #####
+#     # def _neg_loss(self, output: torch.Tensor, target: torch.Tensor):
+#     #     output = torch.clamp(output, min=self.eps, max=1-self.eps)
+        
+#     #     # Use max over spatial dimensions to determine if there's a significant activation
+#     #     if output.dim() == 4:  # [batch_size, channels, height, width]
+#     #         m = output.max(dim=[1, 2, 3])[0]  # max over spatial dimensions
+#     #     elif output.dim() == 3:  # [batch_size, channels, spatial_dim]
+#     #         m = output.max(dim=[1, 2])[0]  # max over channels and spatial dimensions
+#     #     elif output.dim() == 2:  # [batch_size, channels]
+#     #         m = output.max(dim=1)[0]  # max over channels
+#     #     else:
+#     #         raise ValueError(f"Unexpected output tensor with shape: {output.shape}")
+        
+#     #     # Apply threshold to filter out low activations
+#     #     m = torch.where(m > self.eps, m, torch.zeros_like(m))
+        
+#     #     # Ensure m has shape [batch_size, 1]
+#     #     m = m.unsqueeze(1)
+
+#     #     # Move m and target to the same device as binary_head
+#     #     device = self.binary_head.weight.device
+#     #     m = m.to(device)
+#     #     target = target.to(device)
+
+#     #     logits = self.binary_head(m)
+#     #     return self.loss(logits, target)
+
+    
+#  ###############################################################
+#     def _neg_loss(self, output: torch.Tensor, target: torch.Tensor):
+#         # output = torch.clamp(output, min=self.eps, max=1-self.eps)
+
+#         # If target is a dictionary, extract the tensor (assuming a 'binary' key)
+#         if isinstance(target, dict):
+#             target = target.get('binary', None)
+#             if target is None:
+#                 raise ValueError("The target dictionary does not contain a 'binary' key.")
+
+#         # Check the number of dimensions and compute the mean accordingly
+#         if output.dim() == 4:  # [batch_size, channels, height, width]
+#             m = output.mean(dim=[1, 2, 3])  # density mean over the spatial dimensions
+#         elif output.dim() == 3:  # [batch_size, channels, spatial_dim]
+#             m = output.mean(dim=[1, 2])  # density mean over channels and spatial dimensions
+#         elif output.dim() == 2:  # [batch_size, channels]
+#             m = output.mean(dim=1)  # density mean over channels
+#         else:
+#             raise ValueError(f"Unexpected output tensor with shape: {output.shape}")
+
+#         # Ensure m has shape [batch_size, 1]
+#         m = m.unsqueeze(1)
+
+#         # Move m to the same device as binary_head
+#         m = m.to(self.binary_head.weight.device)
+
+#         # Compute logits using the binary head
+#         logits = self.binary_head(m)
+
+#         # Move the target to the same device as logits
+#         target = target.to(logits.device)
+
+#         # Reshape or squeeze target to match logits' shape
+#         if target.shape != logits.shape:
+#             target = target.view_as(logits)  # Reshape target to match logits
+
+#         # Convert target to float (same as logits)
+#         target = target.float()
+
+#         # Compute the loss
+#         return self.loss(logits, target)
 class DensityLoss(torch.nn.Module):
     def __init__(
         self,
         reduction: str = 'mean',
         eps: float = 1e-6
-        ) -> None:
-
+    ) -> None:
         super().__init__()
 
+        # Validate reduction method
         assert reduction in ['mean', 'max'], \
             f'Reduction must be either \'mean\' or \'max\', got {reduction}'
 
         self.reduction = reduction
         self.eps = eps
-        self.th= 1e-6
-        # take a single input feature and produces a single output feature
-        self.binary_head= torch.nn.Linear(1,1)
-        self.loss = BCEWithLogitsLoss()
+
+        # Binary head for logits
+        self.binary_head = torch.nn.Linear(1, 1)
+
+        # Updated BinaryFocalLoss works directly with logits
+        self.loss = BinaryFocalLoss(alpha_pos=1.5, alpha_neg=1, beta=2.5, reduction=reduction)
+        # self.loss=BCEWithLogitsLoss()
+        self.binary_head = self.binary_head.to("cuda")  # Move binary_head to GPU
+
     def forward(self, output: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
-        '''
-        Args:
-            output (torch.Tensor): [B,C,H,W]
-            target (torch.Tensor): [B,C,H,W]
-
-        Returns:
-            torch.Tensor
-        '''
-
         return self._neg_loss(output, target)
- ################# neg_loss based on Max values in heatmap #####
-    # def _neg_loss(self, output: torch.Tensor, target: torch.Tensor):
-    #     output = torch.clamp(output, min=self.eps, max=1-self.eps)
-        
-    #     # Use max over spatial dimensions to determine if there's a significant activation
-    #     if output.dim() == 4:  # [batch_size, channels, height, width]
-    #         m = output.max(dim=[1, 2, 3])[0]  # max over spatial dimensions
-    #     elif output.dim() == 3:  # [batch_size, channels, spatial_dim]
-    #         m = output.max(dim=[1, 2])[0]  # max over channels and spatial dimensions
-    #     elif output.dim() == 2:  # [batch_size, channels]
-    #         m = output.max(dim=1)[0]  # max over channels
-    #     else:
-    #         raise ValueError(f"Unexpected output tensor with shape: {output.shape}")
-        
-    #     # Apply threshold to filter out low activations
-    #     m = torch.where(m > self.eps, m, torch.zeros_like(m))
-        
-    #     # Ensure m has shape [batch_size, 1]
-    #     m = m.unsqueeze(1)
 
-    #     # Move m and target to the same device as binary_head
-    #     device = self.binary_head.weight.device
-    #     m = m.to(device)
-    #     target = target.to(device)
-
-    #     logits = self.binary_head(m)
-    #     return self.loss(logits, target)
-
-    
- ###############################################################
     def _neg_loss(self, output: torch.Tensor, target: torch.Tensor):
-        # output = torch.clamp(output, min=self.eps, max=1-self.eps)
-
-        # If target is a dictionary, extract the tensor (assuming a 'binary' key)
+        # Handle case where target is a dictionary with a 'binary' key
         if isinstance(target, dict):
             target = target.get('binary', None)
             if target is None:
                 raise ValueError("The target dictionary does not contain a 'binary' key.")
 
-        # Check the number of dimensions and compute the mean accordingly
+        # Compute spatial mean of output to reduce dimensions
         if output.dim() == 4:  # [batch_size, channels, height, width]
-            m = output.mean(dim=[1, 2, 3])  # density mean over the spatial dimensions
+            m = output.mean(dim=[1, 2, 3])  # Mean over spatial dimensions
         elif output.dim() == 3:  # [batch_size, channels, spatial_dim]
-            m = output.mean(dim=[1, 2])  # density mean over channels and spatial dimensions
+            m = output.mean(dim=[1, 2])  # Mean over spatial dimensions
         elif output.dim() == 2:  # [batch_size, channels]
-            m = output.mean(dim=1)  # density mean over channels
+            m = output.mean(dim=1)  # Mean over channels
         else:
-            raise ValueError(f"Unexpected output tensor with shape: {output.shape}")
-
-        # Ensure m has shape [batch_size, 1]
-        m = m.unsqueeze(1)
-
-        # Move m to the same device as binary_head
-        m = m.to(self.binary_head.weight.device)
+            raise ValueError(f"Unexpected output tensor shape: {output.shape}")
+        # print(f"Output min: {output.min()}, Output max: {output.max()}, Output mean: {output.mean()}")
 
         # Compute logits using the binary head
-        logits = self.binary_head(m)
+        logits = self.binary_head(m.unsqueeze(1).to(self.binary_head.weight.device))
 
-        # Move the target to the same device as logits
-        target = target.to(logits.device)
-
-        # Reshape or squeeze target to match logits' shape
-        if target.shape != logits.shape:
-            target = target.view_as(logits)  # Reshape target to match logits
-
-        # Convert target to float (same as logits)
-        target = target.float()
-
-        # Compute the loss
+        # Ensure the target matches the shape of logits
+        target = target.to(logits.device).view_as(logits).float()
+        # Compute the loss using BinaryFocalLoss
         return self.loss(logits, target)
-
-
